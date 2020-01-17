@@ -2,7 +2,6 @@ local _G = GLOBAL
 local _S = _G.STRINGS
 local IsDLCEnabled = _G.IsDLCEnabled
 local Ingredient = _G.Ingredient
-local GetAllRecipes = _G.GetAllRecipes 
 local Recipe = _G.Recipe
 local RECIPETABS = _G.RECIPETABS
 local TECH = _G.TECH
@@ -34,29 +33,39 @@ if IsDLCEnabled(3) then
 	Ingredient("twigs", 2) 
 	}, 
 	RECIPETABS.DRESS, TECH.NONE, "common")
-	mermhat.atlas = "images/inventoryimages/mermhat.xml"
-	
-elseif IsDLCEnabled(2) then
-	local mermhat = Recipe("mermhat",
+	mermhat.atlas = "images/inventoryimages/mermhat.xml"	
+	mermhat.image = "mermhat.tex"
+
+	local mermhat_sw = Recipe("mermhat",
 	{ 
 	Ingredient("tropical_fish", 1), 
 	Ingredient("cutreeds", 1), 
 	Ingredient("twigs", 2) 
 	}, 
 	RECIPETABS.DRESS, TECH.NONE, "shipwrecked") 
-	mermhat.atlas = "images/inventoryimages/mermhat.xml"
-	mermhat.image = "mermhat.tex"
+	mermhat_sw.atlas = "images/inventoryimages/mermhat.xml"
+	mermhat_sw.image = "mermhat.tex"
 	
-	local mermhat2 = Recipe("mermhat2",
+elseif IsDLCEnabled(2) then
+	local mermhat = Recipe("mermhat",
 	{ 
 	Ingredient("fish", 1), 
 	Ingredient("cutreeds", 1), 
 	Ingredient("twigs", 2) 
 	}, 
 	RECIPETABS.DRESS, TECH.NONE, "rog") 
-	mermhat2.product = "mermhat"
-	mermhat2.atlas = "images/inventoryimages/mermhat.xml"	
-	mermhat2.image = "mermhat.tex"
+	mermhat.atlas = "images/inventoryimages/mermhat.xml"	
+	mermhat.image = "mermhat.tex"
+	
+	local mermhat_sw = Recipe("mermhat",
+	{ 
+	Ingredient("tropical_fish", 1), 
+	Ingredient("cutreeds", 1), 
+	Ingredient("twigs", 2) 
+	}, 
+	RECIPETABS.DRESS, TECH.NONE, "shipwrecked") 
+	mermhat_sw.atlas = "images/inventoryimages/mermhat.xml"
+	mermhat_sw.image = "mermhat.tex"
 	
 else
 	local mermhat = Recipe("mermhat",
@@ -74,8 +83,6 @@ end
 
 _S.NAMES.MERMHAT = "Clever Disguise"
 _S.RECIPE_DESC.MERMHAT = "Merm-ify your friends."
-_S.NAMES.MERMHAT2 = "Clever Disguise"
-_S.RECIPE_DESC.MERMHAT2 = "Merm-ify your friends."
 
 if _S.CHARACTERS.WALANI 	== nil then _S.CHARACTERS.WALANI 		= { DESCRIBE = {},} end -- DLC002
 if _S.CHARACTERS.WARBUCKS 	== nil then _S.CHARACTERS.WARBUCKS	 	= { DESCRIBE = {},} end -- DLC003
