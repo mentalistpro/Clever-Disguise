@@ -18,12 +18,12 @@ Assets =
 }
 
 ------------------------------------------------------------------------------------------------------------------------
---Config
+-- Config
 
 TUNING.MOD_MERMHAT_PERISH = GetModConfigData("perish")
 
 ------------------------------------------------------------------------------------------------------------------------
---Recipe
+-- Recipe
 
 if IsDLCEnabled(3) then
 	local mermhat = Recipe("mermhat",
@@ -79,7 +79,7 @@ else
 end
 
 ------------------------------------------------------------------------------------------------------------------------
---Strings
+-- Strings
 
 _S.NAMES.MERMHAT = "Clever Disguise"
 _S.RECIPE_DESC.MERMHAT = "Merm-ify your friends."
@@ -112,3 +112,4 @@ _S.CHARACTERS.WORMWOOD.DESCRIBE.MERMHAT 	= {"Glub Glub pretend face"}
 _S.CHARACTERS.WORTOX.DESCRIBE.MERMHAT 		= {"Some would call me two-faced, hyuyu!"}
 _S.CHARACTERS.WURT.DESCRIBE.MERMHAT 		= {"Make scale-less look like friendly Mermfolk!"}
 _S.CHARACTERS.WX78.DESCRIBE.MERMHAT 		= {"WARTY CONCEALMENT"}
+

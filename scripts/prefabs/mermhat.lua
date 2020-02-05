@@ -5,12 +5,8 @@ local assets =
     Asset("IMAGE", "images/inventoryimages/mermhat.tex"),
 }
 
-local prefabs = 
-{
-}
-
 -----------------------------------------------------------------------------------------
---Equipped
+-- Equipped
 
 local function OnEquip(inst, owner)
 	owner.AnimState:OverrideSymbol("swap_hat", "hat_merm", "swap_hat")
@@ -56,7 +52,7 @@ local function OnEquip(inst, owner)
 end
 
 -----------------------------------------------------------------------------------------
---Unequipped
+-- Unequipped
 
 local function OnUnequip(inst, owner)
 	owner.AnimState:Hide("HAT")
@@ -101,7 +97,6 @@ local function OnUnequip(inst, owner)
 end
 
 -----------------------------------------------------------------------------------------
---Mermhat
     
 local function fn()
 	local inst = CreateEntity()
