@@ -135,4 +135,4 @@ local function fn()
     return inst
 end
 
-return  Prefab("common/inventory/mermhat", fn, assets, prefabs)
+return  Prefab("common/inventory/mermhat", fn, assets)

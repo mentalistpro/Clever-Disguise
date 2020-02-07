@@ -1,7 +1,7 @@
 name 		= "Clever Disguise"
 description = "Disguise yourself as a merm"
 author 		= "Mentalistpro"
-version 	= "1.1.9"
+version 	= "1.2"
 forumthread = ""
 api_version = 6
 
