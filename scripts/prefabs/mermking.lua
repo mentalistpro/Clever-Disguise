@@ -408,10 +408,10 @@ local function fn()
 
     inst:SetStateGraph("SGmermking")
 
-    MakeLargeBurnableCharacter(inst, "torso")
+    MakeLargeBurnableCharacter(inst, "krampus_torso")
 
     inst:AddComponent("eater")
-    inst.components.eater:SetVegetarian
+    inst.components.eater:SetVegetarian()
 
     inst:AddComponent("hunger")
     inst.components.hunger:SetMax(TUNING.MERM_KING_HUNGER)
@@ -463,4 +463,4 @@ local function fn()
     return inst
 end
 
-return Prefab("forest/animals/mermking", fn, assets, prefabs)
+return Prefab("common/characters/mermking", fn, assets, prefabs)
