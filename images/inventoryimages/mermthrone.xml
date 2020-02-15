@@ -1,0 +1,6 @@
+﻿<Atlas>
+	<Texture filename="mermthrone.tex" />
+	<Elements>
+		<Element name="0.tex" u1="0.001" u2="0.999" v2="0.999" v1="0.001" variant="" />
+	</Elements>
+</Atlas>

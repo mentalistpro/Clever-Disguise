@@ -1,10 +1,7 @@
 local assets =
 {
     Asset("ANIM", "anim/merm_king_carpet.zip"),
-    Asset("ANIM", "anim/merm_king_carpet_construction.zip"),
-    Asset("MINIMAP_IMAGE", "merm_king_carpet"),
-    Asset("MINIMAP_IMAGE", "merm_king_carpet_occupied"),
-    Asset("MINIMAP_IMAGE", "merm_king_carpet_construction"),
+    Asset("ANIM", "anim/merm_king_carpet_construction.zip")
 }
 
 local prefabs =
@@ -42,9 +39,7 @@ local function onhammered_common(inst, worker)
         inst.components.burnable:Extinguish()
     end
     inst.components.lootdropper:DropLoot()
-    local fx = SpawnPrefab("collapse_big")
-    fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
-    fx:SetMaterial("wood")
+    SpawnPrefab("collapse_big").Transform:SetPosition(inst.Transform:GetWorldPosition())
 end
 
 local function onhammered_construction(inst, worker)
@@ -92,7 +87,7 @@ local function construction_fn()
 
     inst.Transform:SetScale(0.9, 0.9, 0.9)
 
-    inst.MiniMapEntity:SetIcon("merm_king_carpet_construction.png")
+    inst.MiniMapEntity:SetIcon("merm_king_carpet_construction.tex")
     inst:AddTag("constructionsite")
 
     inst:SetPhysicsRadiusOverride(1.5)
@@ -133,7 +128,7 @@ local function OnMermKingCreated(inst, data)
         inst:RemoveComponent("propagator")
         inst:RemoveComponent("burnable")
         
-        inst.MiniMapEntity:SetIcon("merm_king_carpet_occupied.png")
+        inst.MiniMapEntity:SetIcon("merm_king_carpet_occupied.tex")
     end
 end
 
@@ -171,7 +166,7 @@ local function fn()
 
     inst.Transform:SetScale(0.9, 0.9, 0.9)
 
-    inst.MiniMapEntity:SetIcon("merm_king_carpet.png")
+    inst.MiniMapEntity:SetIcon("merm_king_carpet.tex")
 
     inst.AnimState:SetBank("merm_king_carpet")
     inst.AnimState:SetBuild("merm_king_carpet")

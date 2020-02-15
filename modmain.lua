@@ -10,32 +10,46 @@ local TECH = _G.TECH
 
 PrefabFiles = 
 {
-	"mermking"
+	"mermking",
+    "mermsplashes",
+	"mermthrone"
 }
---[[Assets = {
+
+Assets = 
+{
 	Asset("ATLAS", "images/inventoryimages/mermthrone.xml"),
 	Asset("ATLAS", "images/inventoryimages/turf_marsh.xml"),
-   }
+	Asset("ATLAS", "minimap/merm_king_carpet.xml"),
+	Asset("ATLAS", "minimap/merm_king_carpet_construction.xml"),
+	Asset("ATLAS", "minimap/merm_king_carpet_occupied.xml")
+}
 
-AddMinimapAtlas("minimap/mermthrone-0.xml")
-AddMinimapAtlas("minimap/mermthrone-1.xml")
-AddMinimapAtlas("minimap/mermthrone-2.xml")
+AddMinimapAtlas("minimap/merm_king_carpet.xml")
+AddMinimapAtlas("minimap/merm_king_carpet_construction.xml")
+AddMinimapAtlas("minimap/merm_king_carpet_occupied.xml")
 
 
-if STRINGS.CHARACTERS.WAGSTAFF == nil then STRINGS.CHARACTERS.WAGSTAFF = { DESCRIBE = {},	} end -- DLC003
-if STRINGS.CHARACTERS.WALANI == nil then STRINGS.CHARACTERS.WALANI = { DESCRIBE = {},	} end -- DLC002
-if STRINGS.CHARACTERS.WARLY == nil then STRINGS.CHARACTERS.WARLY = { DESCRIBE = {},	} end -- DLC002
-if STRINGS.CHARACTERS.WATHGRITHR == nil then STRINGS.CHARACTERS.WATHGRITHR = { DESCRIBE = {}, }  end -- DLC001
-if STRINGS.CHARACTERS.WEBBER == nil then STRINGS.CHARACTERS.WEBBER = { DESCRIBE = {}, }  end -- DLC001
-if STRINGS.CHARACTERS.WHEELER == nil then STRINGS.CHARACTERS.WHEELER = { DESCRIBE = {}, } end -- DLC003
-if STRINGS.CHARACTERS.WILBA == nil then STRINGS.CHARACTERS.WILBA = { DESCRIBE = {}, } end -- DLC003
-if STRINGS.CHARACTERS.WINONA == nil then STRINGS.CHARACTERS.WINONA = { DESCRIBE = {}, } end -- DST
-if STRINGS.CHARACTERS.WOODLEGS == nil then STRINGS.CHARACTERS.WOODLEGS = { DESCRIBE = {}, } end -- DLC002
-if STRINGS.CHARACTERS.WORMWOOD == nil then STRINGS.CHARACTERS.WORMWOOD = { DESCRIBE = {}, }  end -- DLC003
-if STRINGS.CHARACTERS.WORTOX == nil then STRINGS.CHARACTERS.WORTOX = { DESCRIBE = {}, }  end -- DST
-if STRINGS.CHARACTERS.WURT == nil then STRINGS.CHARACTERS.WURT = { DESCRIBE = {}, } end -- DST
+TUNING.MOD_MERMKING_EXCHANGE_BONUS = 0
+if GetModConfigData("exchange_rate") == 1 then
+	TUNING.MOD_MERMKING_EXCHANGE_BONUS = 2
+elseif GetModConfigData("exchange_rate") == 2 then
+	TUNING.MOD_MERMKING_EXCHANGE_BONUS = 4
+elseif GetModConfigData("exchange_rate") == 3 then
+	TUNING.MOD_MERMKING_EXCHANGE_BONUS = 6
+end
 
--https://dontstarve.fandom.com/wiki/Seawreath
+if _S.CHARACTERS.WAGSTAFF == nil then _S.CHARACTERS.WAGSTAFF = { DESCRIBE = {},	} end -- DLC003
+if _S.CHARACTERS.WALANI == nil then _S.CHARACTERS.WALANI = { DESCRIBE = {},	} end -- DLC002
+if _S.CHARACTERS.WARLY == nil then _S.CHARACTERS.WARLY = { DESCRIBE = {},	} end -- DLC002
+if _S.CHARACTERS.WATHGRITHR == nil then _S.CHARACTERS.WATHGRITHR = { DESCRIBE = {}, }  end -- DLC001
+if _S.CHARACTERS.WEBBER == nil then _S.CHARACTERS.WEBBER = { DESCRIBE = {}, }  end -- DLC001
+if _S.CHARACTERS.WHEELER == nil then _S.CHARACTERS.WHEELER = { DESCRIBE = {}, } end -- DLC003
+if _S.CHARACTERS.WILBA == nil then _S.CHARACTERS.WILBA = { DESCRIBE = {}, } end -- DLC003
+if _S.CHARACTERS.WINONA == nil then _S.CHARACTERS.WINONA = { DESCRIBE = {}, } end -- DST
+if _S.CHARACTERS.WOODLEGS == nil then _S.CHARACTERS.WOODLEGS = { DESCRIBE = {}, } end -- DLC002
+if _S.CHARACTERS.WORMWOOD == nil then _S.CHARACTERS.WORMWOOD = { DESCRIBE = {}, }  end -- DLC003
+if _S.CHARACTERS.WORTOX == nil then _S.CHARACTERS.WORTOX = { DESCRIBE = {}, }  end -- DST
+if _S.CHARACTERS.WURT == nil then _S.CHARACTERS.WURT = { DESCRIBE = {}, } end -- DST
 
 ------------------------------------------------------------------------------------------------------------------------------
 --DIY Royalty Kit
@@ -55,24 +69,24 @@ local mermthrone_construction = Recipe(
 		mermthrone_construction.game_type = "common"
 	end
 	
-	STRINGS.NAMES.MERMTHRONE_CONSTRUCTION = "DIY Royalty Kit"
-	STRINGS.RECIPE_DESC.MERMTHRONE_CONSTRUCTION = "Usher in a new Merm Monarchy."
+	_S.NAMES.MERMTHRONE_CONSTRUCTION = "DIY Royalty Kit"
+	_S.RECIPE_DESC.MERMTHRONE_CONSTRUCTION = "Usher in a new Merm Monarchy."
 
-	STRINGS.CHARACTERS.GENERIC.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"Just what is she planning?"}
-	STRINGS.CHARACTERS.WARLY.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"You have all the ingredients you need?"}
-	STRINGS.CHARACTERS.WATHGRITHR.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"The little beast toils away."}
-	STRINGS.CHARACTERS.WAXWELL.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"What is that little creature up to?"}
-	STRINGS.CHARACTERS.WEBBER.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"Can we help?"}
-	STRINGS.CHARACTERS.WENDY.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"I don't know why you bother."}
-	STRINGS.CHARACTERS.WICKERBOTTOM.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"Careful not to get a splinter, dear."}
-	STRINGS.CHARACTERS.WILLOW.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"What's all this stuff for?"}
-	STRINGS.CHARACTERS.WINONA.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"Whatcha makin' there, kid?"}
-	STRINGS.CHARACTERS.WOLFGANG.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"Tiny fish girl seems very busy."}
-	STRINGS.CHARACTERS.WOODIE.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"You look like you've got this under control."}
-	STRINGS.CHARACTERS.WORMWOOD.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"Making something"}
-	STRINGS.CHARACTERS.WORTOX.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"My my, what mischief are you making?"}
-	STRINGS.CHARACTERS.WURT.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"There lots of Kings in fairy stories... look easy to make!"}
-	STRINGS.CHARACTERS.WX78.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"THE GREEN ONE IS DOING SOMETHING USELESS"}
+	_S.CHARACTERS.GENERIC.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"Just what is she planning?"}
+	_S.CHARACTERS.WARLY.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"You have all the ingredients you need?"}
+	_S.CHARACTERS.WATHGRITHR.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"The little beast toils away."}
+	_S.CHARACTERS.WAXWELL.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"What is that little creature up to?"}
+	_S.CHARACTERS.WEBBER.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"Can we help?"}
+	_S.CHARACTERS.WENDY.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"I don't know why you bother."}
+	_S.CHARACTERS.WICKERBOTTOM.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"Careful not to get a splinter, dear."}
+	_S.CHARACTERS.WILLOW.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"What's all this stuff for?"}
+	_S.CHARACTERS.WINONA.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"Whatcha makin' there, kid?"}
+	_S.CHARACTERS.WOLFGANG.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"Tiny fish girl seems very busy."}
+	_S.CHARACTERS.WOODIE.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"You look like you've got this under control."}
+	_S.CHARACTERS.WORMWOOD.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"Making something"}
+	_S.CHARACTERS.WORTOX.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"My my, what mischief are you making?"}
+	_S.CHARACTERS.WURT.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"There lots of Kings in fairy stories... look easy to make!"}
+	_S.CHARACTERS.WX78.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"THE GREEN ONE IS DOING SOMETHING USELESS"}
 	
 ------------------------------------------------------------------------------------------------------------------------------
 --Marsh Turf
@@ -91,35 +105,35 @@ local turf_marsh = Recipe(
 		turf_marsh.game_type = "common"
 	end
 	
-	STRINGS.NAMES.TURF_MARSH = "Marsh Turf"
-	STRINGS.RECIPE_DESC.TURF_MARSH = "Home is where the marsh is."
+	_S.NAMES.TURF_MARSH = "Marsh Turf"
+	_S.RECIPE_DESC.TURF_MARSH = "Home is where the marsh is."
 
-	STRINGS.CHARACTERS.GENERIC.DESCRIBE.TURF_MARSH = {"A chunk of ground."}
-	STRINGS.CHARACTERS.WAGSTAFF.DESCRIBE.TURF_MARSH = {"A spongy consistency."}
-	STRINGS.CHARACTERS.WALANI.DESCRIBE.TURF_MARSH = {"Goopy..."}
-	STRINGS.CHARACTERS.WARLY.DESCRIBE.TURF_MARSH = {"It's like an ingredient for the ground."}
-	STRINGS.CHARACTERS.WATHGRITHR.DESCRIBE.TURF_MARSH = {"A piece öf the battlefield."}
-	STRINGS.CHARACTERS.WAXWELL.DESCRIBE.TURF_MARSH = {"What is that little creature up to?"}
-	STRINGS.CHARACTERS.WEBBER.DESCRIBE.TURF_MARSH = {"Some pretty average earth."}
-	STRINGS.CHARACTERS.WENDY.DESCRIBE.TURF_MARSH = {"Some ground."}
-	STRINGS.CHARACTERS.WHEELER.DESCRIBE.TURF_MARSH = {"Do I really need to drag this dirt around with me?"}
-	STRINGS.CHARACTERS.WICKERBOTTOM.DESCRIBE.TURF_MARSH = {"The ground. You step on it."}
-	STRINGS.CHARACTERS.WILBA.DESCRIBE.TURF_MARSH = {"'TIS ALL FWOOSHED"}
-	STRINGS.CHARACTERS.WILLOW.DESCRIBE.TURF_MARSH = {"The ground is boring."}
-	STRINGS.CHARACTERS.WINONA.DESCRIBE.TURF_MARSH = {"That's a chunk of squishy ground."}
-	STRINGS.CHARACTERS.WOLFGANG.DESCRIBE.TURF_MARSH = {"Step stones."}
-	STRINGS.CHARACTERS.WOODIE.DESCRIBE.TURF_MARSH = {"Just some ground, eh?"}
-	STRINGS.CHARACTERS.WOODLEGS.DESCRIBE.TURF_MARSH = {"Me ain't no ground lubber."}
-	STRINGS.CHARACTERS.WORMWOOD.DESCRIBE.TURF_MARSH = {"Squishy"}
-	STRINGS.CHARACTERS.WORTOX.DESCRIBE.TURF_MARSH = {"Floor or ceiling, depending on your perspective."}
-	STRINGS.CHARACTERS.WURT.DESCRIBE.TURF_MARSH = {"Ground bit."}
-	STRINGS.CHARACTERS.WX78.DESCRIBE.TURF_MARSH = {"THE GROUND"}]]
+	_S.CHARACTERS.GENERIC.DESCRIBE.TURF_MARSH = {"A chunk of ground."}
+	_S.CHARACTERS.WAGSTAFF.DESCRIBE.TURF_MARSH = {"A spongy consistency."}
+	_S.CHARACTERS.WALANI.DESCRIBE.TURF_MARSH = {"Goopy..."}
+	_S.CHARACTERS.WARLY.DESCRIBE.TURF_MARSH = {"It's like an ingredient for the ground."}
+	_S.CHARACTERS.WATHGRITHR.DESCRIBE.TURF_MARSH = {"A piece öf the battlefield."}
+	_S.CHARACTERS.WAXWELL.DESCRIBE.TURF_MARSH = {"What is that little creature up to?"}
+	_S.CHARACTERS.WEBBER.DESCRIBE.TURF_MARSH = {"Some pretty average earth."}
+	_S.CHARACTERS.WENDY.DESCRIBE.TURF_MARSH = {"Some ground."}
+	_S.CHARACTERS.WHEELER.DESCRIBE.TURF_MARSH = {"Do I really need to drag this dirt around with me?"}
+	_S.CHARACTERS.WICKERBOTTOM.DESCRIBE.TURF_MARSH = {"The ground. You step on it."}
+	_S.CHARACTERS.WILBA.DESCRIBE.TURF_MARSH = {"'TIS ALL FWOOSHED"}
+	_S.CHARACTERS.WILLOW.DESCRIBE.TURF_MARSH = {"The ground is boring."}
+	_S.CHARACTERS.WINONA.DESCRIBE.TURF_MARSH = {"That's a chunk of squishy ground."}
+	_S.CHARACTERS.WOLFGANG.DESCRIBE.TURF_MARSH = {"Step stones."}
+	_S.CHARACTERS.WOODIE.DESCRIBE.TURF_MARSH = {"Just some ground, eh?"}
+	_S.CHARACTERS.WOODLEGS.DESCRIBE.TURF_MARSH = {"Me ain't no ground lubber."}
+	_S.CHARACTERS.WORMWOOD.DESCRIBE.TURF_MARSH = {"Squishy"}
+	_S.CHARACTERS.WORTOX.DESCRIBE.TURF_MARSH = {"Floor or ceiling, depending on your perspective."}
+	_S.CHARACTERS.WURT.DESCRIBE.TURF_MARSH = {"Ground bit."}
+	_S.CHARACTERS.WX78.DESCRIBE.TURF_MARSH = {"THE GROUND"}
+	
 ------------------------------------------------------------------------------------------------------------
 --. Tuning
 
 local seg_time = 30
 local total_day_time = seg_time*16
-
 _T.TOTAL_DAY_TIME  = total_day_time
 
 _T.MERM_KING_HEALTH = 1000
@@ -130,7 +144,7 @@ _T.MERM_KING_HUNGER_KILL_TIME = total_day_time * 2
 _T.MERM_KING_HUNGER_RATE = 200 / (total_day_time * 4)
 
 ------------------------------------------------------------------------------------------------------------
---. Strings
+--. _S
 	
 --//Merm King//
 
