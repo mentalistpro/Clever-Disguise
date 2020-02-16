@@ -5,26 +5,11 @@ local assets =
 
 local prefabs =
 {
-	"durian_seeds",
-	"eggplant_seeds",
-	"fish",
+    "fish",
     "froglegs",
-	"pumpkin_seeds",
-    "seaweed",
-	"spoiled_food",
-	"tentaclespots",
-	"trinket_3", 
-	"trinket_4", 
-	"trinket_12", 
-	"trinket_17", 
-	"trinket_25",
-	"tropical_fish",
-	"merm",
-	--"mermguard",
-	"merm_king_splash",
-    "merm_spawn_fx",
-	"merm_splash",
-	"mermthrone"
+    "kelp",
+    "merm_king_splash",
+    "tropical_fish",
 }
 
 local loot =
@@ -33,8 +18,8 @@ local loot =
     "fish",
     "fish",
     "froglegs",
-    "seaweed",
-    "seaweed",
+    "kelp",
+    "kelp"
 }
 
 local sw_loot =
@@ -43,8 +28,8 @@ local sw_loot =
     "tropical_fish",
     "tropical_fish",
     "froglegs",
-    "seaweed",
-    "seaweed",
+    "kelp",
+    "kelp"
 }
 
 -----------------------------------------------------------------------------------------------------------------------------------
@@ -53,7 +38,7 @@ local sw_loot =
 --#1 Combat
 --#2 Hunger
 --#3 Trade
---#4 OnSave/Load, fn
+--#4 fn()
 
 -----------------------------------------------------------------------------------------------------------------------------------
 --#1 Combat
@@ -69,10 +54,10 @@ local function HealthDelta(inst, data)
                 inst.sg:PushEvent("call_guards")               
                 if not inst.call_guard_task then
                     inst.call_guard_task = inst:DoTaskInTime(TUNING.TOTAL_DAY_TIME, 
-						function() 
-							inst.guards_available = 4
-							inst.call_guard_task = nil
-						end)
+                        function() 
+                            inst.guards_available = 4
+                            inst.call_guard_task = nil
+                        end)
                 end
             end
         end
@@ -88,9 +73,9 @@ local function OnAttacked(inst, data)
         inst.components.combat:SetTarget(attacker)
         local targetshares = MAX_TARGET_SHARES
         inst.components.combat:ShareTarget(attacker, SHARE_TARGET_DIST, 
-			function(sharer)
-				return sharer:HasTag("merm") and not sharer:HasTag("player")
-			end, targetshares)
+            function(sharer)
+                return sharer:HasTag("merm") and not sharer:HasTag("player")
+            end, targetshares)
     end
 end
 
@@ -248,36 +233,34 @@ end
 -----------------------------------------------------------------------------------------------------------------------------------
 --#3 Trade
 
-local x = 0
-
 local trading_items = 
 {
-    { prefabs = { "seaweed"  },       min_count = 2, max_count = 4, reset = false, add_filler = false },
-    { prefabs = { "seaweed"  },       min_count = 2, max_count = 3, reset = false, add_filler = false },
-    { prefabs = { "seeds" },          min_count = 4, max_count = 6, reset = false, add_filler = false },
-    { prefabs = { "spoiled_food"  },  min_count = 2, max_count = 4, reset = false, add_filler = false },
-    { prefabs = { "tentaclespots" },  min_count = 1, max_count = 1, reset = false, add_filler = true  },
-	
-    { prefabs = { "trinket_3" },      min_count = 1, max_count = 1, reset = false, add_filler = true  },
-    { prefabs = { "trinket_4" },      min_count = 1, max_count = 1, reset = false, add_filler = true  },
-    { prefabs = { "trinket_12" },     min_count = 1, max_count = 1, reset = false, add_filler = true  },
-    { prefabs = { "trinket_17" },     min_count = 1, max_count = 1, reset = false, add_filler = true  },
-    { prefabs = { "trinket_25" },     min_count = 1, max_count = 1, reset = false, add_filler = true  },
-	
-    { prefabs = { "durian_seeds" },   min_count = 1, max_count = 2, reset = false, add_filler = true  },
-    { prefabs = { "eggplant_seeds" }, min_count = 1, max_count = 2, reset = false, add_filler = true  },
-    { prefabs = { "pumpkin_seeds" },  min_count = 1, max_count = 2, reset = false, add_filler = true  },
+    { prefabs = { "kelp"  },         min_count = 2, max_count = 4, reset = false, add_filler = false, },
+    { prefabs = { "kelp"  },         min_count = 2, max_count = 3, reset = false, add_filler = false, },
+    { prefabs = { "seeds" },         min_count = 4, max_count = 6, reset = false, add_filler = false, },
+    { prefabs = { "spoiled_food"  }, min_count = 2, max_count = 4, reset = false, add_filler = false, },
+    { prefabs = { "tentaclespots" }, min_count = 1, max_count = 1, reset = false, add_filler = true,  },
+
+    { 
+      prefabs = { "trinket_12", "trinket_3", "trinket_25", "trinket_17", "trinket_4" }, 
+      min_count = 1, max_count = 1, reset = false, add_filler = true,
+    },
+    
+    { 
+        prefabs = { "durian_seeds", "pepper_seeds", "eggplant_seeds", "pumpkin_seeds", "onion_seeds", "garlic_seeds"  }, 
+        min_count = 1, max_count = 2, reset = false, add_filler = true,
+    },
 }
 
-local trading_filler = { "seeds", "seaweed", "seeds", "spoiled_food", "seeds", "seeds"}
+local trading_filler = { "seeds", "kelp", "seeds", "spoiled_food", "seeds", "seeds"}
 
 local function ShouldAcceptItem(inst, item, giver)
-	local giver = GetPlayer()
-	if giver:HasTag("merm") then
-		local can_eat = (item.components.edible and inst.components.eater:CanEat(item)) and (inst.components.hunger and inst.components.hunger:GetPercent() < 1)
-		return can_eat or item.prefab == "fish" or item.prefab == "tropical_fish" or item.prefab == "eel"
-	end
-	return false
+    local giver = GetPlayer()
+    if giver:HasTag("merm") then
+        local can_eat = (item.components.edible and inst.components.eater:CanEat(item)) and (inst.components.hunger and inst.components.hunger:GetPercent() < 1)
+        return can_eat or item.prefab == "fish" or item.prefab == "tropical_fish" or item.prefab == "eel"
+    end
+    return false
 end
 
 local function OnGetItemFromPlayer(inst, giver, item)
@@ -325,8 +308,7 @@ local function TradeItem(inst)
     local filler_max = 4
 
     for k = 1, reward_count do
-        --local reward_item = SpawnPrefab(selected_item.prefabs[math.random(1, #selected_item.prefabs)])
-		local reward_item = SpawnPrefab(trading_items[math.random(1, #trading_items)].prefabs)
+        local reward_item = SpawnPrefab(selected_item.prefabs[math.random(1, #selected_item.prefabs)])
         reward_item.Transform:SetPosition(x, y, z)
         launchitem(reward_item, angle)
     end
@@ -354,7 +336,7 @@ local function OnRefuseItem(inst, item)
 end
 
 -----------------------------------------------------------------------------------------------------------------------------------
---#4 OnSave/Load, fn
+--#4 fn()
 
 local function OnSave(inst, data)
     local ents = {}
@@ -390,7 +372,7 @@ local function OnLoadPostPass(inst, newents, savedata)
             if guard then
                 table.insert(inst.guards, guard)
                 guard.king = inst
-                guard.return_to_king = true	
+                guard.return_to_king = true 
                 inst:ListenForEvent("death",  OnGuardDeath, guard)
                 inst:ListenForEvent("onremove", OnGuardRemoved, guard)
                 inst:ListenForEvent("enterlimbo", OnGuardEnterLimbo, guard)
@@ -429,31 +411,31 @@ local function fn()
     inst:AddTag("wet")
 
     inst:SetStateGraph("SGmermking")
-	
-	-------------------------------------------------
+    
+    -------------------------------------------------
 
     inst:AddComponent("combat")
     inst.components.combat:SetKeepTargetFunction(KeepTarget)
-	
+    
     inst:ListenForEvent("attacked", OnAttacked)
     inst:ListenForEvent("hungerdelta", function(_, data) HungerDelta(inst, data) end)
     inst:ListenForEvent("healthdelta", function(_, data) HealthDelta(inst, data) end)
     inst:ListenForEvent("oncreated", function() OnCreated(inst) end)
     inst:ListenForEvent("droppedtarget", OnGiveUpTarget)
-	inst:ListenForEvent("giveuptarget", OnGiveUpTarget)
+    inst:ListenForEvent("giveuptarget", OnGiveUpTarget)
         
     inst.OnGuardDeath = OnGuardDeath
     inst.OnGuardRemoved = OnGuardRemoved
     inst.OnGuardEnterLimbo = OnGuardEnterLimbo
-	
+    
     inst.CallGuards = CallGuards
     inst.ReturnMerms = ReturnMerms
-	
-	-------------------------------------------------
-	
+    
+    -------------------------------------------------
+    
     inst:AddComponent("eater")
     inst.components.eater:SetVegetarian()
-	
+    
     inst:AddComponent("health")
     inst.components.health:SetMaxHealth(TUNING.MERM_KING_HEALTH)
     inst.components.health:StartRegen(TUNING.MERM_KING_HEALTH_REGEN, TUNING.MERM_KING_HEALTH_REGEN_PERIOD)
@@ -462,33 +444,33 @@ local function fn()
     inst.components.hunger:SetMax(TUNING.MERM_KING_HUNGER)
     inst.components.hunger:SetKillRate(TUNING.MERM_KING_HEALTH / TUNING.MERM_KING_HUNGER_KILL_TIME)
     inst.components.hunger:SetRate(TUNING.MERM_KING_HUNGER_RATE)
-	
+    
     inst:AddComponent("lootdropper")
-	if SaveGameIndex and SaveGameIndex:IsModeShipwrecked() then
-	    inst.components.lootdropper:SetLoot(sw_loot)
-	else
-		inst.components.lootdropper:SetLoot(loot)
-	end
+    if SaveGameIndex and SaveGameIndex:IsModeShipwrecked() then
+        inst.components.lootdropper:SetLoot(sw_loot)
+    else
+        inst.components.lootdropper:SetLoot(loot)
+    end
 
-	-------------------------------------------------
+    -------------------------------------------------
 
     inst:AddComponent("trader")
     inst.components.trader:SetAcceptTest(ShouldAcceptItem)
     inst.components.trader.onaccept = OnGetItemFromPlayer
     inst.components.trader.onrefuse = OnRefuseItem
     inst.components.trader.deleteitemonaccept = false
-	
+    
     inst.trading_items = deepcopy(trading_items)
     inst.TradeItem = TradeItem
 
-	-------------------------------------------------
+    -------------------------------------------------
 
     inst:AddComponent("inspectable")
     inst:AddComponent("inventory")
     inst:AddComponent("talker")
     inst:AddComponent("timer")
 
-	-------------------------------------------------
+    -------------------------------------------------
 
     inst.OnSave = OnSave
     inst.OnLoadPostPass = OnLoadPostPass

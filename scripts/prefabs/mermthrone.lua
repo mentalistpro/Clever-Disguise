@@ -10,6 +10,17 @@ local prefabs =
     "mermking"
 }
 
+-----------------------------------------------------------------------------------------------------------------------------------
+
+--//CONTENT//
+--#1 Physical properties
+--#2 Mermthrone_constuction_fn()
+--#3 Mermking
+--#4 Mermthrone_fn()
+
+-----------------------------------------------------------------------------------------------------------------------------------
+--#1 Physical properties
+
 local function OnConstructed(inst, doer)
     local concluded = true
     for i, v in ipairs(CONSTRUCTION_PLANS[inst.prefab] or {}) do
@@ -61,9 +72,13 @@ local function onhit_construction(inst, worker)
 end
 
 local function onconstruction_built(inst)
-    PreventCharacterCollisionsWithPlacedObjects(inst)
+    inst.Physics:ClearCollisionMask()
+    inst.Physics:CollidesWith(COLLISION.ITEMS)
     inst.SoundEmitter:PlaySound("dontstarve/characters/wurt/merm/throne/place")
 end
+
+-----------------------------------------------------------------------------------------------------------------------------------
+--#2 Mermthrone_constuction fn()
 
 local function onsave(inst, data)
     if inst:HasTag("burnt") or (inst.components.burnable ~= nil and inst.components.burnable:IsBurning()) then
@@ -90,10 +105,8 @@ local function construction_fn()
     inst.MiniMapEntity:SetIcon("merm_king_carpet_construction.tex")
     inst:AddTag("constructionsite")
 
-    inst:SetPhysicsRadiusOverride(1.5)
-    MakeObstaclePhysics(inst, inst.physicsradiusoverride)
+    MakeObstaclePhysics(inst, 1.5)
 
-    MakeHauntableWork(inst)
     MakeLargeBurnable(inst, nil, nil, true)
     MakeMediumPropagator(inst)
 
@@ -120,6 +133,9 @@ local function construction_fn()
 
     return inst
 end
+
+-----------------------------------------------------------------------------------------------------------------------------------
+--#3 Mermking
 
 local function OnMermKingCreated(inst, data)
     if data and data.throne == inst then
@@ -156,6 +172,9 @@ local function OnThroneRemoved(inst)
     end
 end
 
+-----------------------------------------------------------------------------------------------------------------------------------
+--#4 Mermthrone_fn()
+
 local function fn()
     local inst = CreateEntity()
 
@@ -186,7 +205,6 @@ local function fn()
     inst.components.workable:SetWorkLeft(4)
     inst.components.workable:SetOnFinishCallback(onhammered_regular)
 
-    MakeHauntableWork(inst)
     MakeLargeBurnable(inst, nil, nil, true)
     MakeMediumPropagator(inst)
 
@@ -208,16 +226,6 @@ local function fn()
     return inst
 end
 
-local function invalid_placement_fn(player, placer)
-    if placer and placer.mouse_blocked then
-        return
-    end
-
-    if player and player.components.talker then
-        player.components.talker:Say(GetString(player, "ANNOUNCE_CANTBUILDHERE_THRONE"))
-    end
-end
-
 return  Prefab("mermthrone", fn, assets, prefabs),
         Prefab("mermthrone_construction", construction_fn, assets, prefabs),
-        MakePlacer("mermthrone_construction_placer", "merm_king_carpet_construction", "merm_king_carpet_construction", "idle", nil, nil, nil, nil, nil, nil, nil, nil, invalid_placement_fn)
+        MakePlacer("mermthrone_construction_placer", "merm_king_carpet_construction", "merm_king_carpet_construction", "idle")

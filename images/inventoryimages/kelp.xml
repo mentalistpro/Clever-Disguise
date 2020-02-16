@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Atlas>
+	<Texture filename="kelp.tex" />
+	<Elements>
+		<Element name="kelp.tex" u1="0.001" u2="0.999" v2="0.999" v1="0.251" variant="" />
+	</Elements>
+</Atlas>
