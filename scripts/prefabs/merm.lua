@@ -163,18 +163,14 @@ local function OnAttacked(inst, data)
 						and dude.components.homeseeker.home 
 						and dude.components.homeseeker.home == home) 
 						
-						or (dude:HasTag("merm")
-						and not dude:HasTag("player") 
-						
-						and not (dude.components.follower 
+						or (dude:HasTag("merm") and not dude:HasTag("player") 
+						and not	(dude.components.follower 
 						and dude.components.follower.leader 
-						and dude.components.follower.leader:HasTag("player")))
+						and dude.components.follower.leader:HasTag("player") ) )
 			end, max_target_shares)
         end
     end
 end
-
-
 
 -------------------------------------------------------------------------------------------------------------------------
 --#4 Sleep
@@ -185,7 +181,9 @@ local function ShouldSleep(inst)
 			and not (inst.components.homeseeker and inst.components.homeseeker:HasHome() )
 			and not (inst.components.burnable and inst.components.burnable:IsBurning() )
 			and not (inst.components.freezable and inst.components.freezable:IsFrozen() )
-			and ((inst.components.follower == nil or inst.components.follower.leader) == nil) --and not mermkingcandidate
+			
+			and ( (inst.components.follower == nil or inst.components.follower.leader) == nil 
+			and not GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager:IsCandidate(inst) )
 end
 
 local function ShouldWakeUp(inst)
@@ -194,6 +192,7 @@ local function ShouldWakeUp(inst)
 			or (inst.components.homeseeker and inst.components.homeseeker:HasHome() )
 			or (inst.components.burnable and inst.components.burnable:IsBurning() )
 			or (inst.components.freezable and inst.components.freezable:IsFrozen() )
+			or (GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager:IsCandidate(inst) )
 end
 
 local function ShouldGuardSleep(inst)
@@ -231,9 +230,10 @@ local function FindInvaderFn(guy, inst)
 		leader_guy = leader_guy.components.inventoryitem:GetGrandOwner()
     end
 
-    return 	(guy:HasTag("character") and not guy:HasTag("merm")) --and not mermkingcandidate
-			and not (leader and leader:HasTag("player")) 
-			and not (leader_guy and (leader_guy:HasTag("merm")) and not guy:HasTag("pig"))
+    return (guy:HasTag("character") and not guy:HasTag("merm") ) 
+			and not (GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager:HasKing() ) 
+			and not (leader and leader:HasTag("player") ) 
+			and not (leader_guy and leader_guy:HasTag("merm") and not guy:HasTag("pig") )
 end
 
 local function RetargetFn(inst)
@@ -275,15 +275,11 @@ local function ShouldAcceptItem(inst, item, giver)
         inst.components.sleeper:WakeUp()
     end
 
-    return 	(giver:HasTag("merm") and not inst:HasTag("mermguard"))
-			and (	
-					(item.components.equippable and item.components.equippable.equipslot == EQUIPSLOTS.HEAD) 
-					or (item.components.edible and inst.components.eater:CanEat(item))
-					or item.prefab == "fish" 
-					or item.prefab == "tropical_fish"
-					or item.prefab == "eel"
-					--and not mermkingcandidate...within the greater fish prefabs bracket.
-				)
+    return 	(giver:HasTag("merm") and not (inst:HasTag("mermguard") and giver:HasTag("mermdisguise") ) ) 
+	
+			and ( (item.components.equippable ~= nil and item.components.equippable.equipslot == EQUIPSLOTS.HEAD) 
+			or (item.components.edible and inst.components.eater:CanEat(item) ) 
+			or (item:HasTag("fish") and not (GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager:IsCandidate(inst) ) ) )
 end
 
 local function OnGetItemFromPlayer(inst, giver, item)
@@ -294,7 +290,7 @@ local function OnGetItemFromPlayer(inst, giver, item)
         if inst.components.combat.target and inst.components.combat.target == giver then
             inst.components.combat:SetTarget(nil)
 			
-        elseif giver.components.leader ~= nil then --and not mermkingcandidate
+        elseif giver.components.leader ~= nil and not (GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager:IsCandidate(inst) ) then
             giver.components.leader:AddFollower(inst)
             inst.SoundEmitter:PlaySound("dontstarve/common/makeFriend")
             inst.components.follower:AddLoyaltyTime(item.components.edible:GetHunger() * loyalty_per_hunger)
@@ -370,8 +366,9 @@ local function MakeMerm(name, assets, prefabs, postinit)
         inst:AddComponent("inventory")
         inst:AddComponent("knownlocations")
         inst:AddComponent("locomotor")
-        inst:AddComponent("sleeper")
 		--inst:AddComponent("mermcandidate")
+		inst:AddComponent("mermkingmanager")
+        inst:AddComponent("sleeper")
 
         MakeMediumBurnableCharacter(inst, "pig_torso")
         MakeMediumFreezableCharacter(inst, "pig_torso")
@@ -453,5 +450,5 @@ local function mermguard_postinit(inst)
     inst.components.sleeper:SetWakeTest(ShouldGuardWakeUp)
 end
 
-return MakeMerm("merm", assets, prefabs, merm_postinit)
+return MakeMerm("merm", assets, prefabs, merm_postinit),
        MakeMerm("mermguard", assets, prefabs, mermguard_postinit)

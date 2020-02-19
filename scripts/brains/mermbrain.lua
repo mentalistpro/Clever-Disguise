@@ -186,7 +186,7 @@ end
 -----------------------------------------------------------------------------------------------
 --#6 Merm king
 
---[[local function IsThroneValid(inst)
+local function IsThroneValid(inst)
     if GetWorld().components.mermkingmanager then
         local throne = GetWorld.components.mermkingmanager:GetThrone(inst)
         return throne ~= nil
@@ -219,7 +219,7 @@ local function GetThronePosition(inst)
             return throne:GetPosition()
         end
     end
-end]]
+end
 
 -----------------------------------------------------------------------------------------------
 --#7 Home
@@ -283,10 +283,10 @@ end
 function MermBrain:OnStart()
     local root = PriorityNode(
     {
-        --[[IfNode(function() return GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager.king end,"panic with king",
+        IfNode(function() return GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager.king end,"panic with king",
             BrainCommon.PanicWhenScared(self.inst, .25, "MERM_TALK_PANICBOSS_KING")),
         IfNode(function() return not GetWorld().components.mermkingmanager or not GetWorld().components.mermkingmanager.king  end,"panic with no king",
-            BrainCommon.PanicWhenScared(self.inst, .25, "MERM_TALK_PANICBOSS")),]]
+            BrainCommon.PanicWhenScared(self.inst, .25, "MERM_TALK_PANICBOSS")),
         WhileNode(function() return self.inst.components.hauntable ~= nil and self.inst.components.hauntable.panic end, "PanicHaunted", Panic(self.inst)),
         WhileNode(function() return self.inst.components.health.takingfiredamage end, "OnFire", Panic(self.inst)),
         WhileNode(function() return self.inst.components.combat.target == nil or not self.inst.components.combat:InCooldown() end, "AttackMomentarily",
@@ -297,13 +297,13 @@ function MermBrain:OnStart()
         ChattyNode(self.inst, "MERM_TALK_FIND_FOOD",
             DoAction(self.inst, EatFoodAction, "Eat Food")),
 
-        --[[WhileNode(function() return ShouldGoToThrone(self.inst) and self.inst.components.combat.target == nil end, "ShouldGoToThrone",
+        WhileNode(function() return ShouldGoToThrone(self.inst) and self.inst.components.combat.target == nil end, "ShouldGoToThrone",
             PriorityNode({
                 Leash(self.inst, GetThronePosition, 0.2, 0.2, true),
                 IfNode(function() return IsThroneValid(self.inst) end, "IsThroneValid",
                     ActionNode(function() self.inst:PushEvent("onarrivedatthrone") end)
                 ),
-            }, .25)),]]
+            }, .25)),
 
         IfNode(function() return StartChoppingCondition(self.inst) end, "chop", 
                 WhileNode(function() return KeepChoppingAction(self.inst) end, "keep chopping",
