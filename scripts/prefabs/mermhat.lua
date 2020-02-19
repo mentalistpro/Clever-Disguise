@@ -48,9 +48,10 @@ local function OnEquip(inst, owner)
       owner:AddTag("unpigroyalty")  
     end
 	
-    --Friendly pigs no longer follow when disguise is on.
+    --Friendly pigs and spiders no longer follow when disguise is on.
     if owner.components.leader then
       owner.components.leader: RemoveFollowersByTag ("pig")
+      owner.components.leader: RemoveFollowersByTag ("spider")
     end	
 end
 

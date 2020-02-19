@@ -47,7 +47,8 @@ end)
 --#4 Hammer
 --#5 Eat
 --#6 Merm King
---#7 Nodes
+--#7 Home
+--#8 Nodes
 
 -----------------------------------------------------------------------------------------------
 --#1 Face Target
@@ -68,7 +69,7 @@ local function IsDeciduousTreeMonster(guy)
 end
 
 local function FindDeciduousTreeMonster(inst)
-    return FindEntity(inst, SEE_TREE_DIST / 3, IsDeciduousTreeMonster, { "workable" })
+    return FindEntity(inst, SEE_TREE_DIST / 3, IsDeciduousTreeMonster, function(item) return item.components.workable and item.components.workable.action == ACTIONS.CHOP end)
 end
 
 local function KeepChoppingAction(inst)
@@ -91,7 +92,7 @@ local function StartChoppingCondition(inst)
 end
 
 local function FindTreeToChopAction(inst)
-    local target = FindEntity(inst, SEE_TREE_DIST, nil, { "workable" })
+    local target = FindEntity(inst, SEE_TREE_DIST, function(item) return item.components.workable and item.components.workable.action == ACTIONS.CHOP end)
     if target ~= nil then
         if inst.tree_target ~= nil then
             target = inst.tree_target
@@ -123,7 +124,7 @@ local function StartMiningCondition(inst)
 end
 
 local function FindRockToMineAction(inst)
-    local target = FindEntity(inst, SEE_ROCK_DIST, nil, { "workable" })
+    local target = FindEntity(inst, SEE_ROCK_DIST, function(item) return item.components.workable and item.components.workable.action == ACTIONS.MINE end)
     if target ~= nil then
         return BufferedAction(inst, target, ACTIONS.MINE)
     end
@@ -148,7 +149,7 @@ local function StartHammeringCondition(inst)
 end
 
 local function FindHammerTargetAction(inst)
-    local target = FindEntity(inst, SEE_HAMMER_DIST, nil, { "workable" })
+    local target = FindEntity(inst, SEE_HAMMER_DIST, function(item) return item.components.workable and item.components.workable.action == ACTIONS.HAMMER end)
     if target ~= nil then
         return BufferedAction(inst, target, ACTIONS.HAMMER)
     end
@@ -181,7 +182,6 @@ local function EatFoodAction(inst)
         return act
     end
 end
-
 
 -----------------------------------------------------------------------------------------------
 --#6 Merm king

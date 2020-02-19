@@ -19,7 +19,7 @@ local events=
     CommonHandlers.OnAttacked(),
     CommonHandlers.OnDeath(),
 
-    --[[EventHandler("onarrivedatthrone", function(inst)
+    EventHandler("onarrivedatthrone", function(inst)
 
         if inst.components.health and inst.components.health:IsDead() then
             return
@@ -44,18 +44,18 @@ local events=
                 inst.sg:GoToState("getup")
             end
         end
-    end),]]
-
-    EventHandler("getup", function(inst) 
-        inst.sg:GoToState("getup")
     end),
 
-    --[[EventHandler("onmermkingcreated", function(inst) 
+	EventHandler("onmermkingcreated", function(inst) 
         inst.sg:GoToState("buff")
     end),
     EventHandler("onmermkingdestroyed", function(inst) 
         inst.sg:GoToState("debuff")
-    end),   ]]
+    end),
+	
+    EventHandler("getup", function(inst) 
+        inst.sg:GoToState("getup")
+    end),
 }
 
 local states=
