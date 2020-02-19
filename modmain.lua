@@ -1,11 +1,3 @@
-local _G = GLOBAL
-local _S = _G.STRINGS
-local IsDLCEnabled = _G.IsDLCEnabled
-local Ingredient = _G.Ingredient
-local Recipe = _G.Recipe
-local RECIPETABS = _G.RECIPETABS
-local TECH = _G.TECH
-	
 PrefabFiles = 
 {
 	"mermhat"
@@ -14,72 +6,66 @@ PrefabFiles =
 Assets = 
 {
     Asset("ATLAS", "images/inventoryimages/mermhat.xml"),
-    Asset("IMAGE", "images/inventoryimages/mermhat.tex")
 }
 
-------------------------------------------------------------------------------------------------------------------------
--- Config
+-----------------------------------------------------------------
+
+--//CONTENT//
+--1. Config
+--2. Recipes
+--3. Strings
+
+-----------------------------------------------------------------
+--1. Config
 
 TUNING.MOD_MERMHAT_PERISH = GetModConfigData("perish")
 
-------------------------------------------------------------------------------------------------------------------------
--- Recipe
+-----------------------------------------------------------------
+--2. Recipes
 
-if IsDLCEnabled(3) then
-	local mermhat = Recipe("mermhat",
-	{ 
-	Ingredient("fish", 1), 
-	Ingredient("cutreeds", 1), 
-	Ingredient("twigs", 2) 
-	}, 
-	RECIPETABS.DRESS, TECH.NONE, "common")
-	mermhat.atlas = "images/inventoryimages/mermhat.xml"	
-	mermhat.image = "mermhat.tex"
-
-	local mermhat_sw = Recipe("mermhat",
-	{ 
-	Ingredient("tropical_fish", 1), 
-	Ingredient("cutreeds", 1), 
-	Ingredient("twigs", 2) 
-	}, 
-	RECIPETABS.DRESS, TECH.NONE, "shipwrecked") 
-	mermhat_sw.atlas = "images/inventoryimages/mermhat.xml"
-	mermhat_sw.image = "mermhat.tex"
+local _G = GLOBAL
+local IsDLCEnabled = _G.IsDLCEnabled
+local Ingredient = _G.Ingredient
+local Recipe = _G.Recipe
+local RECIPETABS = _G.RECIPETABS
+local TECH = _G.TECH
 	
-elseif IsDLCEnabled(2) then
-	local mermhat = Recipe("mermhat",
-	{ 
-	Ingredient("fish", 1), 
-	Ingredient("cutreeds", 1), 
-	Ingredient("twigs", 2) 
-	}, 
-	RECIPETABS.DRESS, TECH.NONE, "rog") 
-	mermhat.atlas = "images/inventoryimages/mermhat.xml"	
-	mermhat.image = "mermhat.tex"
-	
-	local mermhat_sw = Recipe("mermhat",
-	{ 
-	Ingredient("tropical_fish", 1), 
-	Ingredient("cutreeds", 1), 
-	Ingredient("twigs", 2) 
-	}, 
-	RECIPETABS.DRESS, TECH.NONE, "shipwrecked") 
-	mermhat_sw.atlas = "images/inventoryimages/mermhat.xml"
-	mermhat_sw.image = "mermhat.tex"
-	
+if IsDLCEnabled(2) or IsDLCEnabled(3) then
+	local mermhat = Recipe(									--register recipe at ROG/HAM world.
+		"mermhat", 
+		{
+			Ingredient("fish", 1), 
+			Ingredient("cutreeds", 1), 
+			Ingredient("twigs", 2)
+		},
+		RECIPETABS.DRESS, TECH.NONE, "common")
+		mermhat.atlas = "images/inventoryimages/mermhat.xml"
+		
+	local mermhat_sw = Recipe(								--register recipe at SW world.
+		"mermhat", 
+		{
+			Ingredient("tropical_fish", 1), 
+			Ingredient("cutreeds", 1), 
+			Ingredient("twigs", 2)
+		},
+		RECIPETABS.DRESS, TECH.NONE, "shipwrecked")
+		mermhat_sw.atlas = "images/inventoryimages/mermhat.xml"
 else
-	local mermhat = Recipe("mermhat",
-	{ 
-	Ingredient("fish", 1), 
-	Ingredient("cutreeds", 1), 
-	Ingredient("twigs", 2) 
-	}, 
-	RECIPETABS.DRESS, TECH.NONE)
-	mermhat.atlas = "images/inventoryimages/mermhat.xml"
+	local mermhat = Recipe(									--register recipe at Vanilla world.
+		"mermhat", 
+		{
+			Ingredient("fish", 1), 
+			Ingredient("cutreeds", 1), 
+			Ingredient("twigs", 2)
+		},
+		RECIPETABS.DRESS, TECH.NONE)
+		mermhat.atlas = "images/inventoryimages/mermhat.xml"
 end
 
 ------------------------------------------------------------------------------------------------------------------------
--- Strings
+--3. Strings
+
+local _S = _G.STRINGS
 
 _S.NAMES.MERMHAT = "Clever Disguise"
 _S.RECIPE_DESC.MERMHAT = "Merm-ify your friends."
