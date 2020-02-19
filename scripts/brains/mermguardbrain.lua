@@ -175,11 +175,11 @@ end
 --Spring
 
 local function SpringCombatMod(amt)
-	if GetSeasonManager() and GetSeasonManager():IsRaining() then
-		return amt * 1.33
-	else
-		return amt
-	end
+    if GetSeasonManager() and GetSeasonManager():IsRaining() then
+        return amt * 1.33
+    else
+        return amt
+    end
 end
 
 -----------------------------------------------------------------------------------------------
