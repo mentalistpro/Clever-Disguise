@@ -7,10 +7,10 @@ local merm_brain = require "brains/mermbrain"
 local assets =
 {
     Asset("ANIM", "anim/merm_build.zip"),
-    --Asset("ANIM", "anim/merm_guard_build.zip"),
-    --Asset("ANIM", "anim/merm_guard_small_build.zip"),
+    Asset("ANIM", "anim/merm_guard_build.zip"),
+    Asset("ANIM", "anim/merm_guard_small_build.zip"),
     Asset("ANIM", "anim/merm_actions.zip"),
-    --Asset("ANIM", "anim/merm_guard_transformation.zip"),    
+    Asset("ANIM", "anim/merm_guard_transformation.zip"),    
     Asset("ANIM", "anim/ds_pig_basic.zip"),
     Asset("ANIM", "anim/ds_pig_actions.zip"),
     Asset("ANIM", "anim/ds_pig_attacks.zip"),
