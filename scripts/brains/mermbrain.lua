@@ -166,7 +166,7 @@ local function EatFoodAction(inst)
     if inst.components.inventory ~= nil and inst.components.eater ~= nil then
         target = inst.components.inventory:FindItem(function(item) return inst.components.eater:CanEat(item) end)
     end
-	
+    
     if target == nil then
         target = FindEntity(inst, SEE_FOOD_DIST, function(item) return inst.components.eater:CanEat(item) end, { "VEGGIE", "ROUGHAGE"}, { "INLIMBO" })
         --check for scary things near the food
@@ -174,7 +174,7 @@ local function EatFoodAction(inst)
             target = nil
         end
     end
-	
+    
     if target ~= nil then
         local act = BufferedAction(inst, target, ACTIONS.EAT)
         act.validfn = function() return target.components.inventoryitem == nil or target.components.inventoryitem.owner == nil or target.components.inventoryitem.owner == inst end
@@ -228,9 +228,9 @@ local function GoHomeAction(inst)
     if inst.components.combat.target ~= nil then
         return
     end
-	
+    
     local home = inst.components.homeseeker ~= nil and inst.components.homeseeker.home or nil
-	return home ~= nil
+    return home ~= nil
         and home:IsValid()
         and not (home.components.burnable ~= nil and home.components.burnable:IsBurning())
         and not home:HasTag("burnt")
@@ -269,15 +269,15 @@ end
 --#7 Nodes
 
 local function SpringCombatMod(amt)
-	if IsDLCEnabled(1) or IsDLCEnabled(2) or IsDLCEnabled(3) then
-		if GetSeasonManager() and GetSeasonManager():IsSpring() then
-			return amt * 1.33
-		else
-			return amt
-		end
-	else
-		return amt
-	end
+    if IsDLCEnabled(1) or IsDLCEnabled(2) or IsDLCEnabled(3) then
+        if GetSeasonManager() and GetSeasonManager():IsSpring() then
+            return amt * 1.33
+        else
+            return amt
+        end
+    else
+        return amt
+    end
 end
 
 function MermBrain:OnStart()
@@ -318,7 +318,7 @@ function MermBrain:OnStart()
                             DoAction(self.inst, FindRockToMineAction ))})),
 
         ChattyNode(self.inst, "MERM_TALK_FOLLOWWILSON",
-		  Follow(self.inst, function() return self.inst.components.follower.leader end, MIN_FOLLOW_DIST, TARGET_FOLLOW_DIST, MAX_FOLLOW_DIST)),
+          Follow(self.inst, function() return self.inst.components.follower.leader end, MIN_FOLLOW_DIST, TARGET_FOLLOW_DIST, MAX_FOLLOW_DIST)),
 
         IfNode(function() return self.inst.components.follower.leader ~= nil end, "HasLeader",
             ChattyNode(self.inst, "MERM_TALK_FOLLOWWILSON",

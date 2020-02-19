@@ -316,25 +316,25 @@ local states=
 
 CommonStates.AddWalkStates(states,
 {
-	walktimeline = {
-		TimeEvent(0*FRAMES, PlayFootstep ),
-		TimeEvent(12*FRAMES, PlayFootstep ),
-	},
+    walktimeline = {
+        TimeEvent(0*FRAMES, PlayFootstep ),
+        TimeEvent(12*FRAMES, PlayFootstep ),
+    },
 })
 CommonStates.AddRunStates(states,
 {
-	runtimeline = {
-		TimeEvent(0*FRAMES, PlayFootstep ),
-		TimeEvent(10*FRAMES, PlayFootstep ),
-	},
+    runtimeline = {
+        TimeEvent(0*FRAMES, PlayFootstep ),
+        TimeEvent(10*FRAMES, PlayFootstep ),
+    },
 })
 
 CommonStates.AddSleepStates(states,
 {
-	sleeptimeline = 
-	{
-		TimeEvent(35*FRAMES, function(inst) inst.SoundEmitter:PlaySound("dontstarve/creatures/merm/sleep") end ),
-	},
+    sleeptimeline = 
+    {
+        TimeEvent(35*FRAMES, function(inst) inst.SoundEmitter:PlaySound("dontstarve/creatures/merm/sleep") end ),
+    },
 })
 
 CommonStates.AddCombatStates(states,
