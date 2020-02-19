@@ -20,6 +20,14 @@ Assets =
 
 TUNING.MOD_MERMHAT_PERISH = GetModConfigData("perish")
 
+local function ItemIsFish(inst)
+	inst:AddTag("fish")
+end
+
+AddPrefabPostInit("eel", ItemIsFish)
+AddPrefabPostInit("fish", ItemIsFish)
+AddPrefabPostInit("tropical_fish", ItemIsFish)
+
 -----------------------------------------------------------------
 --2. Recipes
 
