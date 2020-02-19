@@ -185,7 +185,7 @@ local function ShouldSleep(inst)
 			and not (inst.components.homeseeker and inst.components.homeseeker:HasHome() )
 			and not (inst.components.burnable and inst.components.burnable:IsBurning() )
 			and not (inst.components.freezable and inst.components.freezable:IsFrozen() )
-			and ((inst.components.follower == nil or inst.components.follower.leader) == nil)
+			and ((inst.components.follower == nil or inst.components.follower.leader) == nil) --and not mermkingcandidate
 end
 
 local function ShouldWakeUp(inst)
@@ -231,12 +231,9 @@ local function FindInvaderFn(guy, inst)
 		leader_guy = leader_guy.components.inventoryitem:GetGrandOwner()
     end
 
-    return 	(guy:HasTag("character") 
-			and not guy:HasTag("merm"))
+    return 	(guy:HasTag("character") and not guy:HasTag("merm")) --and not mermkingcandidate
 			and not (leader and leader:HasTag("player")) 
-			
-			and not (leader_guy and (leader_guy:HasTag("merm")) 
-			and not guy:HasTag("pig"))
+			and not (leader_guy and (leader_guy:HasTag("merm")) and not guy:HasTag("pig"))
 end
 
 local function RetargetFn(inst)
@@ -278,18 +275,15 @@ local function ShouldAcceptItem(inst, item, giver)
         inst.components.sleeper:WakeUp()
     end
 
-    return 	(giver:HasTag("merm") 
-			and not inst:HasTag("mermguard")) 
-			
-			and ((item.components.equippable ~= nil 
-			and item.components.equippable.equipslot == EQUIPSLOTS.HEAD) 
-			
-			or (item.components.edible 
-			and inst.components.eater:CanEat(item))
-			
-			or item.prefab == "fish" 
-			or item.prefab == "tropical_fish"
-			or item.prefab == "eel")
+    return 	(giver:HasTag("merm") and not inst:HasTag("mermguard"))
+			and (	
+					(item.components.equippable and item.components.equippable.equipslot == EQUIPSLOTS.HEAD) 
+					or (item.components.edible and inst.components.eater:CanEat(item))
+					or item.prefab == "fish" 
+					or item.prefab == "tropical_fish"
+					or item.prefab == "eel"
+					--and not mermkingcandidate...within the greater fish prefabs bracket.
+				)
 end
 
 local function OnGetItemFromPlayer(inst, giver, item)
@@ -299,7 +293,8 @@ local function OnGetItemFromPlayer(inst, giver, item)
     if item.components.edible ~= nil then
         if inst.components.combat.target and inst.components.combat.target == giver then
             inst.components.combat:SetTarget(nil)
-        elseif giver.components.leader ~= nil then
+			
+        elseif giver.components.leader ~= nil then --and not mermkingcandidate
             giver.components.leader:AddFollower(inst)
             inst.SoundEmitter:PlaySound("dontstarve/common/makeFriend")
             inst.components.follower:AddLoyaltyTime(item.components.edible:GetHunger() * loyalty_per_hunger)
@@ -312,6 +307,7 @@ local function OnGetItemFromPlayer(inst, giver, item)
         if current ~= nil then
             inst.components.inventory:DropItem(current)
         end
+		
         inst.components.inventory:Equip(item)
         inst.AnimState:Show("hat")
     end
@@ -362,7 +358,6 @@ local function MakeMerm(name, assets, prefabs, postinit)
         inst.components.talker.font = TALKINGFONT
         inst.components.talker.offset = Vector3(0, -400, 0)
 
-
         inst:AddComponent("trader")
         inst.components.trader:SetAcceptTest(ShouldAcceptItem)
         inst.components.trader.onaccept = OnGetItemFromPlayer
@@ -376,6 +371,7 @@ local function MakeMerm(name, assets, prefabs, postinit)
         inst:AddComponent("knownlocations")
         inst:AddComponent("locomotor")
         inst:AddComponent("sleeper")
+		--inst:AddComponent("mermcandidate")
 
         MakeMediumBurnableCharacter(inst, "pig_torso")
         MakeMediumFreezableCharacter(inst, "pig_torso")
