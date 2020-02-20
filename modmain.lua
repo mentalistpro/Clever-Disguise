@@ -18,7 +18,7 @@ Assets =
 -----------------------------------------------------------------
 --1. Config
 
-TUNING.MOD_MERMHAT_PERISH = GetModConfigData("perish")
+TUNING.MERMHAT_PERISH = GetModConfigData("perish")
 
 local function ItemIsFish(inst)
 	inst:AddTag("fish")
@@ -75,9 +75,6 @@ end
 
 local _S = _G.STRINGS
 
-_S.NAMES.MERMHAT = "Clever Disguise"
-_S.RECIPE_DESC.MERMHAT = "Merm-ify your friends."
-
 if _S.CHARACTERS.WALANI 	== nil then _S.CHARACTERS.WALANI 		= { DESCRIBE = {},} end -- DLC002
 if _S.CHARACTERS.WARBUCKS 	== nil then _S.CHARACTERS.WARBUCKS	 	= { DESCRIBE = {},} end -- DLC003
 if _S.CHARACTERS.WARLY 		== nil then _S.CHARACTERS.WARLY 		= { DESCRIBE = {},} end -- DLC002
@@ -90,6 +87,11 @@ if _S.CHARACTERS.WOODLEGS 	== nil then _S.CHARACTERS.WOODLEGS 		= { DESCRIBE = {
 if _S.CHARACTERS.WORMWOOD 	== nil then _S.CHARACTERS.WORMWOOD 		= { DESCRIBE = {},} end -- DLC003
 if _S.CHARACTERS.WORTOX 	== nil then _S.CHARACTERS.WORTOX 		= { DESCRIBE = {},} end -- DST
 if _S.CHARACTERS.WURT 		== nil then _S.CHARACTERS.WURT 			= { DESCRIBE = {},} end -- DST
+
+--Clever Disguise
+
+_S.NAMES.MERMHAT = "Clever Disguise"
+_S.RECIPE_DESC.MERMHAT = "Merm-ify your friends."
 
 _S.CHARACTERS.GENERIC.DESCRIBE.MERMHAT 		= {"Finally, I can show my face in public."}
 _S.CHARACTERS.WARLY.DESCRIBE.MERMHAT 		= {"Mon dieu, must I dress as a frog?"}
@@ -107,3 +109,30 @@ _S.CHARACTERS.WORTOX.DESCRIBE.MERMHAT 		= {"Some would call me two-faced, hyuyu!
 _S.CHARACTERS.WURT.DESCRIBE.MERMHAT 		= {"Make scale-less look like friendly Mermfolk!"}
 _S.CHARACTERS.WX78.DESCRIBE.MERMHAT 		= {"WARTY CONCEALMENT"}
 
+--Merm Guard
+
+_S.NAMES.MERMGUARD = "Loyal Merm Guard"
+
+_S.CHARACTERS.GENERIC.DESCRIBE.MERMGUARD 		= {"I feel very guarded around these guys..."}
+_S.CHARACTERS.WARLY.DESCRIBE.MERMGUARD 			= {"A most fearsome fishmonger!"}
+_S.CHARACTERS.WATHGRITHR.DESCRIBE.MERMGUARD 	= {"A formidable warrior, to be sure."}
+_S.CHARACTERS.WAXWELL.DESCRIBE.MERMGUARD 		= {"I'd best try to stay on their good side."}
+_S.CHARACTERS.WEBBER.DESCRIBE.MERMGUARD 		= {"They look pretty scary!"}
+_S.CHARACTERS.WENDY.DESCRIBE.MERMGUARD 			= {"Friend or foe?"}
+_S.CHARACTERS.WICKERBOTTOM.DESCRIBE.MERMGUARD 	= {"A royal bodyguard."}
+_S.CHARACTERS.WILLOW.DESCRIBE.MERMGUARD 		= {"I can't tell which way it's looking."}
+_S.CHARACTERS.WINONA.DESCRIBE.MERMGUARD 		= {"Just doin' their job."}
+_S.CHARACTERS.WOLFGANG.DESCRIBE.MERMGUARD		= {"Not as mighty as Wolfgang!"}
+_S.CHARACTERS.WOODIE.DESCRIBE.MERMGUARD 		= {"They stand on guard for the king."}
+_S.CHARACTERS.WORMWOOD.DESCRIBE.MERMGUARD 		= {"Friends?"}
+_S.CHARACTERS.WORTOX.DESCRIBE.MERMGUARD 		= {"The horns are an improvement."}
+_S.CHARACTERS.WURT.DESCRIBE.MERMGUARD 			= {"Will grow up big and strong like that one day!"}
+_S.CHARACTERS.WX78.DESCRIBE.MERMGUARD 			= {"YOU WOULD MAKE AN EXCELLENT MINION"}
+
+--MERM_TALK_PANICBOSS_KING
+--MERM_TALK_PANICBOSS
+--MERM_TALK_FIND_FOOD
+--MERM_TALK_HELP_CHOP_WOOD
+--MERM_TALK_HELP_MINE_ROCK
+--MERM_TALK_HELP_HAMMER
+--MERM_TALK_FOLLOWWILSON
