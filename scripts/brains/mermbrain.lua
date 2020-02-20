@@ -345,16 +345,16 @@ function MermBrain:OnStart()
     local root = PriorityNode(
     {
         IfNode(function() return GetWorld() and GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager.king end, "panic with king",
-            BrainCommon.PanicWhenScared(self.inst, .25, "MERM_TALK_PANICBOSS_KING")),
+            BrainCommon.PanicWhenScared(self.inst, .25, makechatpackage("MERM_TALK_PANICBOSS_KING"))),
         IfNode(function() return not GetWorld().components.mermkingmanager or not GetWorld().components.mermkingmanager.king  end,"panic with no king",
-            BrainCommon.PanicWhenScared(self.inst, .25, "MERM_TALK_PANICBOSS")),
+            BrainCommon.PanicWhenScared(self.inst, .25, makechatpackage("MERM_TALK_PANICBOSS"))),
         WhileNode(function() return self.inst.components.health.takingfiredamage end, "OnFire", Panic(self.inst)),
         WhileNode(function() return self.inst.components.combat.target == nil or not self.inst.components.combat:InCooldown() end, "AttackMomentarily",
             ChaseAndAttack(self.inst, SpringCombatMod(MAX_CHASE_TIME), SpringCombatMod(MAX_CHASE_DIST))),
         WhileNode(function() return self.inst.components.combat.target ~= nil and self.inst.components.combat:InCooldown() end, "Dodge",
             RunAway(self.inst, function() return self.inst.components.combat.target end, RUN_AWAY_DIST, STOP_RUN_AWAY_DIST)),
 
-        ChattyNode(self.inst, "MERM_TALK_FIND_FOOD",
+        ChattyNode(self.inst, makechatpackage("MERM_TALK_FIND_FOOD"),
             DoAction(self.inst, EatFoodAction, "Eat Food")),
 
         WhileNode(function() return ShouldGoToThrone(self.inst) and self.inst.components.combat.target == nil end, "ShouldGoToThrone",
@@ -368,26 +368,26 @@ function MermBrain:OnStart()
         IfNode(function() return StartChoppingCondition(self.inst) end, "chop", 
                 WhileNode(function() return KeepChoppingAction(self.inst) end, "keep chopping",
                     LoopNode{
-                        ChattyNode(self.inst, "MERM_TALK_HELP_CHOP_WOOD",
+                        ChattyNode(self.inst, makechatpackage("MERM_TALK_HELP_CHOP_WOOD"),
                             DoAction(self.inst, FindTreeToChopAction ))})),
 
         IfNode(function() return StartMiningCondition(self.inst) end, "mine", 
                 WhileNode(function() return KeepMiningAction(self.inst) end, "keep mining", 
                     LoopNode{
-                        ChattyNode(self.inst, "MERM_TALK_HELP_MINE_ROCK",
+                        ChattyNode(self.inst, makechatpackage("MERM_TALK_HELP_MINE_ROCK"),
                             DoAction(self.inst, FindRockToMineAction ))})),
                             
         IfNode(function() return StartHammeringCondition(self.inst) end, "hammer", 
                 WhileNode(function() return KeepHammeringAction(self.inst) end, "keep hammering", 
                     LoopNode{
-                        ChattyNode(self.inst, "MERM_TALK_HELP_HAMMER",
+                        ChattyNode(self.inst, makechatpackage("MERM_TALK_HELP_HAMMER"),
                             DoAction(self.inst, FindHammerTargetAction ))})),
 
-        ChattyNode(self.inst, "MERM_TALK_FOLLOWWILSON",
+        ChattyNode(self.inst, makechatpackage("MERM_TALK_FOLLOWWILSON"),
           Follow(self.inst, function() return self.inst.components.follower.leader end, MIN_FOLLOW_DIST, TARGET_FOLLOW_DIST, MAX_FOLLOW_DIST)),
 
         IfNode(function() return self.inst.components.follower.leader ~= nil end, "HasLeader",
-            ChattyNode(self.inst, "MERM_TALK_FOLLOWWILSON",
+            ChattyNode(self.inst, makechatpackage("MERM_TALK_FOLLOWWILSON"),
                 FaceEntity(self.inst, GetFaceTargetFn, KeepFaceTargetFn ))),
 
         WhileNode( function() return IsHomeOnFire(self.inst) end, "HomeOnFire", Panic(self.inst)), 
