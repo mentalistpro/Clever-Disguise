@@ -12,47 +12,29 @@ local function OnEquip(inst, owner)
     owner.AnimState:Hide("HAIR_HAT")
     owner.AnimState:Show("HAIR_NOHAT")
     owner.AnimState:Show("HAIR")
+	
     if owner:HasTag("player") then
-      owner.AnimState:Show("HEAD")
-      owner.AnimState:Hide("HEAD_HAIR")
+		owner.AnimState:Show("HEAD")
+		owner.AnimState:Hide("HEAD_HAIR")
     end
     
-    --Characters and pigs are now merms
-    if (owner:HasTag("player") or owner:HasTag("pig")) and not owner:HasTag("merm") then
-      owner:AddTag("temporary_merm")
-      owner:AddTag("merm")
-      owner:AddTag("mermguard")
-      owner:AddTag("mermfluent")  --//TODO: remove soon - need new tool to interpret merm language.  
+    --Players, pigs and bunnyman are now considered as merms
+    if (owner:HasTag("player") or owner:HasTag("pig") ) then
+		owner:AddTag("merm")
+		owner:AddTag("mermdisguise")
     end 
     
     --Monsters are not monsters
     if owner:HasTag("monster") then
-      owner:RemoveTag("monster")
-      owner:AddTag("unmonster")     
+		owner:RemoveTag("monster")
+		owner:AddTag("unmonster")     
     end
     
-    if owner:HasTag("playermonster") then
-      owner:RemoveTag("playermonster")
-      owner:AddTag("unplayermonster")   
-    end
-    
-    --Spiders are not spiders   
-    if owner:HasTag("spiderwhisperer") then
-      owner:RemoveTag("spiderwhisperer")
-      owner:AddTag("unspiderwhisperer") 
-    end
-    
-    --Royal pigs are not royal pigs
-    if owner:HasTag("pigroyalty") then
-      owner:RemoveTag("pigroyalty")
-      owner:AddTag("unpigroyalty")  
-    end
-	
     --Friendly pigs and spiders no longer follow when disguise is on.
     if owner.components.leader then
-      owner.components.leader: RemoveFollowersByTag ("pig")
-      owner.components.leader: RemoveFollowersByTag ("spider")
-    end	
+		owner.components.leader:RemoveFollowersByTag("pig")
+		owner.components.leader:RemoveFollowersByTag("spider")
+    end 
 end
 
 -----------------------------------------------------------------------------------------
@@ -63,40 +45,25 @@ local function OnUnequip(inst, owner)
     owner.AnimState:Hide("HAIR_HAT")
     owner.AnimState:Show("HAIR_NOHAT")
     owner.AnimState:Show("HAIR")
+	
     if owner:HasTag("player") then
-      owner.AnimState:Show("HEAD")
-      owner.AnimState:Hide("HEAD_HAIR")
+		owner.AnimState:Show("HEAD")
+		owner.AnimState:Hide("HEAD_HAIR")
     end
 
-    if owner:HasTag("temporary_merm") then
-      owner:RemoveTag("merm")
-      owner:RemoveTag("mermguard")
-      owner:RemoveTag("mermfluent") 
+    if owner:HasTag("mermdisguise") then
+		owner:RemoveTag("merm")
+		owner:RemoveTag("mermdisguise")
     end
 
     if owner:HasTag("unmonster") then
-      owner:RemoveTag("unmonster")
-      owner:AddTag("monster")       
-    end
-    
-    if owner:HasTag("unplayermonster") then
-      owner:RemoveTag("unplayermonster")
-      owner:AddTag("playermonster") 
-    end
-    
-    if owner:HasTag("unspiderwhisperer") then
-      owner:RemoveTag("unspiderwhisperer")
-      owner:AddTag("spiderwhisperer")   
-    end
-    
-    if owner:HasTag("unpigroyalty") then
-      owner:RemoveTag("unpigroyalty")
-      owner:AddTag("pigroyalty")    
+		owner:RemoveTag("unmonster")
+		owner:AddTag("monster")       
     end
     
     --Friendly merms no longer follow when disguise is off.
     if owner.components.leader then
-      owner.components.leader: RemoveFollowersByTag ("merm")
+		owner.components.leader:RemoveFollowersByTag("merm")
     end
 end
 
@@ -114,12 +81,8 @@ local function fn()
     inst.AnimState:PlayAnimation("anim")
 
     inst:AddTag("hat")
-    inst:AddTag("open_top_hat")
-    inst:AddTag("show_spoilage")
     inst:AddTag("merm")
-    
-    inst:AddComponent("inspectable")
-    inst:AddComponent("tradable")
+    inst:AddTag("show_spoilage")
     
     inst:AddComponent("equippable")
     inst.components.equippable.equipslot = EQUIPSLOTS.HEAD
@@ -134,6 +97,9 @@ local function fn()
     inst.components.perishable:SetPerishTime(TUNING.MOD_MERMHAT_PERISH)
     inst.components.perishable:StartPerishing()
     inst.components.perishable:SetOnPerishFn(inst.Remove)
+	
+    inst:AddComponent("inspectable")
+    inst:AddComponent("tradable")
     
     return inst
 end
