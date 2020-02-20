@@ -43,47 +43,16 @@ end)
 -----------------------------------------------------------------------------------------------
 
 --//CONTENT//
---#1 Face Target
---#2 Chop
---#3 Mine
+--#1 Chop
+--#2 Eat
+--#3 Face Target
 --#4 Hammer
---#5 Eat
---#6 Home
+--#5 Home
+--#6 Mine
 --#7 Nodes
 
 -----------------------------------------------------------------------------------------------
---#1 Face Target
-
-local function GetFaceTargetFn(inst)
-    if inst.components.timer:TimerExists("dontfacetime") then
-        return nil
-    end
-    
-    local shouldface =  inst.components.follower.leader or 
-                        GetClosestInstWithTag("player", inst, SEE_PLAYER_DIST)              
-    if shouldface and not inst.components.timer:TimerExists("facetime") then
-        inst.components.timer:StartTimer("facetime", FACETIME_BASE + math.random()*FACETIME_RAND)
-    end
-    
-    return shouldface
-end
-
-local function KeepFaceTargetFn(inst, target)
-    if inst.components.timer:TimerExists("dontfacetime") then
-        return nil
-    end    
-    
-    local keepface = (inst.components.follower.leader and inst.components.follower.leader == target) or 
-                     (target:IsValid() and inst:IsNear(target, SEE_PLAYER_DIST))    
-    if not keepface then
-        inst.components.timer:StopTimer("facetime")
-    end
-    
-    return keepface
-end
-
------------------------------------------------------------------------------------------------
---#2 Chop
+--#1 Chop
 
 local function IsDeciduousTreeMonster(guy)
     return guy.monster and guy.prefab == "deciduoustree"
@@ -134,61 +103,7 @@ local function FindTreeToChopAction(inst)
 end
 
 -----------------------------------------------------------------------------------------------
---#3 Mine
-
-local function KeepMiningAction(inst)
-    local keep_mining = (inst.components.follower.leader ~= nil and
-                         inst:IsNear(inst.components.follower.leader, KEEP_MINING_DIST))
-    return keep_mining
-end
-
-local function StartMiningCondition(inst)
-    local mine_condition = (inst.components.follower.leader ~= nil and
-                            inst.components.follower.leader.sg ~= nil and
-                            inst.components.follower.leader.sg:HasStateTag("mining"))
-    return mine_condition
-end
-
-local function FindRockToMineAction(inst)
-    local target = FindEntity(inst, SEE_ROCK_DIST, 
-        function(item) 
-            return item.components.workable and item.components.workable.action == ACTIONS.MINE 
-        end)
-        
-    if target ~= nil then
-        return BufferedAction(inst, target, ACTIONS.MINE)
-    end
-end
-
------------------------------------------------------------------------------------------------
---#4 Hammer
-
-local function KeepHammeringAction(inst)
-    local keep_hammering = (inst.components.follower.leader ~= nil and
-                            inst:IsNear(inst.components.follower.leader, KEEP_HAMMERING_DIST))
-    return keep_hammering
-end
-
-local function StartHammeringCondition(inst)
-    local hammer_condition = (inst.components.follower.leader ~= nil and
-                              inst.components.follower.leader.sg ~= nil and
-                              inst.components.follower.leader.sg:HasStateTag("hammering"))
-    return hammer_condition
-end
-
-local function FindHammerTargetAction(inst)
-    local target = FindEntity(inst, SEE_HAMMER_DIST, 
-                    function(item) 
-                        return item.components.workable and item.components.workable.action == ACTIONS.HAMMER 
-                    end)
-                    
-    if target ~= nil then
-        return BufferedAction(inst, target, ACTIONS.HAMMER)
-    end
-end
-
------------------------------------------------------------------------------------------------
---#5 Eat
+--#2 Eat
 
 local function EatFoodAction(inst)
     if inst.sg:HasStateTag("waking") then
@@ -224,7 +139,65 @@ local function EatFoodAction(inst)
 end
 
 -----------------------------------------------------------------------------------------------
---#6 Home
+--#3 Face Target
+
+local function GetFaceTargetFn(inst)
+    if inst.components.timer:TimerExists("dontfacetime") then
+        return nil
+    end
+    
+    local shouldface =  inst.components.follower.leader or 
+                        GetClosestInstWithTag("player", inst, SEE_PLAYER_DIST)              
+    if shouldface and not inst.components.timer:TimerExists("facetime") then
+        inst.components.timer:StartTimer("facetime", FACETIME_BASE + math.random()*FACETIME_RAND)
+    end
+    
+    return shouldface
+end
+
+local function KeepFaceTargetFn(inst, target)
+    if inst.components.timer:TimerExists("dontfacetime") then
+        return nil
+    end    
+    
+    local keepface = (inst.components.follower.leader and inst.components.follower.leader == target) or 
+                     (target:IsValid() and inst:IsNear(target, SEE_PLAYER_DIST))    
+    if not keepface then
+        inst.components.timer:StopTimer("facetime")
+    end
+    
+    return keepface
+end
+
+-----------------------------------------------------------------------------------------------
+--#4 Hammer
+
+local function KeepHammeringAction(inst)
+    local keep_hammering = (inst.components.follower.leader ~= nil and
+                            inst:IsNear(inst.components.follower.leader, KEEP_HAMMERING_DIST))
+    return keep_hammering
+end
+
+local function StartHammeringCondition(inst)
+    local hammer_condition = (inst.components.follower.leader ~= nil and
+                              inst.components.follower.leader.sg ~= nil and
+                              inst.components.follower.leader.sg:HasStateTag("hammering"))
+    return hammer_condition
+end
+
+local function FindHammerTargetAction(inst)
+    local target = FindEntity(inst, SEE_HAMMER_DIST, 
+                    function(item) 
+                        return item.components.workable and item.components.workable.action == ACTIONS.HAMMER 
+                    end)
+                    
+    if target ~= nil then
+        return BufferedAction(inst, target, ACTIONS.HAMMER)
+    end
+end
+
+-----------------------------------------------------------------------------------------------
+--#5 Home
 
 local function GetNoLeaderHomePos(inst)
     if inst.components.follower and inst.components.follower.leader ~= nil then
@@ -233,6 +206,32 @@ local function GetNoLeaderHomePos(inst)
     return inst.components.knownlocations:GetLocation("home")
 end
 
+-----------------------------------------------------------------------------------------------
+--#6 Mine
+
+local function KeepMiningAction(inst)
+    local keep_mining = (inst.components.follower.leader ~= nil and
+                         inst:IsNear(inst.components.follower.leader, KEEP_MINING_DIST))
+    return keep_mining
+end
+
+local function StartMiningCondition(inst)
+    local mine_condition = (inst.components.follower.leader ~= nil and
+                            inst.components.follower.leader.sg ~= nil and
+                            inst.components.follower.leader.sg:HasStateTag("mining"))
+    return mine_condition
+end
+
+local function FindRockToMineAction(inst)
+    local target = FindEntity(inst, SEE_ROCK_DIST, 
+        function(item) 
+            return item.components.workable and item.components.workable.action == ACTIONS.MINE 
+        end)
+        
+    if target ~= nil then
+        return BufferedAction(inst, target, ACTIONS.MINE)
+    end
+end
 -----------------------------------------------------------------------------------------------
 --#7 Nodes
 
@@ -249,11 +248,33 @@ local function SpringCombatMod(amt)
 end
 
 function MermBrain:OnStart()
+    local player = GetPlayer()
+    if player:HasTag("mermfluent") then   
+		STRINGS.MERM_TALK_FOLLOWWILSON    = STRINGS.MERM_TALK_FOLLOWWILSON               
+		STRINGS.MERM_TALK_FIND_FOOD       = STRINGS.MERM_TALK_FIND_FOOD             
+		STRINGS.MERM_TALK_HELP_CHOP_WOOD  = STRINGS.MERM_TALK_HELP_CHOP_WOOD             
+		STRINGS.MERM_TALK_HELP_MINE_ROCK  = STRINGS.MERM_TALK_HELP_MINE_ROCK            
+		STRINGS.MERM_TALK_HELP_HAMMER     = STRINGS.MERM_TALK_HELP_HAMMER             
+		STRINGS.MERM_TALK_PANICBOSS       = STRINGS.MERM_TALK_PANICBOSS            
+		STRINGS.MERM_TALK_PANICBOSS_KING  = STRINGS.MERM_TALK_PANICBOSS_KING       
+		STRINGS.MERM_BATTLECRY            = STRINGS.MERM_BATTLECRY             
+		STRINGS.MERM_GUARD_BATTLECRY 	  = STRINGS.MERM_GUARD_BATTLECRY 	
+	else	
+		STRINGS.MERM_TALK_FOLLOWWILSON    = STRINGS.MERM_TALK_FOLLOWWILSON_UNTRANSLATED               
+		STRINGS.MERM_TALK_FIND_FOOD       = STRINGS.MERM_TALK_FIND_FOOD_UNTRANSLATED                
+		STRINGS.MERM_TALK_HELP_CHOP_WOOD  = STRINGS.MERM_TALK_HELP_CHOP_WOOD_UNTRANSLATED                
+		STRINGS.MERM_TALK_HELP_MINE_ROCK  = STRINGS.MERM_TALK_HELP_MINE_ROCK_UNTRANSLATED               
+		STRINGS.MERM_TALK_HELP_HAMMER     = STRINGS.MERM_TALK_HELP_HAMMER_UNTRANSLATED                
+		STRINGS.MERM_TALK_PANICBOSS       = STRINGS.MERM_TALK_PANICBOSS_UNTRANSLATED               
+		STRINGS.MERM_TALK_PANICBOSS_KING  = STRINGS.MERM_TALK_PANICBOSS_KING_UNTRANSLATED          
+		STRINGS.MERM_BATTLECRY            = STRINGS.MERM_BATTLECRY_UNTRANSLATED                
+		STRINGS.MERM_GUARD_BATTLECRY 	  = STRINGS.MERM_GUARD_BATTLECRY_UNTRANSLATED    
+	end
+
     local root = PriorityNode(
     {
         WhileNode(function() return self.inst.components.health.takingfiredamage end, "OnFire", Panic(self.inst)),
-        WhileNode(function() return self.inst.components.combat.target == nil or not self.inst.components.combat:InCooldown() end, "AttackMomentarily",
-            ChaseAndAttack(self.inst, SpringCombatMod(MAX_CHASE_TIME), SpringCombatMod(MAX_CHASE_DIST))),
+		
         WhileNode(function() return self.inst.components.combat.target ~= nil and self.inst.components.combat:InCooldown() end, "Dodge",
             RunAway(self.inst, function() return self.inst.components.combat.target end, RUN_AWAY_DIST, STOP_RUN_AWAY_DIST)),
 
@@ -290,15 +311,19 @@ function MermBrain:OnStart()
                         ChattyNode(self.inst, "MERM_TALK_HELP_MINE_ROCK",
                             DoAction(self.inst, FindRockToMineAction ))})),
 
+        IfNode(function() return self.inst.components.follower.leader ~= nil end, "HasLeader",
+            ChattyNode(self.inst, "MERM_TALK_FOLLOWWILSON",
+                FaceEntity(self.inst, GetFaceTargetFn, KeepFaceTargetFn ))),
+
+		ChattyNode(self.inst, STRINGS.MERM_BATTLECRY, 	
+			WhileNode(function() return self.inst.components.combat.target == nil or not self.inst.components.combat:InCooldown() end, "AttackMomentarily",
+				ChaseAndAttack(self.inst, SpringCombatMod(MAX_CHASE_TIME), SpringCombatMod(MAX_CHASE_DIST)))),
+			
         ChattyNode(self.inst, "MERM_TALK_FIND_FOOD",
             DoAction(self.inst, EatFoodAction, "Eat Food")),
 
         ChattyNode(self.inst, "MERM_TALK_FOLLOWWILSON",
           Follow(self.inst, function() return self.inst.components.follower.leader end, MIN_FOLLOW_DIST, TARGET_FOLLOW_DIST, MAX_FOLLOW_DIST)),
-
-        IfNode(function() return self.inst.components.follower.leader ~= nil end, "HasLeader",
-            ChattyNode(self.inst, "MERM_TALK_FOLLOWWILSON",
-                FaceEntity(self.inst, GetFaceTargetFn, KeepFaceTargetFn ))),
 
         FaceEntity(self.inst, GetFaceTargetFn, KeepFaceTargetFn),
         Wander(self.inst, GetNoLeaderHomePos, MAX_WANDER_DIST),
