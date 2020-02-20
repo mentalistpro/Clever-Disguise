@@ -99,7 +99,7 @@ _S.CHARACTERS.WATHGRITHR.DESCRIBE.MERMHAT 	= {"Tis a deceitful mask."}
 _S.CHARACTERS.WAXWELL.DESCRIBE.MERMHAT 		= {"This seems rather... fishy."}
 _S.CHARACTERS.WEBBER.DESCRIBE.MERMHAT 		= {"Hopefully they don't notice the extra legs."}
 _S.CHARACTERS.WENDY.DESCRIBE.MERMHAT 		= {"We all hide behind our own masks..."}
-_S.CHARACTERS.WICKERBOTTOM.DESCRIBE.MERMHAT = {"I'm not eager to test out its effectiveness."}
+_S.CHARACTERS.WICKERBOTTOM.DESCRIBE.MERMHAT     = {"I'm not eager to test out its effectiveness."}
 _S.CHARACTERS.WILLOW.DESCRIBE.MERMHAT 		= {"Yuck, who'd want a face like that?"}
 _S.CHARACTERS.WINONA.DESCRIBE.MERMHAT 		= {"Do I look a little green around the gills? Ha!"}
 _S.CHARACTERS.WOLFGANG.DESCRIBE.MERMHAT		= {"Wolfgang will be biggest and strongest fish man!"}
@@ -115,11 +115,11 @@ _S.NAMES.MERMGUARD = "Loyal Merm Guard"
 
 _S.CHARACTERS.GENERIC.DESCRIBE.MERMGUARD 		= {"I feel very guarded around these guys..."}
 _S.CHARACTERS.WARLY.DESCRIBE.MERMGUARD 			= {"A most fearsome fishmonger!"}
-_S.CHARACTERS.WATHGRITHR.DESCRIBE.MERMGUARD 	= {"A formidable warrior, to be sure."}
+_S.CHARACTERS.WATHGRITHR.DESCRIBE.MERMGUARD 	        = {"A formidable warrior, to be sure."}
 _S.CHARACTERS.WAXWELL.DESCRIBE.MERMGUARD 		= {"I'd best try to stay on their good side."}
 _S.CHARACTERS.WEBBER.DESCRIBE.MERMGUARD 		= {"They look pretty scary!"}
 _S.CHARACTERS.WENDY.DESCRIBE.MERMGUARD 			= {"Friend or foe?"}
-_S.CHARACTERS.WICKERBOTTOM.DESCRIBE.MERMGUARD	= {"A royal bodyguard."}
+_S.CHARACTERS.WICKERBOTTOM.DESCRIBE.MERMGUARD	        = {"A royal bodyguard."}
 _S.CHARACTERS.WILLOW.DESCRIBE.MERMGUARD 		= {"I can't tell which way it's looking."}
 _S.CHARACTERS.WINONA.DESCRIBE.MERMGUARD 		= {"Just doin' their job."}
 _S.CHARACTERS.WOLFGANG.DESCRIBE.MERMGUARD		= {"Not as mighty as Wolfgang!"}
@@ -131,26 +131,26 @@ _S.CHARACTERS.WX78.DESCRIBE.MERMGUARD 			= {"YOU WOULD MAKE AN EXCELLENT MINION"
 
 --Merm Talk
 
-_S.MERM_TALK_FOLLOWWILSON_UNTRANSLATED 	= {"Flort glut.", "Blut gloppy Glurtsu!", "Glut Glurtsu flopt!", "Florpy flort."}
-_S.MERM_TALK_FOLLOWWILSON  				= {"Will come with you.", "Make Mermfolk strong!", "You help Mermfolk!", "You okay."}
+_S.MERM_TALK_FOLLOWWILSON_UNTRANSLATED 	        = {"Flort glut.", "Blut gloppy Glurtsu!", "Glut Glurtsu flopt!", "Florpy flort."}
+_S.MERM_TALK_FOLLOWWILSON  			= {"Will come with you.", "Make Mermfolk strong!", "You help Mermfolk!", "You okay."}
 _S.MERM_TALK_FIND_FOOD_UNTRANSLATED		= {"Flort glut.", "Blut gloppy Glurtsu!", "Glort grolt flut.", "Glurt florpy flut!"}
-_S.MERM_TALK_FIND_FOOD					= {"Will come with you.", "Make Mermfolk strong!", "This do fine.", "Find something tasty!"}
+_S.MERM_TALK_FIND_FOOD				= {"Will come with you.", "Make Mermfolk strong!", "This do fine.", "Find something tasty!"}
 
-_S.MERM_TALK_HELP_CHOP_WOOD_UNTRANSLATED	= {	
-_S.MERM_TALK_HELP_CHOP_WOOD 				= {"Will come with you.", "Flort glut."}, {"Make Mermfolk strong!", "Blut gloppy Glurtsu!"}, {"Chop, choppy, chop!", "Grop, groppy, grop!"}, {"Work hard, florp!", "Glort blut, florp!"}},
-_S.MERM_TALK_HELP_MINE_ROCK_UNTRANSLATED	= {
-_S.MERM_TALK_HELP_MINE_ROCK					= {"Will come with you.", "Flort glut."}, {"Make Mermfolk strong!", "Blut gloppy Glurtsu!"}, {"Break rock, easy!", "Wult wop, florty flort!"}, {"Work hard, florp!", "Glort blut, florp!"}},
-_S.MERM_TALK_HELP_HAMMER_UNTRANSLATED		= {   
-_S.MERM_TALK_HELP_HAMMER   					= {"Will come with you.", "Flort glut."}, {"Make Mermfolk strong!", "Blut gloppy Glurtsu!"}, {"Smash! Smash!", "Florph! Florph!"}, {"Work hard, florp!", "Glort blut, florp!"}},
+_S.MERM_TALK_HELP_CHOP_WOOD_UNTRANSLATED	= {"Flort glut.", "Blut gloppy Glurtsu!", "Grop, groppy, grop!", "Glort blut, florp!"}
+_S.MERM_TALK_HELP_CHOP_WOOD 			= {"Will come with you.", "Make Mermfolk strong!", "Chop, choppy, chop!", "Work hard, florp!"}
+_S.MERM_TALK_HELP_MINE_ROCK_UNTRANSLATED	= {"Flort glut.", "Blut gloppy Glurtsu!", "Wult wop, florty flort!", "Glort blut, florp!"}
+_S.MERM_TALK_HELP_MINE_ROCK			= {"Will come with you.", "Make Mermfolk strong!", "Break rock, easy!", "Work hard, florp!"}
+_S.MERM_TALK_HELP_HAMMER_UNTRANSLATED		= {"Flort glut.", "Blut gloppy Glurtsu!", "Florph! Florph!", "Glort blut, florp!"}
+_S.MERM_TALK_HELP_HAMMER   			= {"Will come with you.", "Make Mermfolk strong!", "Smash! Smash!", "Work hard, florp!"}
 
-_S.MERM_TALK_PANICBOSS_UNTRANSLATED			= {
-_S.MERM_TALK_PANICBOSS      				= {"Something coming!", "Gloppy flort!"}, {"Aaah!! Bad thing! Bad thing!", "Gloooorph!! Glurph glot! Glurph glot!"}, {"It come to destroy us!", "Flort wult Glurtsu!"}},
-_S.MERM_TALK_PANICBOSS_KING_UNTRANSLATED	= {
-_S.MERM_TALK_PANICBOSS_KING 				= {"Rally to King!", "Glurtsen blut flort!"}, {"Hurry! Protect kingdom!", "Flurph flrot! Gloppy Glurtsam!"}, {"S-stay brave!!", "G-glop blut flrot!!"}},
+_S.MERM_TALK_PANICBOSS_UNTRANSLATED		= {"Gloppy flort!", "Gloooorph!! Glurph glot! Glurph glot!", "Flort wult Glurtsu!"}
+_S.MERM_TALK_PANICBOSS      			= {"Something coming!", "Aaah!! Bad thing! Bad thing!", "It come to destroy us!"}
+_S.MERM_TALK_PANICBOSS_KING_UNTRANSLATED	= {"Glurtsen blut flort!", "Flurph flrot! Gloppy Glurtsam!", "G-glop blut flrot!!"}
+_S.MERM_TALK_PANICBOSS_KING 			= {"Rally to King!", "Hurry! Protect kingdom!", "S-stay brave!!"}
 
 _S.MERM_BATTLECRY_UNTRANSLATED         		= {"Glorp! Glorpy glup!", "Wult glut!"}
-_S.MERM_BATTLECRY          					= {"Glorp! Go away!", "Destroy you!"}
+_S.MERM_BATTLECRY          			= {"Glorp! Go away!", "Destroy you!"}
 _S.MERM_GUARD_BATTLECRY_UNTRANSLATED  		= {"Wult flrot!", "Flort Glurtsu flut!", "GLOT FLOOOORPH!!", "Glurph Glurtsen!"}
-_S.MERM_GUARD_BATTLECRY     				= {"To battle!", "For glory of Mermfolk!", "ATTAAAACK!!", "Defend King!"}
+_S.MERM_GUARD_BATTLECRY     			= {"To battle!", "For glory of Mermfolk!", "ATTAAAACK!!", "Defend King!"}
 
 https://github.com/mentalistpro/HAM/blob/ceb8b53900890bb9bd184347853697f122224e21/brains/antbrain.lua
