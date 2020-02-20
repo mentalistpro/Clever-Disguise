@@ -44,48 +44,18 @@ end)
 -----------------------------------------------------------------------------------------------
 
 --//CONTENT//
---#1 Face Target
---#2 Chop
---#3 Mine
+--#1 Chop
+--#2 Eat
+--#3 Face Target
 --#4 Hammer
---#5 Eat
+--#5 Home
 --#6 Merm King
---#7 Home
---#8 Nodes
+--#7 Mine
+--#8 Speech
+--#9 Nodes
 
 -----------------------------------------------------------------------------------------------
---#1 Face Target
-
-local function GetFaceTargetFn(inst)
-    if inst.components.timer:TimerExists("dontfacetime") then
-        return nil
-    end
-    
-    local shouldface =  inst.components.follower.leader or 
-                        GetClosestInstWithTag("player", inst, SEE_PLAYER_DIST)              
-    if shouldface and not inst.components.timer:TimerExists("facetime") then
-        inst.components.timer:StartTimer("facetime", FACETIME_BASE + math.random()*FACETIME_RAND)
-    end
-    
-    return shouldface
-end
-
-local function KeepFaceTargetFn(inst, target)
-    if inst.components.timer:TimerExists("dontfacetime") then
-        return nil
-    end    
-    
-    local keepface = (inst.components.follower.leader and inst.components.follower.leader == target) or 
-                     (target:IsValid() and inst:IsNear(target, SEE_PLAYER_DIST))    
-    if not keepface then
-        inst.components.timer:StopTimer("facetime")
-    end
-    
-    return keepface
-end
-
------------------------------------------------------------------------------------------------
---#2 Chop
+--#1 Chop
 
 local function IsDeciduousTreeMonster(guy)
     return guy.monster and guy.prefab == "deciduoustree"
@@ -136,61 +106,7 @@ local function FindTreeToChopAction(inst)
 end
 
 -----------------------------------------------------------------------------------------------
---#3 Mine
-
-local function KeepMiningAction(inst)
-    local keep_mining = (inst.components.follower.leader ~= nil and
-                         inst:IsNear(inst.components.follower.leader, KEEP_MINING_DIST))
-    return keep_mining
-end
-
-local function StartMiningCondition(inst)
-    local mine_condition = (inst.components.follower.leader ~= nil and
-                            inst.components.follower.leader.sg ~= nil and
-                            inst.components.follower.leader.sg:HasStateTag("mining"))
-    return mine_condition
-end
-
-local function FindRockToMineAction(inst)
-    local target = FindEntity(inst, SEE_ROCK_DIST, 
-        function(item) 
-            return item.components.workable and item.components.workable.action == ACTIONS.MINE 
-        end)
-        
-    if target ~= nil then
-        return BufferedAction(inst, target, ACTIONS.MINE)
-    end
-end
-
------------------------------------------------------------------------------------------------
---#4 Hammer
-
-local function KeepHammeringAction(inst)
-    local keep_hammering = (inst.components.follower.leader ~= nil and
-                            inst:IsNear(inst.components.follower.leader, KEEP_HAMMERING_DIST))
-    return keep_hammering
-end
-
-local function StartHammeringCondition(inst)
-    local hammer_condition = (inst.components.follower.leader ~= nil and
-                              inst.components.follower.leader.sg ~= nil and
-                              inst.components.follower.leader.sg:HasStateTag("hammering"))
-    return hammer_condition
-end
-
-local function FindHammerTargetAction(inst)
-    local target = FindEntity(inst, SEE_HAMMER_DIST, 
-                    function(item) 
-                        return item.components.workable and item.components.workable.action == ACTIONS.HAMMER 
-                    end)
-                    
-    if target ~= nil then
-        return BufferedAction(inst, target, ACTIONS.HAMMER)
-    end
-end
-
------------------------------------------------------------------------------------------------
---#5 Eat
+--#2 Eat
 
 local function EatFoodAction(inst)
     if inst.sg:HasStateTag("waking") then
@@ -226,44 +142,65 @@ local function EatFoodAction(inst)
 end
 
 -----------------------------------------------------------------------------------------------
---#6 Merm king
+--#3 Face Target
 
-local function IsThroneValid(inst)
-    if GetWorld() and GetWorld().components.mermkingmanager then
-        local throne = GetWorld.components.mermkingmanager:GetThrone(inst)
-        return  throne ~= nil and 
-                throne:IsValid() and not
-                throne:HasTag("burnt") and not
-                (throne.components.burnable ~= nil and throne.components.burnable:IsBurning() ) 
-                
-                and GetWorld().components.mermkingmanager:ShouldGoToThrone(inst, throne)
+local function GetFaceTargetFn(inst)
+    if inst.components.timer:TimerExists("dontfacetime") then
+        return nil
     end
-    return false
+    
+    local shouldface =  inst.components.follower.leader or 
+                        GetClosestInstWithTag("player", inst, SEE_PLAYER_DIST)              
+    if shouldface and not inst.components.timer:TimerExists("facetime") then
+        inst.components.timer:StartTimer("facetime", FACETIME_BASE + math.random()*FACETIME_RAND)
+    end
+    
+    return shouldface
 end
 
-local function ShouldGoToThrone(inst)
-    if GetWorld() and GetWorld().components.mermkingmanager then
-        local throne = GetWorld().components.mermkingmanager:GetThrone(inst)
-        if throne == nil then
-            throne = FindEntity(inst, SEE_THRONE_DISTANCE, nil, { "mermthrone" })
-        end
-
-        return throne and GetWorld().components.mermkingmanager:ShouldGoToThrone(inst, throne)
+local function KeepFaceTargetFn(inst, target)
+    if inst.components.timer:TimerExists("dontfacetime") then
+        return nil
+    end    
+    
+    local keepface = (inst.components.follower.leader and inst.components.follower.leader == target) or 
+                     (target:IsValid() and inst:IsNear(target, SEE_PLAYER_DIST))    
+    if not keepface then
+        inst.components.timer:StopTimer("facetime")
     end
-    return false
+    
+    return keepface
 end
 
-local function GetThronePosition(inst)
-    if GetWorld() and GetWorld().components.mermkingmanager then
-        local throne = GetWorld().components.mermkingmanager:GetThrone(inst)
-        if throne then
-            return throne:GetPosition()
-        end
+-----------------------------------------------------------------------------------------------
+--#4 Hammer
+
+local function KeepHammeringAction(inst)
+    local keep_hammering = (inst.components.follower.leader ~= nil and
+                            inst:IsNear(inst.components.follower.leader, KEEP_HAMMERING_DIST))
+    return keep_hammering
+end
+
+local function StartHammeringCondition(inst)
+    local hammer_condition = (inst.components.follower.leader ~= nil and
+                              inst.components.follower.leader.sg ~= nil and
+                              inst.components.follower.leader.sg:HasStateTag("hammering"))
+    return hammer_condition
+end
+
+local function FindHammerTargetAction(inst)
+    local target = FindEntity(inst, SEE_HAMMER_DIST, 
+                    function(item) 
+                        return item.components.workable and item.components.workable.action == ACTIONS.HAMMER 
+                    end)
+                    
+    if target ~= nil then
+        return BufferedAction(inst, target, ACTIONS.HAMMER)
     end
 end
 
 -----------------------------------------------------------------------------------------------
---#7 Home
+--#5 Home
 
 local function GoHomeAction(inst)
     if inst.components.combat.target ~= nil then
@@ -305,7 +242,92 @@ local function GetNoLeaderHomePos(inst)
 end
 
 -----------------------------------------------------------------------------------------------
---#7 Nodes
+--#6 Merm king
+
+local function IsThroneValid(inst)
+    if GetWorld() and GetWorld().components.mermkingmanager then
+        local throne = GetWorld.components.mermkingmanager:GetThrone(inst)
+        return  throne ~= nil and 
+                throne:IsValid() and not
+                throne:HasTag("burnt") and not
+                (throne.components.burnable ~= nil and throne.components.burnable:IsBurning() ) 
+                
+                and GetWorld().components.mermkingmanager:ShouldGoToThrone(inst, throne)
+    end
+    return false
+end
+
+local function ShouldGoToThrone(inst)
+    if GetWorld() and GetWorld().components.mermkingmanager then
+        local throne = GetWorld().components.mermkingmanager:GetThrone(inst)
+        if throne == nil then
+            throne = FindEntity(inst, SEE_THRONE_DISTANCE, nil, { "mermthrone" })
+        end
+
+        return throne and GetWorld().components.mermkingmanager:ShouldGoToThrone(inst, throne)
+    end
+    return false
+end
+
+local function GetThronePosition(inst)
+    if GetWorld() and GetWorld().components.mermkingmanager then
+        local throne = GetWorld().components.mermkingmanager:GetThrone(inst)
+        if throne then
+            return throne:GetPosition()
+        end
+    end
+end
+
+-----------------------------------------------------------------------------------------------
+--#7 Mine
+
+local function KeepMiningAction(inst)
+    local keep_mining = (inst.components.follower.leader ~= nil and
+                         inst:IsNear(inst.components.follower.leader, KEEP_MINING_DIST))
+    return keep_mining
+end
+
+local function StartMiningCondition(inst)
+    local mine_condition = (inst.components.follower.leader ~= nil and
+                            inst.components.follower.leader.sg ~= nil and
+                            inst.components.follower.leader.sg:HasStateTag("mining"))
+    return mine_condition
+end
+
+local function FindRockToMineAction(inst)
+    local target = FindEntity(inst, SEE_ROCK_DIST, 
+        function(item) 
+            return item.components.workable and item.components.workable.action == ACTIONS.MINE 
+        end)
+        
+    if target ~= nil then
+        return BufferedAction(inst, target, ACTIONS.MINE)
+    end
+end
+
+-----------------------------------------------------------------------------------------------
+--#8 Speech
+
+local function translationfn(inst)
+    local player = GetPlayer()
+    if player:HasTag("mermfluent") then        
+        return true
+    else
+        return false
+    end
+end
+
+local function makechatpackage(speech)
+	return 	{
+				chatlines = speech,
+				untranslated = STRINGS.MERM_TALK_UNTRANSLATED,
+				translationfn = translationfn        
+			}
+end
+
+
+-----------------------------------------------------------------------------------------------
+--#9 Nodes
 
 local function SpringCombatMod(amt)
     if IsDLCEnabled(1) or IsDLCEnabled(2) or IsDLCEnabled(3) then

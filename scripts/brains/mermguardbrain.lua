@@ -43,47 +43,17 @@ end)
 -----------------------------------------------------------------------------------------------
 
 --//CONTENT//
---#1 Face Target
---#2 Chop
---#3 Mine
+--#1 Chop
+--#2 Eat
+--#3 Face Target
 --#4 Hammer
---#5 Eat
---#6 Home
---#7 Nodes
+--#5 Home
+--#6 Mine
+--#7 Speech
+--#8 Nodes
 
 -----------------------------------------------------------------------------------------------
---#1 Face Target
-
-local function GetFaceTargetFn(inst)
-    if inst.components.timer:TimerExists("dontfacetime") then
-        return nil
-    end
-    
-    local shouldface =  inst.components.follower.leader or 
-                        GetClosestInstWithTag("player", inst, SEE_PLAYER_DIST)              
-    if shouldface and not inst.components.timer:TimerExists("facetime") then
-        inst.components.timer:StartTimer("facetime", FACETIME_BASE + math.random()*FACETIME_RAND)
-    end
-    
-    return shouldface
-end
-
-local function KeepFaceTargetFn(inst, target)
-    if inst.components.timer:TimerExists("dontfacetime") then
-        return nil
-    end    
-    
-    local keepface = (inst.components.follower.leader and inst.components.follower.leader == target) or 
-                     (target:IsValid() and inst:IsNear(target, SEE_PLAYER_DIST))    
-    if not keepface then
-        inst.components.timer:StopTimer("facetime")
-    end
-    
-    return keepface
-end
-
------------------------------------------------------------------------------------------------
---#2 Chop
+--#1 Chop
 
 local function IsDeciduousTreeMonster(guy)
     return guy.monster and guy.prefab == "deciduoustree"
@@ -134,61 +104,7 @@ local function FindTreeToChopAction(inst)
 end
 
 -----------------------------------------------------------------------------------------------
---#3 Mine
-
-local function KeepMiningAction(inst)
-    local keep_mining = (inst.components.follower.leader ~= nil and
-                         inst:IsNear(inst.components.follower.leader, KEEP_MINING_DIST))
-    return keep_mining
-end
-
-local function StartMiningCondition(inst)
-    local mine_condition = (inst.components.follower.leader ~= nil and
-                            inst.components.follower.leader.sg ~= nil and
-                            inst.components.follower.leader.sg:HasStateTag("mining"))
-    return mine_condition
-end
-
-local function FindRockToMineAction(inst)
-    local target = FindEntity(inst, SEE_ROCK_DIST, 
-        function(item) 
-            return item.components.workable and item.components.workable.action == ACTIONS.MINE 
-        end)
-        
-    if target ~= nil then
-        return BufferedAction(inst, target, ACTIONS.MINE)
-    end
-end
-
------------------------------------------------------------------------------------------------
---#4 Hammer
-
-local function KeepHammeringAction(inst)
-    local keep_hammering = (inst.components.follower.leader ~= nil and
-                            inst:IsNear(inst.components.follower.leader, KEEP_HAMMERING_DIST))
-    return keep_hammering
-end
-
-local function StartHammeringCondition(inst)
-    local hammer_condition = (inst.components.follower.leader ~= nil and
-                              inst.components.follower.leader.sg ~= nil and
-                              inst.components.follower.leader.sg:HasStateTag("hammering"))
-    return hammer_condition
-end
-
-local function FindHammerTargetAction(inst)
-    local target = FindEntity(inst, SEE_HAMMER_DIST, 
-                    function(item) 
-                        return item.components.workable and item.components.workable.action == ACTIONS.HAMMER 
-                    end)
-                    
-    if target ~= nil then
-        return BufferedAction(inst, target, ACTIONS.HAMMER)
-    end
-end
-
------------------------------------------------------------------------------------------------
---#5 Eat
+--#2 Eat
 
 local function EatFoodAction(inst)
     if inst.sg:HasStateTag("waking") then
@@ -224,7 +140,65 @@ local function EatFoodAction(inst)
 end
 
 -----------------------------------------------------------------------------------------------
---#6 Home
+--#3 Face Target
+
+local function GetFaceTargetFn(inst)
+    if inst.components.timer:TimerExists("dontfacetime") then
+        return nil
+    end
+    
+    local shouldface =  inst.components.follower.leader or 
+                        GetClosestInstWithTag("player", inst, SEE_PLAYER_DIST)              
+    if shouldface and not inst.components.timer:TimerExists("facetime") then
+        inst.components.timer:StartTimer("facetime", FACETIME_BASE + math.random()*FACETIME_RAND)
+    end
+    
+    return shouldface
+end
+
+local function KeepFaceTargetFn(inst, target)
+    if inst.components.timer:TimerExists("dontfacetime") then
+        return nil
+    end    
+    
+    local keepface = (inst.components.follower.leader and inst.components.follower.leader == target) or 
+                     (target:IsValid() and inst:IsNear(target, SEE_PLAYER_DIST))    
+    if not keepface then
+        inst.components.timer:StopTimer("facetime")
+    end
+    
+    return keepface
+end
+
+-----------------------------------------------------------------------------------------------
+--#4 Hammer
+
+local function KeepHammeringAction(inst)
+    local keep_hammering = (inst.components.follower.leader ~= nil and
+                            inst:IsNear(inst.components.follower.leader, KEEP_HAMMERING_DIST))
+    return keep_hammering
+end
+
+local function StartHammeringCondition(inst)
+    local hammer_condition = (inst.components.follower.leader ~= nil and
+                              inst.components.follower.leader.sg ~= nil and
+                              inst.components.follower.leader.sg:HasStateTag("hammering"))
+    return hammer_condition
+end
+
+local function FindHammerTargetAction(inst)
+    local target = FindEntity(inst, SEE_HAMMER_DIST, 
+                    function(item) 
+                        return item.components.workable and item.components.workable.action == ACTIONS.HAMMER 
+                    end)
+                    
+    if target ~= nil then
+        return BufferedAction(inst, target, ACTIONS.HAMMER)
+    end
+end
+
+-----------------------------------------------------------------------------------------------
+--#5 Home
 
 local function GetNoLeaderHomePos(inst)
     if inst.components.follower and inst.components.follower.leader ~= nil then
@@ -234,7 +208,39 @@ local function GetNoLeaderHomePos(inst)
 end
 
 -----------------------------------------------------------------------------------------------
---#7 Nodes
+--#6 Mine
+
+local function KeepMiningAction(inst)
+    local keep_mining = (inst.components.follower.leader ~= nil and
+                         inst:IsNear(inst.components.follower.leader, KEEP_MINING_DIST))
+    return keep_mining
+end
+
+local function StartMiningCondition(inst)
+    local mine_condition = (inst.components.follower.leader ~= nil and
+                            inst.components.follower.leader.sg ~= nil and
+                            inst.components.follower.leader.sg:HasStateTag("mining"))
+    return mine_condition
+end
+
+local function FindRockToMineAction(inst)
+    local target = FindEntity(inst, SEE_ROCK_DIST, 
+        function(item) 
+            return item.components.workable and item.components.workable.action == ACTIONS.MINE 
+        end)
+        
+    if target ~= nil then
+        return BufferedAction(inst, target, ACTIONS.MINE)
+    end
+end
+
+-----------------------------------------------------------------------------------------------
+--#7 Speech
+
+
+
+-----------------------------------------------------------------------------------------------
+--#8 Nodes
 
 local function SpringCombatMod(amt)
     if IsDLCEnabled(1) or IsDLCEnabled(2) or IsDLCEnabled(3) then
