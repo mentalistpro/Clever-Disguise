@@ -12,28 +12,29 @@ local function OnEquip(inst, owner)
     owner.AnimState:Hide("HAIR_HAT")
     owner.AnimState:Show("HAIR_NOHAT")
     owner.AnimState:Show("HAIR")
-	
+    
     if owner:HasTag("player") then
-		owner.AnimState:Show("HEAD")
-		owner.AnimState:Hide("HEAD_HAIR")
+        owner.AnimState:Show("HEAD")
+        owner.AnimState:Hide("HEAD_HAIR")
     end
     
     --Players, pigs and bunnyman are now considered as merms
-    if (owner:HasTag("player") or owner:HasTag("pig") ) then
-		owner:AddTag("merm")
-		owner:AddTag("mermdisguise")
+    --No need to apply it to merms or Wurt
+    if (owner:HasTag("player") or owner:HasTag("pig") ) and not owner:HasTag("merm")  then
+        owner:AddTag("merm")
+        owner:AddTag("mermdisguise")
     end 
     
     --Monsters are not monsters
     if owner:HasTag("monster") then
-		owner:RemoveTag("monster")
-		owner:AddTag("unmonster")     
+        owner:RemoveTag("monster")
+        owner:AddTag("unmonster")     
     end
     
     --Friendly pigs and spiders no longer follow when disguise is on.
     if owner.components.leader then
-		owner.components.leader:RemoveFollowersByTag("pig")
-		owner.components.leader:RemoveFollowersByTag("spider")
+        owner.components.leader:RemoveFollowersByTag("pig")
+        owner.components.leader:RemoveFollowersByTag("spider")
     end 
 end
 
@@ -45,25 +46,25 @@ local function OnUnequip(inst, owner)
     owner.AnimState:Hide("HAIR_HAT")
     owner.AnimState:Show("HAIR_NOHAT")
     owner.AnimState:Show("HAIR")
-	
+    
     if owner:HasTag("player") then
-		owner.AnimState:Show("HEAD")
-		owner.AnimState:Hide("HEAD_HAIR")
+        owner.AnimState:Show("HEAD")
+        owner.AnimState:Hide("HEAD_HAIR")
     end
 
     if owner:HasTag("mermdisguise") then
-		owner:RemoveTag("merm")
-		owner:RemoveTag("mermdisguise")
+        owner:RemoveTag("merm")
+        owner:RemoveTag("mermdisguise")
     end
 
     if owner:HasTag("unmonster") then
-		owner:RemoveTag("unmonster")
-		owner:AddTag("monster")       
+        owner:RemoveTag("unmonster")
+        owner:AddTag("monster")       
     end
     
     --Friendly merms no longer follow when disguise is off.
     if owner.components.leader then
-		owner.components.leader:RemoveFollowersByTag("merm")
+        owner.components.leader:RemoveFollowersByTag("merm")
     end
 end
 
@@ -94,10 +95,10 @@ local function fn()
     inst.components.inventoryitem.atlasname = "images/inventoryimages/mermhat.xml"
     
     inst:AddComponent("perishable")
-    inst.components.perishable:SetPerishTime(TUNING.MOD_MERMHAT_PERISH)
+    inst.components.perishable:SetPerishTime(TUNING.MERMHAT_PERISH)
     inst.components.perishable:StartPerishing()
     inst.components.perishable:SetOnPerishFn(inst.Remove)
-	
+    
     inst:AddComponent("inspectable")
     inst:AddComponent("tradable")
     
