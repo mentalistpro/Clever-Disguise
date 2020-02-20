@@ -34,6 +34,9 @@ local KEEP_HAMMERING_DIST = 10
 
 local SEE_THRONE_DISTANCE = 50
 
+local FACETIME_BASE       = 2
+local FACETIME_RAND       = 2
+
 local MermBrain = Class(Brain, function(self, inst)
     Brain._ctor(self, inst)
 end)
@@ -54,11 +57,31 @@ end)
 --#1 Face Target
 
 local function GetFaceTargetFn(inst)
-    return GetClosestInstWithTag("player", inst, SEE_PLAYER_DIST)
+    if inst.components.timer:TimerExists("dontfacetime") then
+        return nil
+    end
+    
+    local shouldface =  inst.components.follower.leader or 
+                        GetClosestInstWithTag("player", inst, SEE_PLAYER_DIST)              
+    if shouldface and not inst.components.timer:TimerExists("facetime") then
+        inst.components.timer:StartTimer("facetime", FACETIME_BASE + math.random()*FACETIME_RAND)
+    end
+    
+    return shouldface
 end
 
 local function KeepFaceTargetFn(inst, target)
-    return inst:GetDistanceSqToInst(target) <= SEE_PLAYER_DIST*SEE_PLAYER_DIST
+    if inst.components.timer:TimerExists("dontfacetime") then
+        return nil
+    end    
+    
+    local keepface = (inst.components.follower.leader and inst.components.follower.leader == target) or 
+                     (target:IsValid() and inst:IsNear(target, SEE_PLAYER_DIST))    
+    if not keepface then
+        inst.components.timer:StopTimer("facetime")
+    end
+    
+    return keepface
 end
 
 -----------------------------------------------------------------------------------------------
@@ -69,12 +92,15 @@ local function IsDeciduousTreeMonster(guy)
 end
 
 local function FindDeciduousTreeMonster(inst)
-    return FindEntity(inst, SEE_TREE_DIST / 3, IsDeciduousTreeMonster, function(item) return item.components.workable and item.components.workable.action == ACTIONS.CHOP end)
+    return FindEntity(inst, SEE_TREE_DIST / 3, IsDeciduousTreeMonster, 
+        function(item) 
+            return item.components.workable and item.components.workable.action == ACTIONS.CHOP 
+        end)
 end
 
 local function KeepChoppingAction(inst)
     local keep_chopping = inst.tree_target ~= nil
-        or (inst.components.follower.leader ~= nil and
+        or (inst.components.follower.leader ~= nil and 
             inst:IsNear(inst.components.follower.leader, KEEP_CHOPPING_DIST))
         or FindDeciduousTreeMonster(inst) ~= nil
     
@@ -83,7 +109,7 @@ end
 
 local function StartChoppingCondition(inst)
     local chop_condition = inst.tree_target ~= nil
-        or (inst.components.follower.leader ~= nil and
+        or (inst.components.follower.leader ~= nil and 
             inst.components.follower.leader.sg ~= nil and
             inst.components.follower.leader.sg:HasStateTag("chopping"))
         or FindDeciduousTreeMonster(inst) ~= nil
@@ -92,7 +118,11 @@ local function StartChoppingCondition(inst)
 end
 
 local function FindTreeToChopAction(inst)
-    local target = FindEntity(inst, SEE_TREE_DIST, function(item) return item.components.workable and item.components.workable.action == ACTIONS.CHOP end)
+    local target = FindEntity(inst, SEE_TREE_DIST, 
+        function(item) 
+            return item.components.workable and item.components.workable.action == ACTIONS.CHOP 
+        end)
+        
     if target ~= nil then
         if inst.tree_target ~= nil then
             target = inst.tree_target
@@ -110,21 +140,23 @@ end
 
 local function KeepMiningAction(inst)
     local keep_mining = (inst.components.follower.leader ~= nil and
-            inst:IsNear(inst.components.follower.leader, KEEP_MINING_DIST))
-    
+                         inst:IsNear(inst.components.follower.leader, KEEP_MINING_DIST))
     return keep_mining
 end
 
 local function StartMiningCondition(inst)
     local mine_condition = (inst.components.follower.leader ~= nil and
-            inst.components.follower.leader.sg ~= nil and
-            inst.components.follower.leader.sg:HasStateTag("mining"))
-
+                            inst.components.follower.leader.sg ~= nil and
+                            inst.components.follower.leader.sg:HasStateTag("mining"))
     return mine_condition
 end
 
 local function FindRockToMineAction(inst)
-    local target = FindEntity(inst, SEE_ROCK_DIST, function(item) return item.components.workable and item.components.workable.action == ACTIONS.MINE end)
+    local target = FindEntity(inst, SEE_ROCK_DIST, 
+        function(item) 
+            return item.components.workable and item.components.workable.action == ACTIONS.MINE 
+        end)
+        
     if target ~= nil then
         return BufferedAction(inst, target, ACTIONS.MINE)
     end
@@ -135,21 +167,23 @@ end
 
 local function KeepHammeringAction(inst)
     local keep_hammering = (inst.components.follower.leader ~= nil and
-            inst:IsNear(inst.components.follower.leader, KEEP_HAMMERING_DIST))
-    
+                            inst:IsNear(inst.components.follower.leader, KEEP_HAMMERING_DIST))
     return keep_hammering
 end
 
 local function StartHammeringCondition(inst)
     local hammer_condition = (inst.components.follower.leader ~= nil and
-            inst.components.follower.leader.sg ~= nil and
-            inst.components.follower.leader.sg:HasStateTag("hammering"))
-
+                              inst.components.follower.leader.sg ~= nil and
+                              inst.components.follower.leader.sg:HasStateTag("hammering"))
     return hammer_condition
 end
 
 local function FindHammerTargetAction(inst)
-    local target = FindEntity(inst, SEE_HAMMER_DIST, function(item) return item.components.workable and item.components.workable.action == ACTIONS.HAMMER end)
+    local target = FindEntity(inst, SEE_HAMMER_DIST, 
+                    function(item) 
+                        return item.components.workable and item.components.workable.action == ACTIONS.HAMMER 
+                    end)
+                    
     if target ~= nil then
         return BufferedAction(inst, target, ACTIONS.HAMMER)
     end
@@ -169,7 +203,11 @@ local function EatFoodAction(inst)
     end
     
     if target == nil then
-        target = FindEntity(inst, SEE_FOOD_DIST, function(item) return inst.components.eater:CanEat(item) end, { "VEGGIE", "ROUGHAGE"}, { "INLIMBO" })
+        target = FindEntity(inst, SEE_FOOD_DIST, 
+                    function(item) 
+                        return inst.components.eater:CanEat(item) 
+                    end, { "VEGGIE", "ROUGHAGE"}, { "INLIMBO" })
+                    
         --check for scary things near the food
         if target ~= nil and (GetClosestInstWithTag("scarytoprey", target, SEE_PLAYER_DIST) ~= nil) then
             target = nil
@@ -178,7 +216,11 @@ local function EatFoodAction(inst)
     
     if target ~= nil then
         local act = BufferedAction(inst, target, ACTIONS.EAT)
-        act.validfn = function() return target.components.inventoryitem == nil or target.components.inventoryitem.owner == nil or target.components.inventoryitem.owner == inst end
+        act.validfn = function() 
+                        return  target.components.inventoryitem == nil or 
+                                target.components.inventoryitem.owner == nil or 
+                                target.components.inventoryitem.owner == inst 
+                      end
         return act
     end
 end
@@ -187,20 +229,20 @@ end
 --#6 Merm king
 
 local function IsThroneValid(inst)
-    if GetWorld().components.mermkingmanager then
+    if GetWorld() and GetWorld().components.mermkingmanager then
         local throne = GetWorld.components.mermkingmanager:GetThrone(inst)
-        return throne ~= nil
-            and throne:IsValid()
-            and not (throne.components.burnable ~= nil and throne.components.burnable:IsBurning())
-            and not throne:HasTag("burnt")
-            and GetWorld().components.mermkingmanager:ShouldGoToThrone(inst, throne)
+        return  throne ~= nil and 
+                throne:IsValid() and not
+                throne:HasTag("burnt") and not
+                (throne.components.burnable ~= nil and throne.components.burnable:IsBurning() ) 
+                
+                and GetWorld().components.mermkingmanager:ShouldGoToThrone(inst, throne)
     end
-
     return false
 end
 
 local function ShouldGoToThrone(inst)
-    if GetWorld().components.mermkingmanager then
+    if GetWorld() and GetWorld().components.mermkingmanager then
         local throne = GetWorld().components.mermkingmanager:GetThrone(inst)
         if throne == nil then
             throne = FindEntity(inst, SEE_THRONE_DISTANCE, nil, { "mermthrone" })
@@ -208,12 +250,11 @@ local function ShouldGoToThrone(inst)
 
         return throne and GetWorld().components.mermkingmanager:ShouldGoToThrone(inst, throne)
     end
-
     return false
 end
 
 local function GetThronePosition(inst)
-    if GetWorld().components.mermkingmanager then
+    if GetWorld() and GetWorld().components.mermkingmanager then
         local throne = GetWorld().components.mermkingmanager:GetThrone(inst)
         if throne then
             return throne:GetPosition()
@@ -230,12 +271,11 @@ local function GoHomeAction(inst)
     end
     
     local home = inst.components.homeseeker ~= nil and inst.components.homeseeker.home or nil
-    return home ~= nil
-        and home:IsValid()
-        and not (home.components.burnable ~= nil and home.components.burnable:IsBurning())
-        and not home:HasTag("burnt")
-        and BufferedAction(inst, home, ACTIONS.GOHOME)
-        or nil
+    return  home ~= nil and 
+            home:IsValid() and not
+            home:HasTag("burnt") and not
+            (home.components.burnable ~= nil and home.components.burnable:IsBurning() ) and
+            BufferedAction(inst, home, ACTIONS.GOHOME) or nil
 end
 
 local function ShouldGoHome(inst)
@@ -245,23 +285,22 @@ local function ShouldGoHome(inst)
 
     --one merm should stay outside
     local home = inst.components.homeseeker ~= nil and inst.components.homeseeker.home or nil
-    return home == nil
-        or home.components.childspawner == nil
-        or home.components.childspawner:CountChildrenOutside() > 1
+    return  home == nil or 
+            home.components.childspawner == nil or
+            home.components.childspawner:CountChildrenOutside() > 1
 end
 
 local function IsHomeOnFire(inst)
-    return inst.components.homeseeker
-        and inst.components.homeseeker.home
-        and inst.components.homeseeker.home.components.burnable
-        and inst.components.homeseeker.home.components.burnable:IsBurning()
+    return  inst.components.homeseeker and
+            inst.components.homeseeker.home and
+            inst.components.homeseeker.home.components.burnable and
+            inst.components.homeseeker.home.components.burnable:IsBurning()
 end
 
 local function GetNoLeaderHomePos(inst)
     if inst.components.follower and inst.components.follower.leader ~= nil then
         return nil
     end
-
     return inst.components.knownlocations:GetLocation("home")
 end
 
@@ -283,11 +322,10 @@ end
 function MermBrain:OnStart()
     local root = PriorityNode(
     {
-        IfNode(function() return GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager.king end,"panic with king",
+        IfNode(function() return GetWorld() and GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager.king end, "panic with king",
             BrainCommon.PanicWhenScared(self.inst, .25, "MERM_TALK_PANICBOSS_KING")),
         IfNode(function() return not GetWorld().components.mermkingmanager or not GetWorld().components.mermkingmanager.king  end,"panic with no king",
             BrainCommon.PanicWhenScared(self.inst, .25, "MERM_TALK_PANICBOSS")),
-        WhileNode(function() return self.inst.components.hauntable ~= nil and self.inst.components.hauntable.panic end, "PanicHaunted", Panic(self.inst)),
         WhileNode(function() return self.inst.components.health.takingfiredamage end, "OnFire", Panic(self.inst)),
         WhileNode(function() return self.inst.components.combat.target == nil or not self.inst.components.combat:InCooldown() end, "AttackMomentarily",
             ChaseAndAttack(self.inst, SpringCombatMod(MAX_CHASE_TIME), SpringCombatMod(MAX_CHASE_DIST))),
@@ -316,6 +354,12 @@ function MermBrain:OnStart()
                     LoopNode{
                         ChattyNode(self.inst, "MERM_TALK_HELP_MINE_ROCK",
                             DoAction(self.inst, FindRockToMineAction ))})),
+                            
+        IfNode(function() return StartHammeringCondition(self.inst) end, "hammer", 
+                WhileNode(function() return KeepHammeringAction(self.inst) end, "keep hammering", 
+                    LoopNode{
+                        ChattyNode(self.inst, "MERM_TALK_HELP_HAMMER",
+                            DoAction(self.inst, FindHammerTargetAction ))})),
 
         ChattyNode(self.inst, "MERM_TALK_FOLLOWWILSON",
           Follow(self.inst, function() return self.inst.components.follower.leader end, MIN_FOLLOW_DIST, TARGET_FOLLOW_DIST, MAX_FOLLOW_DIST)),
