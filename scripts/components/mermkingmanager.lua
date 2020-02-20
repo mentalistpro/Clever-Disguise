@@ -43,18 +43,15 @@ end)
 local function OnKingDeath(inst, data)
 	local manager = GetWorld().components.mermkingmanager
 	manager.king.persists = false
-
 	manager.king_dying = true
 end
 
 local function OnKingRemoval(inst, data)
 	local manager = GetWorld().components.mermkingmanager
-	
 	manager.inst:RemoveEventCallback("onremove", OnKingRemoval, manager.king)
 	manager.inst:RemoveEventCallback("death", OnKingDeath, manager.king)
 	
 	GetWorld():PushEvent("onmermkingdestroyed", {throne = manager.main_throne})
-
 	table.insert(manager.thrones, manager.main_throne)
 	
 	manager.main_throne = nil
@@ -78,7 +75,6 @@ local function OnCandidateRemoved(inst, data)
 
 	manager.inst:RemoveEventCallback("death", OnCandidateRemoved, inst)
 	manager.inst:RemoveEventCallback("onremove", OnCandidateRemoved, inst)
-
 	manager.candidates[throne] = nil
 
 	if manager:IsThroneValid(throne) then
@@ -87,7 +83,6 @@ local function OnCandidateRemoved(inst, data)
 end
 
 function MermKingManager:OnThroneDestroyed(throne)
-
 	local removal_index = nil
 	for index, throne_instance in ipairs(self.thrones) do
 		if throne == throne_instance then
@@ -101,12 +96,11 @@ function MermKingManager:OnThroneDestroyed(throne)
 	end
 
 	local candidate = self.candidates[throne]
-
 	if candidate ~= nil then
 		if self:IsCandidateAtThrone(candidate, throne) then
 			candidate:PushEvent("getup")
 		end
-
+		
 		candidate.nameoverride = nil
 		self.inst:RemoveEventCallback("death", OnCandidateRemoved, candidate)
         self.inst:RemoveEventCallback("onremove", OnCandidateRemoved, candidate)
@@ -124,7 +118,6 @@ function MermKingManager:OnThroneDestroyed(throne)
 end
 
 function MermKingManager:CreateMermKing(candidate, throne)
-
 	candidate.components.inventory:DropEverything()
     self.inst:RemoveEventCallback("onremove", OnCandidateRemoved, candidate)
 	self.inst:RemoveEventCallback("death", OnCandidateRemoved, candidate)
@@ -150,14 +143,13 @@ function MermKingManager:CreateMermKing(candidate, throne)
 			self.inst:RemoveEventCallback("death", OnCandidateRemoved, v)
 		end
 	end
+	
 	self.candidates = {}
 	self.candidate_transforming = nil
-
     GetWorld():PushEvent("onmermkingcreated", {king = self.king, throne = self:GetMainThrone()})
 end
 
 function MermKingManager:FindMermCandidate(throne)
-
 	-- Why are we finding a candidate if we already have a king?
 	if self:HasKing() then
 		print ("ERROR? Trying to find candidate when we already have a king")
@@ -199,7 +191,6 @@ end
 
 function MermKingManager:ShouldTransform(merm)
 	local throne = self:GetThrone(merm)
-	
 	local should_transform = merm and throne and self:IsCandidateAtThrone(merm, throne) and
 		  merm.components.mermcandidate:ShouldTransform() and (self.candidate_transforming == nil or self.candidate_transforming == merm)
 
@@ -351,7 +342,6 @@ function MermKingManager:LoadPostPass(newents, savedata)
 			table.insert(self.thrones, newents[v].entity)
 		end
 	end
-
 end
 
 return MermKingManager

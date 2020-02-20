@@ -46,13 +46,13 @@ local events=
         end
     end),
 
-	EventHandler("onmermkingcreated", function(inst) 
+    EventHandler("onmermkingcreated", function(inst) 
         inst.sg:GoToState("buff")
     end),
     EventHandler("onmermkingdestroyed", function(inst) 
         inst.sg:GoToState("debuff")
     end),
-	
+    
     EventHandler("getup", function(inst) 
         inst.sg:GoToState("getup")
     end),
