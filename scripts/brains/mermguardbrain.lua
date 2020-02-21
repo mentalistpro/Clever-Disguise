@@ -49,8 +49,7 @@ end)
 --#4 Hammer
 --#5 Home
 --#6 Mine
---#7 Speech
---#8 Nodes
+--#7 Nodes
 
 -----------------------------------------------------------------------------------------------
 --#1 Chop
@@ -233,14 +232,8 @@ local function FindRockToMineAction(inst)
         return BufferedAction(inst, target, ACTIONS.MINE)
     end
 end
-
 -----------------------------------------------------------------------------------------------
---#7 Speech
-
-
-
------------------------------------------------------------------------------------------------
---#8 Nodes
+--#7 Nodes
 
 local function SpringCombatMod(amt)
     if IsDLCEnabled(1) or IsDLCEnabled(2) or IsDLCEnabled(3) then
@@ -255,11 +248,33 @@ local function SpringCombatMod(amt)
 end
 
 function MermBrain:OnStart()
+    local player = GetPlayer()
+    if player:HasTag("mermfluent") then   
+		STRINGS.MERM_TALK_FOLLOWWILSON    = STRINGS.MERM_TALK_FOLLOWWILSON               
+		STRINGS.MERM_TALK_FIND_FOOD       = STRINGS.MERM_TALK_FIND_FOOD             
+		STRINGS.MERM_TALK_HELP_CHOP_WOOD  = STRINGS.MERM_TALK_HELP_CHOP_WOOD             
+		STRINGS.MERM_TALK_HELP_MINE_ROCK  = STRINGS.MERM_TALK_HELP_MINE_ROCK            
+		STRINGS.MERM_TALK_HELP_HAMMER     = STRINGS.MERM_TALK_HELP_HAMMER             
+		STRINGS.MERM_TALK_PANICBOSS       = STRINGS.MERM_TALK_PANICBOSS            
+		STRINGS.MERM_TALK_PANICBOSS_KING  = STRINGS.MERM_TALK_PANICBOSS_KING       
+		STRINGS.MERM_BATTLECRY            = STRINGS.MERM_BATTLECRY             
+		STRINGS.MERM_GUARD_BATTLECRY 	  = STRINGS.MERM_GUARD_BATTLECRY 	
+	else	
+		STRINGS.MERM_TALK_FOLLOWWILSON    = STRINGS.MERM_TALK_FOLLOWWILSON_UNTRANSLATED               
+		STRINGS.MERM_TALK_FIND_FOOD       = STRINGS.MERM_TALK_FIND_FOOD_UNTRANSLATED                
+		STRINGS.MERM_TALK_HELP_CHOP_WOOD  = STRINGS.MERM_TALK_HELP_CHOP_WOOD_UNTRANSLATED                
+		STRINGS.MERM_TALK_HELP_MINE_ROCK  = STRINGS.MERM_TALK_HELP_MINE_ROCK_UNTRANSLATED               
+		STRINGS.MERM_TALK_HELP_HAMMER     = STRINGS.MERM_TALK_HELP_HAMMER_UNTRANSLATED                
+		STRINGS.MERM_TALK_PANICBOSS       = STRINGS.MERM_TALK_PANICBOSS_UNTRANSLATED               
+		STRINGS.MERM_TALK_PANICBOSS_KING  = STRINGS.MERM_TALK_PANICBOSS_KING_UNTRANSLATED          
+		STRINGS.MERM_BATTLECRY            = STRINGS.MERM_BATTLECRY_UNTRANSLATED                
+		STRINGS.MERM_GUARD_BATTLECRY 	  = STRINGS.MERM_GUARD_BATTLECRY_UNTRANSLATED    
+	end
+
     local root = PriorityNode(
     {
         WhileNode(function() return self.inst.components.health.takingfiredamage end, "OnFire", Panic(self.inst)),
-        WhileNode(function() return self.inst.components.combat.target == nil or not self.inst.components.combat:InCooldown() end, "AttackMomentarily",
-            ChaseAndAttack(self.inst, SpringCombatMod(MAX_CHASE_TIME), SpringCombatMod(MAX_CHASE_DIST))),
+		
         WhileNode(function() return self.inst.components.combat.target ~= nil and self.inst.components.combat:InCooldown() end, "Dodge",
             RunAway(self.inst, function() return self.inst.components.combat.target end, RUN_AWAY_DIST, STOP_RUN_AWAY_DIST)),
 
@@ -296,15 +311,19 @@ function MermBrain:OnStart()
                         ChattyNode(self.inst, "MERM_TALK_HELP_MINE_ROCK",
                             DoAction(self.inst, FindRockToMineAction ))})),
 
+        IfNode(function() return self.inst.components.follower.leader ~= nil end, "HasLeader",
+            ChattyNode(self.inst, "MERM_TALK_FOLLOWWILSON",
+                FaceEntity(self.inst, GetFaceTargetFn, KeepFaceTargetFn ))),
+
+		ChattyNode(self.inst, STRINGS.MERM_BATTLECRY, 	
+			WhileNode(function() return self.inst.components.combat.target == nil or not self.inst.components.combat:InCooldown() end, "AttackMomentarily",
+				ChaseAndAttack(self.inst, SpringCombatMod(MAX_CHASE_TIME), SpringCombatMod(MAX_CHASE_DIST)))),
+			
         ChattyNode(self.inst, "MERM_TALK_FIND_FOOD",
             DoAction(self.inst, EatFoodAction, "Eat Food")),
 
         ChattyNode(self.inst, "MERM_TALK_FOLLOWWILSON",
           Follow(self.inst, function() return self.inst.components.follower.leader end, MIN_FOLLOW_DIST, TARGET_FOLLOW_DIST, MAX_FOLLOW_DIST)),
-
-        IfNode(function() return self.inst.components.follower.leader ~= nil end, "HasLeader",
-            ChattyNode(self.inst, "MERM_TALK_FOLLOWWILSON",
-                FaceEntity(self.inst, GetFaceTargetFn, KeepFaceTargetFn ))),
 
         FaceEntity(self.inst, GetFaceTargetFn, KeepFaceTargetFn),
         Wander(self.inst, GetNoLeaderHomePos, MAX_WANDER_DIST),
