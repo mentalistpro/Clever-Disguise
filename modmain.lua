@@ -14,19 +14,12 @@ Assets =
 --1. Config
 --2. Recipes
 --3. Strings
+--4. AddPrefabPostInit
 
 -----------------------------------------------------------------
 --1. Config
 
 TUNING.MERMHAT_PERISH = GetModConfigData("perish")
-
-local function ItemIsFish(inst)
-    inst:AddTag("fish")
-end
-
-AddPrefabPostInit("eel", ItemIsFish)
-AddPrefabPostInit("fish", ItemIsFish)
-AddPrefabPostInit("tropical_fish", ItemIsFish)
 
 -----------------------------------------------------------------
 --2. Recipes
@@ -153,4 +146,38 @@ _S.MERM_BATTLECRY                           = {"Glorp! Go away!", "Destroy you!"
 _S.MERM_GUARD_BATTLECRY_UNTRANSLATED        = {"Wult flrot!", "Flort Glurtsu flut!", "GLOT FLOOOORPH!!", "Glurph Glurtsen!"}
 _S.MERM_GUARD_BATTLECRY                     = {"To battle!", "For glory of Mermfolk!", "ATTAAAACK!!", "Defend King!"}
 
+------------------------------------------------------------------------------------------------------------------------
+--4. AddPrefabPostInit
 
+--Fish tags
+
+local function ItemIsFish(inst)
+    inst:AddTag("fish")
+end
+
+AddPrefabPostInit("eel", ItemIsFish)
+AddPrefabPostInit("fish", ItemIsFish)
+AddPrefabPostInit("tropical_fish", ItemIsFish)
+
+--Pigs target merms
+
+local function NormalKeepTargetFn_new(inst)
+    local notags = {"FX", "NOCLICK","INLIMBO"}
+    local yestags = {"monster", "merm"}
+    return FindEntity(inst, TUNING.PIG_TARGET_DIST, function(guy)
+		if not guy.LightWatcher or guy.LightWatcher:IsInLight() then
+			return guy.components.health and not guy.components.health:IsDead() and inst.components.combat:CanTarget(guy) and not 
+			(inst.components.follower.leader ~= nil and guy:HasTag("abigail"))
+		end
+	end, yestags, notags)
+end
+
+local prefabs = {"pigman", "pigguard", "wildbore"}
+
+for k,v in pairs(prefabs) do
+	AddPrefabPostInit(v, function(inst)   
+		if inst.components.combat then
+			inst.components.combat:SetRetargetFunction(3, NormalKeepTargetFn_new)
+		end
+	end)
+end
