@@ -55,63 +55,22 @@ local sounds_guard =
     buff = "dontstarve/characters/wurt/merm/warrior/yell",
 } 
 
--------------------------------------------------------------------------------------------------------------------------
-
---//CONTENT//
---#1 TUNING
---#2 Chop 
---#3 Combat
---#4 Merm King
---#5 Sleep
---#6 Target
---#7 Trade
---#8 Fn
-
--------------------------------------------------------------------------------------------------------------------------
---#1 TUNING
-
 local MAX_TARGET_SHARES = 5
 local SHARE_TARGET_DIST = 40
 
-local seg_time = 30
-local total_day_time = seg_time*16
+-------------------------------------------------------------------------------------------------------------------------
 
---Merm
-    TUNING.MERM_DAMAGE = 30
-    TUNING.MERM_DAMAGE_KINGBONUS = 40
-    TUNING.MERM_HEALTH = 250
-    TUNING.MERM_HEALTH_KINGBONUS = 280
-
-    TUNING.MERM_ATTACK_PERIOD = 3 
-    TUNING.MERM_DEFEND_DIST = 30
-    TUNING.MERM_TARGET_DIST = 10
-    TUNING.MERM_RUN_SPEED = 8
-    TUNING.MERM_WALK_SPEED = 3
-
-    TUNING.MERM_LOYALTY_MAXTIME = 3 * total_day_time
-    TUNING.MERM_LOYALTY_PER_HUNGER = total_day_time/25
-    TUNING.MERM_MAX_TARGET_SHARES = 5
-    TUNING.MERM_SHARE_TARGET_DIST = 40
-
---Mermguard
-    TUNING.PUNY_MERM_DAMAGE = 20
-    TUNING.MERM_GUARD_DAMAGE = 50
-    TUNING.PUNY_MERM_HEALTH = 200
-    TUNING.MERM_GUARD_HEALTH = 330
-    
-    TUNING.MERM_GUARD_ATTACK_PERIOD = 3 
-    TUNING.MERM_GUARD_DEFEND_DIST = 40
-    TUNING.MERM_GUARD_TARGET_DIST = 15
-    TUNING.MERM_GUARD_RUN_SPEED = 8
-    TUNING.MERM_GUARD_WALK_SPEED = 3
-
-    TUNING.MERM_GUARD_LOYALTY_MAXTIME = 3 * total_day_time
-    TUNING.MERM_GUARD_LOYALTY_PER_HUNGER = total_day_time/25
-    TUNING.MERM_GUARD_MAX_TARGET_SHARES = 8
-    TUNING.MERM_GUARD_SHARE_TARGET_DIST = 60
+--//CONTENT//
+--#1 Chop 
+--#2 Combat
+--#3 Merm King
+--#4 Sleep
+--#5 Target
+--#6 Trade
+--#7 Fn
 
 -------------------------------------------------------------------------------------------------------------------------
---#2 Chop
+--#1 Chop
 
 local function SuggestTreeTarget(inst, data)
     if data ~= nil and data.tree ~= nil and inst:GetBufferedAction() ~= ACTIONS.CHOP then
@@ -120,7 +79,7 @@ local function SuggestTreeTarget(inst, data)
 end
 
 -------------------------------------------------------------------------------------------------------------------------
---#3 Combat
+--#2 Combat
 
 local function OnAttackedByDecidRoot(inst, attacker)
     local share_target_dist = inst:HasTag("mermguard") and TUNING.MERM_GUARD_SHARE_TARGET_DIST or TUNING.MERM_SHARE_TARGET_DIST
@@ -176,7 +135,7 @@ local function OnAttacked(inst, data)
 end
 
 -------------------------------------------------------------------------------------------------------------------------
---#4 Merm King
+--#3 Merm King
 
 local function RoyalUpgrade(inst)
     if inst.components.health:IsDead() then
@@ -221,7 +180,7 @@ local function RoyalGuardUpgrade(inst)
 end
 
 -------------------------------------------------------------------------------------------------------------------------
---#5 Sleep
+--#4 Sleep
 
 local function ShouldSleep(inst)
     return  GetClock():IsDay() and not 
@@ -252,7 +211,7 @@ local function ShouldGuardWakeUp(inst)
 end
 
 -------------------------------------------------------------------------------------------------------------------------
---#6 Target
+--#5 Target
 
 local function SpringCombatMod(amt)
     if IsDLCEnabled(1) or IsDLCEnabled(2) or IsDLCEnabled(3) then
@@ -320,7 +279,7 @@ local function OnTimerDone(inst, data)
 end
 
 -------------------------------------------------------------------------------------------------------------------------
---#7 Trade
+--#6 Trade
 
 local function ShouldAcceptItem(inst, item, giver)
     local giver = GetPlayer()
@@ -383,7 +342,7 @@ local function OnRefuseItem(inst, item)
 end
 
 -------------------------------------------------------------------------------------------------------------------------
---#8 Fn
+--#7 Fn
 
 local function MakeMerm(name, assets, prefabs, postinit)
     local function fn()

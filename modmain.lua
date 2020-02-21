@@ -14,19 +14,50 @@ Assets =
 --1. Config
 --2. Recipes
 --3. Strings
+--4. AddPrefabPostInit
 
 -----------------------------------------------------------------
 --1. Config
 
-TUNING.MERMHAT_PERISH = GetModConfigData("perish")
+local seg_time = 30
+local total_day_time = seg_time*16
 
-local function ItemIsFish(inst)
-    inst:AddTag("fish")
-end
+--Merm
+    TUNING.MERM_DAMAGE = 30
+    TUNING.MERM_DAMAGE_KINGBONUS = 40
+    TUNING.MERM_HEALTH = 250
+    TUNING.MERM_HEALTH_KINGBONUS = 280
 
-AddPrefabPostInit("eel", ItemIsFish)
-AddPrefabPostInit("fish", ItemIsFish)
-AddPrefabPostInit("tropical_fish", ItemIsFish)
+    TUNING.MERM_ATTACK_PERIOD = 3 
+    TUNING.MERM_DEFEND_DIST = 30
+    TUNING.MERM_TARGET_DIST = 10
+    TUNING.MERM_RUN_SPEED = 8
+    TUNING.MERM_WALK_SPEED = 3
+
+    TUNING.MERM_LOYALTY_MAXTIME = 3 * total_day_time
+    TUNING.MERM_LOYALTY_PER_HUNGER = total_day_time/25
+    TUNING.MERM_MAX_TARGET_SHARES = 5
+    TUNING.MERM_SHARE_TARGET_DIST = 40
+
+--Mermguard
+    TUNING.PUNY_MERM_DAMAGE = 20
+    TUNING.MERM_GUARD_DAMAGE = 50
+    TUNING.PUNY_MERM_HEALTH = 200
+    TUNING.MERM_GUARD_HEALTH = 330
+    
+    TUNING.MERM_GUARD_ATTACK_PERIOD = 3 
+    TUNING.MERM_GUARD_DEFEND_DIST = 40
+    TUNING.MERM_GUARD_TARGET_DIST = 15
+    TUNING.MERM_GUARD_RUN_SPEED = 8
+    TUNING.MERM_GUARD_WALK_SPEED = 3
+
+    TUNING.MERM_GUARD_LOYALTY_MAXTIME = 3 * total_day_time
+    TUNING.MERM_GUARD_LOYALTY_PER_HUNGER = total_day_time/25
+    TUNING.MERM_GUARD_MAX_TARGET_SHARES = 8
+    TUNING.MERM_GUARD_SHARE_TARGET_DIST = 60
+	
+--Mermhat
+	TUNING.MERMHAT_PERISH = GetModConfigData("perish")
 
 -----------------------------------------------------------------
 --2. Recipes
@@ -153,4 +184,35 @@ _S.MERM_BATTLECRY                           = {"Glorp! Go away!", "Destroy you!"
 _S.MERM_GUARD_BATTLECRY_UNTRANSLATED        = {"Wult flrot!", "Flort Glurtsu flut!", "GLOT FLOOOORPH!!", "Glurph Glurtsen!"}
 _S.MERM_GUARD_BATTLECRY                     = {"To battle!", "For glory of Mermfolk!", "ATTAAAACK!!", "Defend King!"}
 
+------------------------------------------------------------------------------------------------------------------------
+--4. AddPrefabPostInit
 
+--Fish tags
+
+local function ItemIsFish(inst)
+    inst:AddTag("fish")
+end
+
+AddPrefabPostInit("eel", ItemIsFish)
+AddPrefabPostInit("fish", ItemIsFish)
+AddPrefabPostInit("tropical_fish", ItemIsFish)
+
+--Pigs target merms
+
+local function NormalKeepTargetFn_new(inst)
+    local notags = {"FX", "NOCLICK","INLIMBO"}
+    local yestags = {"monster", "merm"}
+    return _G.FindEntity(inst, TUNING.PIG_TARGET_DIST, function(guy)
+		return not (inst.components.follower.leader ~= nil and guy:HasTag("abigail"))
+	end, yestags, notags)
+end
+
+local prefabs = {"pigman", "wildbore"} --no need to touch pigguard functions
+
+for k,v in pairs(prefabs) do
+	AddPrefabPostInit(v, function(inst)   
+		if inst.components.combat then
+			inst.components.combat:SetRetargetFunction(3, NormalKeepTargetFn_new)
+		end
+	end)
+end
