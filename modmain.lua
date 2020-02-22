@@ -199,12 +199,16 @@ AddPrefabPostInit("tropical_fish", ItemIsFish)
 
 --Pigs target merms
 
+local FindEntity = _G.FindEntity
+
 local function NormalKeepTargetFn_new(inst)
-    local notags = {"FX", "NOCLICK","INLIMBO"}
-    local yestags = {"monster", "merm"}
-    return _G.FindEntity(inst, TUNING.PIG_TARGET_DIST, function(guy)
-		return not (inst.components.follower.leader ~= nil and guy:HasTag("abigail"))
-	end, yestags, notags)
+    return FindEntity(inst, TUNING.PIG_TARGET_DIST,
+	function(guy)
+		if not guy.LightWatcher or guy.LightWatcher:IsInLight() then
+			return (guy:HasTag("monster") or guy:HasTag("merm") ) and guy.components.health and not guy.components.health:IsDead() and inst.components.combat:CanTarget(guy) and not 
+			(inst.components.follower.leader ~= nil and guy:HasTag("abigail"))
+		end
+	end)
 end
 
 local prefabs = {"pigman", "wildbore"} --no need to touch pigguard functions
