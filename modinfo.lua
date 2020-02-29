@@ -1,7 +1,7 @@
-name                        = "Befriendable Merms"
-description                 = "Bye pigs, merms are my new friends!"
+name                        = "Clever Disguise"
+description                 = "Disguise yourself as a merm"
 author                      = "Mentalistpro"
-version                     = "1.0"
+version                     = "1.2.1"
 forumthread                 = ""
 api_version                 = 6
 
@@ -15,4 +15,14 @@ icon                        = "modicon.tex"
 
 configuration_options =
 {
+    {
+    name = "perish",
+    label = "Perishability",
+    options =   {
+                    {description = "Default (Fast)", data = 6*480},
+                    {description = "Medium", data = 10*480},
+                    {description = "Slow", data = 15*480},
+                },
+    default = 6*480,
+    }
 }
