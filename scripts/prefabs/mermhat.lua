@@ -4,7 +4,14 @@ local assets =
 }
 
 -----------------------------------------------------------------------------------------
--- Equipped
+
+--[[CONTENT]]
+--#1 OnEquip
+--#2 OnUnequip
+--#3 fn()
+
+-----------------------------------------------------------------------------------------
+--#1 OnEquip
 
 local function OnEquip(inst, owner)
     owner.AnimState:OverrideSymbol("swap_hat", "hat_merm", "swap_hat")
@@ -18,8 +25,7 @@ local function OnEquip(inst, owner)
         owner.AnimState:Hide("HEAD_HAIR")
     end
     
-    --Players, pigs and bunnyman are now considered as merms
-    --No need to apply it to merms or Wurt
+    --If worn, you are a merm
     if (owner:HasTag("player") or owner:HasTag("pig") ) and not owner:HasTag("merm")  then
         owner:AddTag("merm")
         owner:AddTag("mermdisguise")
@@ -39,7 +45,7 @@ local function OnEquip(inst, owner)
 end
 
 -----------------------------------------------------------------------------------------
--- Unequipped
+--#2 OnUnequip
 
 local function OnUnequip(inst, owner)
     owner.AnimState:Hide("HAT")
@@ -69,6 +75,7 @@ local function OnUnequip(inst, owner)
 end
 
 -----------------------------------------------------------------------------------------
+--#3 fn()
     
 local function fn()
     local inst = CreateEntity()
@@ -81,6 +88,7 @@ local function fn()
     inst.AnimState:SetBuild("hat_merm") --fname (zip file under /anim)
     inst.AnimState:PlayAnimation("anim")
 
+    inst:AddTag("disguise")
     inst:AddTag("hat")
     inst:AddTag("merm")
     inst:AddTag("show_spoilage")
