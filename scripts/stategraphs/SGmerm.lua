@@ -7,6 +7,7 @@ local actionhandlers =
     ActionHandler(ACTIONS.CHOP, "chop"),
     ActionHandler(ACTIONS.MINE, "mine"),
     ActionHandler(ACTIONS.HAMMER, "hammer"),
+    ActionHandler(ACTIONS.FISH, "fishing_pre"),
 }
 
 
@@ -60,6 +61,119 @@ local events=
 
 local states=
 {
+    State{
+        name = "fishing_pre",
+        tags = {"canrotate", "prefish", "fishing"},
+        onenter = function(inst)
+            inst.AnimState:PlayAnimation("fish_pre")
+        end,
+
+        events =
+        {
+            EventHandler("animover", function(inst)
+                inst:PerformBufferedAction()
+                inst.sg:GoToState("fishing")
+            end),
+        },
+    },
+
+    State{
+        name = "fishing",
+        tags = {"canrotate", "fishing"},
+
+        onenter = function(inst)
+            inst.AnimState:PlayAnimation("fish_loop", true)
+            inst.components.fishingrod:WaitForFish()
+        end,
+
+        events =
+        {
+            EventHandler("fishingnibble", function(inst) inst.sg:GoToState("fishing_nibble") end ),
+            EventHandler("fishingloserod", function(inst) inst.sg:GoToState("loserod") end),
+        },
+    },
+
+    State{
+        name = "fishing_pst",
+        tags = {"canrotate", "fishing"},
+        onenter = function(inst)
+            inst.AnimState:PushAnimation("fish_loop", true)
+            inst.AnimState:PlayAnimation("fish_pst")
+        end,
+
+        events =
+        {
+            EventHandler("animover", function(inst) inst.sg:GoToState("idle") end),
+        },
+    },
+
+    State{
+        name = "fishing_nibble",
+        tags = {"canrotate", "fishing", "nibble"},
+        onenter = function(inst)
+            inst.AnimState:PushAnimation("fish_loop", true)
+            inst.components.fishingrod:Hook()
+        end,
+
+        events = 
+        {
+            EventHandler("fishingstrain", function(inst) inst.sg:GoToState("fishing_strain") end),
+        },
+    },
+
+    State{
+        name = "fishing_strain",
+        tags = {"canrotate", "fishing"},
+        onenter = function(inst)
+            inst.components.fishingrod:Reel()
+        end,
+
+        events = 
+        {
+            EventHandler("fishingcatch", function(inst, data)
+                inst.sg:GoToState("catchfish", data.build)
+            end),
+
+            EventHandler("fishingloserod", function(inst)
+                inst.sg:GoToState("loserod")
+            end),
+        },
+    },
+
+    State{
+        name = "catchfish",
+        tags = {"canrotate", "fishing", "catchfish"},
+        onenter = function(inst, build)
+            inst.AnimState:PlayAnimation("fishcatch")
+            inst.AnimState:OverrideSymbol("fish01", build, "fish01")
+        end,
+        
+        timeline = 
+        {
+            TimeEvent(10*FRAMES, function(inst)
+                inst.SoundEmitter:PlaySound("dontstarve_DLC002/creatures/Merm/whoosh_throw")
+            end), 
+            TimeEvent(14*FRAMES, function(inst)
+                inst.SoundEmitter:PlaySound("dontstarve_DLC002/creatures/Merm/spear_water")
+            end), 
+            TimeEvent(34*FRAMES, function(inst) 
+                inst.components.fishingrod:Collect()
+            end),
+        },
+
+        events =
+        {
+            EventHandler("animover", function(inst) 
+                inst.sg:RemoveStateTag("fishing")
+                inst.sg:GoToState("idle")
+            end),
+        },
+
+        onexit = function(inst)
+            inst.AnimState:ClearOverrideSymbol("fish01")
+        end,
+    }, 
+    
     State{
         name = "idle_sit",
         tags = { "idle", "sitting" },
