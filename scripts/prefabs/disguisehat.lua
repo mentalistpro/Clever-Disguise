@@ -20,6 +20,11 @@ local function OnEquip(inst, owner)
         owner:RemoveTag("monster")
         owner:AddTag("unmonster")     
     end
+	
+    if owner:HasTag("merm") then
+        owner:RemoveTag("merm")
+        owner:AddTag("unmerm")     
+    end
 end
 
 -----------------------------------------------------------------------------------------
@@ -40,6 +45,11 @@ local function OnUnequip(inst, owner)
     if owner:HasTag("unmonster") then
         owner:RemoveTag("unmonster")
         owner:AddTag("monster")     
+    end
+
+    if owner:HasTag("unmerm") then
+        owner:RemoveTag("unmerm")
+        owner:AddTag("merm")     
     end
 end
 
