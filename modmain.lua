@@ -254,7 +254,7 @@ _S.MERM_GUARD_BATTLECRY                     = {"To battle!", "For glory of Mermf
 ------------------------------------------------------------------------------------------------------------------------
 --#4 AddPrefabPostInit
 
---Fish tags
+--//Fish tags
 
 local function ItemIsFish(inst)
     inst:AddTag("fish")
@@ -264,11 +264,11 @@ AddPrefabPostInit("eel", ItemIsFish)
 AddPrefabPostInit("fish", ItemIsFish)
 AddPrefabPostInit("tropical_fish", ItemIsFish)
 
---Pigs target merms
+--//Pigs target merms
 
 local FindEntity = _G.FindEntity
 
-local function NormalKeepTargetFn_new(inst)
+local function NormalRetargetfn_new(inst)
     return FindEntity(inst, TUNING.PIG_TARGET_DIST,
     function(guy)
         if not guy.LightWatcher or guy.LightWatcher:IsInLight() then
@@ -278,12 +278,40 @@ local function NormalKeepTargetFn_new(inst)
     end)
 end
 
-local prefabs = {"pigman", "wildbore"} --no need to touch pigguard functions
+local prefabs = {"pigman", "wildbore"} --no need to touch prefabs/pigguard.lua
 
 for k,v in pairs(prefabs) do
     AddPrefabPostInit(v, function(inst)   
         if inst.components.combat then
-            inst.components.combat:SetRetargetFunction(3, NormalKeepTargetFn_new)
+            inst.components.combat:SetRetargetFunction(3, NormalRetargetfn_new)
         end
     end)
 end
+
+--//Royal pigguards target merms
+
+local function NormalRetargetFn_royal_new(inst)
+    return FindEntity(inst, TUNING.CITY_PIG_GUARD_TARGET_DIST,
+        function(guy)
+            if not guy.LightWatcher or guy.LightWatcher:IsInLight() then
+
+                if guy == GetPlayer() and inst:HasTag("angry_at_player") and guy.components.health and not guy.components.health:IsDead() and inst.components.combat:CanTarget(guy) and inst.components.combat.target ~= GetPlayer() then
+                    inst.sayline(inst, getSpeechType(inst,STRINGS.CITY_PIG_GUARD_TALK_ANGRY_PLAYER))
+                end
+
+                return (guy:HasTag("monster") or guy:HasTag("merm") or (guy == GetPlayer() and inst:HasTag("angry_at_player"))  ) and guy.components.health and not guy.components.health:IsDead() and inst.components.combat:CanTarget(guy) and not 
+                (inst.components.follower.leader ~= nil and guy:HasTag("abigail"))
+            end
+        end)
+end
+
+local prefabs = {"pigman_royalguard", "pigman_royalguard_2"} --no need to touch prefabs/pigguard.lua
+
+for k,v in pairs(prefabs) do
+    AddPrefabPostInit(v, function(inst)   
+        if inst.components.combat then
+            inst.components.combat:SetRetargetFunction(3, NormalRetargetFn_royal_new)
+        end
+    end)
+end
+
