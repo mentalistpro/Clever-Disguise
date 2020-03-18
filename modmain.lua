@@ -59,9 +59,6 @@ local total_day_time = seg_time*16
     TUNING.MERM_GUARD_MAX_TARGET_SHARES = 8
     TUNING.MERM_GUARD_SHARE_TARGET_DIST = 60
     
---Mermhouse Crafting
-    TUNING.IsCleverDisguiseEnabled = 1
-    
 --Mermhat
     TUNING.MERMHAT_PERISH = GetModConfigData("perish")
 
@@ -88,6 +85,7 @@ if IsDLCEnabled and ( IsDLCEnabled(1) or IsDLCEnabled(2) or IsDLCEnabled(3) ) th
         RECIPETABS.DRESS, TECH.NONE, {"vanilla", "rog", "porkland"}
     )
     mermhat.atlas = "images/inventoryimages/mermhat.xml"
+    mermhat.sortkey = 1
 
     --//Enable mermhat recipe in SW world.
     local mermhat_sw = Recipe(                              
@@ -100,6 +98,7 @@ if IsDLCEnabled and ( IsDLCEnabled(1) or IsDLCEnabled(2) or IsDLCEnabled(3) ) th
         RECIPETABS.DRESS, TECH.NONE, "shipwrecked"
     )
     mermhat_sw.atlas = "images/inventoryimages/mermhat.xml"
+    mermhat_sw.sortkey = 1
 else
     --//Enable mermhat recipe in Vanilla world.
     local mermhat = Recipe(                                 
@@ -112,6 +111,7 @@ else
         RECIPETABS.DRESS, TECH.NONE
     )
     mermhat.atlas = "images/inventoryimages/mermhat.xml"
+    mermhat.sortkey = 1
 end
 
 --Pighat
@@ -127,6 +127,7 @@ if IsDLCEnabled and ( IsDLCEnabled(1) or IsDLCEnabled(2) ) then
         RECIPETABS.DRESS, TECH.NONE, {"vanilla", "rog", "shipwrecked"}
     )
     disguisehat.atlas = "images/inventoryimages/disguisehat.xml"
+    disguisehat.sortkey = 2
 else
     --//Enable pighat recipe in Vanilla world.
     local disguisehat = Recipe(                                 
@@ -139,6 +140,7 @@ else
         RECIPETABS.DRESS, TECH.NONE
     )
     disguisehat.atlas = "images/inventoryimages/disguisehat.xml"
+    disguisehat.sortkey = 2
 end
 
 ------------------------------------------------------------------------------------------------------------------------
@@ -315,3 +317,10 @@ for k,v in pairs(prefabs) do
     end)
 end
 
+--//Spawn mermguard in mermwatchtower
+
+local function MermguardReturns(inst)
+    inst.components.childspawner.childname = "mermguard"
+end
+
+AddPrefabPostInit("mermwatchtower", MermguardReturns)    
