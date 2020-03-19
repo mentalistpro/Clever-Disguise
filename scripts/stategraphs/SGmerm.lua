@@ -20,6 +20,15 @@ local events=
     CommonHandlers.OnAttacked(),
     CommonHandlers.OnDeath(),
 
+    EventHandler("doaction", 
+        function(inst, data) 
+            if not inst.components.health:IsDead() and not inst.sg:HasStateTag("busy") then
+                if data.action == ACTIONS.CHOP then
+                    inst.sg:GoToState("chop", data.target)
+                end
+            end
+        end),
+
     EventHandler("onarrivedatthrone", function(inst)
 
         if inst.components.health and inst.components.health:IsDead() then

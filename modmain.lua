@@ -22,9 +22,6 @@ Assets =
 -----------------------------------------------------------------
 --#1 Config
     
-local seg_time = 30
-local total_day_time = seg_time*16
-
 --Merm
     TUNING.MERM_DAMAGE = 30
     TUNING.MERM_DAMAGE_KINGBONUS = 40
@@ -37,8 +34,8 @@ local total_day_time = seg_time*16
     TUNING.MERM_RUN_SPEED = 8
     TUNING.MERM_WALK_SPEED = 3
 
-    TUNING.MERM_LOYALTY_MAXTIME = 3 * total_day_time
-    TUNING.MERM_LOYALTY_PER_HUNGER = total_day_time/25
+    TUNING.MERM_LOYALTY_MAXTIME = 3 * 480
+    TUNING.MERM_LOYALTY_PER_HUNGER = 480/25
     TUNING.MERM_MAX_TARGET_SHARES = 5
     TUNING.MERM_SHARE_TARGET_DIST = 40
 
@@ -54,8 +51,8 @@ local total_day_time = seg_time*16
     TUNING.MERM_GUARD_RUN_SPEED = 8
     TUNING.MERM_GUARD_WALK_SPEED = 3
 
-    TUNING.MERM_GUARD_LOYALTY_MAXTIME = 3 * total_day_time
-    TUNING.MERM_GUARD_LOYALTY_PER_HUNGER = total_day_time/25
+    TUNING.MERM_GUARD_LOYALTY_MAXTIME = 3 * 480
+    TUNING.MERM_GUARD_LOYALTY_PER_HUNGER = 480/25
     TUNING.MERM_GUARD_MAX_TARGET_SHARES = 8
     TUNING.MERM_GUARD_SHARE_TARGET_DIST = 60
     
@@ -73,76 +70,47 @@ local RECIPETABS = _G.RECIPETABS
 local TECH = _G.TECH
 
 --Mermhat
-if IsDLCEnabled and ( IsDLCEnabled(1) or IsDLCEnabled(2) or IsDLCEnabled(3) ) then
-    --//Enable mermhat recipe in Vanilla, ROG, HAM world with/without compatibility enabled.
+if IsDLCEnabled and ( IsDLCEnabled(2) or IsDLCEnabled(3) ) then
     local mermhat = Recipe(                                 
-        "mermhat", 
-        {
-            Ingredient("fish", 1), 
-            Ingredient("cutreeds", 1), 
-            Ingredient("twigs", 2)
-        },
-        RECIPETABS.DRESS, TECH.NONE, {"vanilla", "rog", "porkland"}
-    )
-    mermhat.atlas = "images/inventoryimages/mermhat.xml"
-    mermhat.sortkey = 1
-
-    --//Enable mermhat recipe in SW world.
-    local mermhat_sw = Recipe(                              
         "mermhat", 
         {
             Ingredient("tropical_fish", 1), 
             Ingredient("cutreeds", 1), 
             Ingredient("twigs", 2)
         },
-        RECIPETABS.DRESS, TECH.NONE, "shipwrecked"
-    )
-    mermhat_sw.atlas = "images/inventoryimages/mermhat.xml"
-    mermhat_sw.sortkey = 1
-else
-    --//Enable mermhat recipe in Vanilla world.
-    local mermhat = Recipe(                                 
-        "mermhat", 
-        {
-            Ingredient("fish", 1), 
-            Ingredient("cutreeds", 1), 
-            Ingredient("twigs", 2)
-        },
-        RECIPETABS.DRESS, TECH.NONE
-    )
+        RECIPETABS.DRESS, TECH.NONE, "shipwrecked")
+        mermhat.atlas = "images/inventoryimages/mermhat.xml"
+        mermhat.sortkey = 1
+end
+
+local mermhat = Recipe(                                 
+    "mermhat", 
+    {
+        Ingredient("fish", 1), 
+        Ingredient("cutreeds", 1), 
+        Ingredient("twigs", 2)
+    },
+    RECIPETABS.DRESS, TECH.NONE)    
     mermhat.atlas = "images/inventoryimages/mermhat.xml"
     mermhat.sortkey = 1
-end
 
 --Pighat
-if IsDLCEnabled and ( IsDLCEnabled(1) or IsDLCEnabled(2) ) then
-    --//Enable pighat recipe in Vanilla, ROG, SW world with/without compatibility enabled.
-    local disguisehat = Recipe(                                 
-        "disguisehat", 
-        {
-            Ingredient("twigs", 2), 
-            Ingredient("pigskin", 1), 
-            Ingredient("beardhair", 1)
-        },
-        RECIPETABS.DRESS, TECH.NONE, {"vanilla", "rog", "shipwrecked"}
-    )
-    disguisehat.atlas = "images/inventoryimages/disguisehat.xml"
-    disguisehat.sortkey = 2
-else
-    --//Enable pighat recipe in Vanilla world.
-    local disguisehat = Recipe(                                 
-        "disguisehat", 
-        {
-            Ingredient("twigs", 2), 
-            Ingredient("pigskin", 1), 
-            Ingredient("beardhair", 1)
-        },
-        RECIPETABS.DRESS, TECH.NONE
-    )
-    disguisehat.atlas = "images/inventoryimages/disguisehat.xml"
-    disguisehat.sortkey = 2
-end
 
+local disguisehat = Recipe(                                 
+    "disguisehat", 
+    {
+        Ingredient("twigs", 2), 
+        Ingredient("pigskin", 1), 
+        Ingredient("beardhair", 1)
+    },
+    RECIPETABS.DRESS, TECH.NONE)
+    
+    if IsDLCEnabled and ( IsDLCEnabled(1) or IsDLCEnabled(2) or IsDLCEnabled(3) ) then
+        disguisehat.game_type = "common"
+    end
+    disguisehat.atlas = "images/inventoryimages/disguisehat.xml"
+    disguisehat.sortkey = 2
+    
 ------------------------------------------------------------------------------------------------------------------------
 --#3 Strings
 
@@ -184,30 +152,30 @@ _S.CHARACTERS.WX78.DESCRIBE.MERMHAT         = {"WARTY CONCEALMENT"}
 
 --Pighat
 
-_S.NAMES.MERMHAT = "Shamlet Mask"
-_S.RECIPE_DESC.MERMHAT = "A fresh face."
+_S.NAMES.DISGUISEHAT = "Shamlet Mask"
+_S.RECIPE_DESC.DISGUISEHAT = "A fresh face."
 
-_S.CHARACTERS.GENERIC.DESCRIBE.MERMHAT      = {"For swindling a swine."}
-_S.CHARACTERS.WARLY.DESCRIBE.MERMHAT        = {"It is the icing on the face."}
-_S.CHARACTERS.WATHGRITHR.DESCRIBE.MERMHAT   = {"Öne öf Löki's tricks."}
-_S.CHARACTERS.WAXWELL.DESCRIBE.MERMHAT      = {"Doesn't fool me."}
-_S.CHARACTERS.WEBBER.DESCRIBE.MERMHAT       = {"I bet we can fool those pigs with this!"}
-_S.CHARACTERS.WENDY.DESCRIBE.MERMHAT        = {"Full of deception."}
-_S.CHARACTERS.WICKERBOTTOM.DESCRIBE.MERMHAT = {"Clever."}
-_S.CHARACTERS.WILLOW.DESCRIBE.MERMHAT       = {"Who would fall for that disguise?"}
-_S.CHARACTERS.WINONA.DESCRIBE.MERMHAT       = {"Do I look a little pink around the gills? Ha!"}
-_S.CHARACTERS.WOLFGANG.DESCRIBE.MERMHAT     = {"Hehe. Is funny little pig mask."}
-_S.CHARACTERS.WOODIE.DESCRIBE.MERMHAT       = {"Hehe. It's like a halloween mask."}
-_S.CHARACTERS.WORMWOOD.DESCRIBE.MERMHAT     = {"Twirly Tail?"}
-_S.CHARACTERS.WORTOX.DESCRIBE.MERMHAT       = {"Some would call me two-faced, hyuyu!"}
-_S.CHARACTERS.WURT.DESCRIBE.MERMHAT         = {"Disgusting to mermfolk, florp!"}
-_S.CHARACTERS.WX78.DESCRIBE.MERMHAT         = {"FACIAL ENCRYPTION."}
+_S.CHARACTERS.GENERIC.DESCRIBE.DISGUISEHAT      = {"For swindling a swine."}
+_S.CHARACTERS.WARLY.DESCRIBE.DISGUISEHAT        = {"It is the icing on the face."}
+_S.CHARACTERS.WATHGRITHR.DESCRIBE.DISGUISEHAT   = {"Öne öf Löki's tricks."}
+_S.CHARACTERS.WAXWELL.DESCRIBE.DISGUISEHAT      = {"Doesn't fool me."}
+_S.CHARACTERS.WEBBER.DESCRIBE.DISGUISEHAT       = {"I bet we can fool those pigs with this!"}
+_S.CHARACTERS.WENDY.DESCRIBE.DISGUISEHAT        = {"Full of deception."}
+_S.CHARACTERS.WICKERBOTTOM.DESCRIBE.DISGUISEHAT = {"Clever."}
+_S.CHARACTERS.WILLOW.DESCRIBE.DISGUISEHAT       = {"Who would fall for that disguise?"}
+_S.CHARACTERS.WINONA.DESCRIBE.DISGUISEHAT       = {"Do I look a little pink around the gills? Ha!"}
+_S.CHARACTERS.WOLFGANG.DESCRIBE.DISGUISEHAT     = {"Hehe. Is funny little pig mask."}
+_S.CHARACTERS.WOODIE.DESCRIBE.DISGUISEHAT       = {"Hehe. It's like a halloween mask."}
+_S.CHARACTERS.WORMWOOD.DESCRIBE.DISGUISEHAT     = {"Twirly Tail?"}
+_S.CHARACTERS.WORTOX.DESCRIBE.DISGUISEHAT       = {"Some would call me two-faced, hyuyu!"}
+_S.CHARACTERS.WURT.DESCRIBE.DISGUISEHAT         = {"Disgusting to mermfolk, florp!"}
+_S.CHARACTERS.WX78.DESCRIBE.DISGUISEHAT         = {"FACIAL ENCRYPTION."}
 
-_S.CHARACTERS.WAGSTAFF.DESCRIBE.MERMHAT     = {"Theoretically, this is what passes for a disguise here."}
-_S.CHARACTERS.WALANI.DESCRIBE.MERMHAT       = {"Ha! It's kinda cute!"}
-_S.CHARACTERS.WHEELER.DESCRIBE.MERMHAT      = {"A disguise sneaky enough to fool those city pigs."}
-_S.CHARACTERS.WILBA.DESCRIBE.MERMHAT        = {"A MERRY VISAGE"}
-_S.CHARACTERS.WOODLEGS.DESCRIBE.MERMHAT     = {"'Tis fer foolin' tha'pigs."}
+_S.CHARACTERS.WAGSTAFF.DESCRIBE.DISGUISEHAT     = {"Theoretically, this is what passes for a disguise here."}
+_S.CHARACTERS.WALANI.DESCRIBE.DISGUISEHAT       = {"Ha! It's kinda cute!"}
+_S.CHARACTERS.WHEELER.DESCRIBE.DISGUISEHAT      = {"A disguise sneaky enough to fool those city pigs."}
+_S.CHARACTERS.WILBA.DESCRIBE.DISGUISEHAT        = {"A MERRY VISAGE"}
+_S.CHARACTERS.WOODLEGS.DESCRIBE.DISGUISEHAT     = {"'Tis fer foolin' tha'pigs."}
 
 --Merm Guard
 
@@ -257,7 +225,6 @@ _S.MERM_GUARD_BATTLECRY                     = {"To battle!", "For glory of Mermf
 --#4 AddPrefabPostInit
 
 --//Fish tags
-
 local function ItemIsFish(inst)
     inst:AddTag("fish")
 end
@@ -267,8 +234,8 @@ AddPrefabPostInit("fish", ItemIsFish)
 AddPrefabPostInit("tropical_fish", ItemIsFish)
 
 --//Pigs target merms
-
 local FindEntity = _G.FindEntity
+local GetPlayer = _G.GetPlayer
 
 local function NormalRetargetfn_new(inst)
     return FindEntity(inst, TUNING.PIG_TARGET_DIST,
@@ -291,7 +258,6 @@ for k,v in pairs(prefabs) do
 end
 
 --//Royal pigguards target merms
-
 local function NormalRetargetFn_royal_new(inst)
     return FindEntity(inst, TUNING.CITY_PIG_GUARD_TARGET_DIST,
         function(guy)
@@ -317,10 +283,16 @@ for k,v in pairs(prefabs) do
     end)
 end
 
---//Spawn mermguard in mermwatchtower
-
+--//Spawn mermguard in mermwatchtower -- previously, it spawns normal merms in Mermhouse Crafting
 local function MermguardReturns(inst)
     inst.components.childspawner.childname = "mermguard"
 end
 
-AddPrefabPostInit("mermwatchtower", MermguardReturns)    
+AddPrefabPostInit("mermwatchtower", MermguardReturns) 
+
+--//Add new food category "HONEY"
+AddPrefabPostInit("honey", 
+    function(inst)
+        inst.components.edible.foodtype = "HONEY"
+    end
+)

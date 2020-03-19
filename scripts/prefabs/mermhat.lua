@@ -37,7 +37,7 @@ local function OnEquip(inst, owner)
         owner:AddTag("unmonster")     
     end
     
-    --Friendly pigs and spiders no longer follow when disguise is on.
+    --Pigs and spiders don't recognise you when you wear shamlet mask
     if owner.components.leader then
         owner.components.leader:RemoveFollowersByTag("pig")
         owner.components.leader:RemoveFollowersByTag("spider")
@@ -68,7 +68,7 @@ local function OnUnequip(inst, owner)
         owner:AddTag("monster")       
     end
     
-    --Friendly merms no longer follow when disguise is off.
+    --Merms feel cheated when you remove shamlet mask.
     if owner.components.leader then
         owner.components.leader:RemoveFollowersByTag("merm")
     end

@@ -59,6 +59,18 @@ local sounds_guard =
 local MAX_TARGET_SHARES = 5
 local SHARE_TARGET_DIST = 40
 
+local function SpringCombatMod(amt)
+    if IsDLCEnabled(1) or IsDLCEnabled(2) or IsDLCEnabled(3) then
+        if GetSeasonManager() and GetSeasonManager():IsSpring() then
+            return amt * 1.33
+        else
+            return amt
+        end
+    else
+        return amt
+    end
+end
+
 -------------------------------------------------------------------------------------------------------------------------
 
 --//CONTENT//
@@ -85,7 +97,6 @@ end
 local function OnAttackedByDecidRoot(inst, attacker)
     local share_target_dist = inst:HasTag("mermguard") and TUNING.MERM_GUARD_SHARE_TARGET_DIST or TUNING.MERM_SHARE_TARGET_DIST
     local max_target_shares = inst:HasTag("mermguard") and TUNING.MERM_GUARD_MAX_TARGET_SHARES or TUNING.MERM_MAX_TARGET_SHARES
-    
     local x, y, z = inst.Transform:GetWorldPosition()
     local ents = TheSim:FindEntities(x, y, z, SpringCombatMod(share_target_dist) * .5, { "_combat", "_health", "merm" }, { "INLIMBO" })
     local num_helpers = 0
@@ -103,17 +114,17 @@ end
 
 local function OnAttacked(inst, data)
     local attacker = data and data.attacker
-    if attacker and attacker.prefab == "deciduous_root" and attacker.owner ~= nil then 
+    inst:ClearBufferedAction()
+
+    if attacker.prefab == "deciduous_root" and attacker.owner then 
         OnAttackedByDecidRoot(inst, attacker.owner)
-    
-    elseif attacker and inst.components.combat:CanTarget(attacker) and attacker.prefab ~= "deciduous_root" then
+    elseif attacker.prefab ~= "deciduous_root" then
         local share_target_dist = inst:HasTag("mermguard") and TUNING.MERM_GUARD_SHARE_TARGET_DIST or TUNING.MERM_SHARE_TARGET_DIST
         local max_target_shares = inst:HasTag("mermguard") and TUNING.MERM_GUARD_MAX_TARGET_SHARES or TUNING.MERM_MAX_TARGET_SHARES
         inst.components.combat:SetTarget(attacker)
         
         if inst.components.homeseeker and inst.components.homeseeker.home then
-            local home = inst.components.homeseeker.home
-            
+            local home = inst.components.homeseeker.home           
             if home and home.components.childspawner and inst:GetDistanceSqToInst(home) <= share_target_dist*share_target_dist then
                 max_target_shares = max_target_shares - home.components.childspawner.childreninside
                 home.components.childspawner:ReleaseAllChildren(attacker)
@@ -213,18 +224,6 @@ end
 
 -------------------------------------------------------------------------------------------------------------------------
 --#5 Target
-
-local function SpringCombatMod(amt)
-    if IsDLCEnabled(1) or IsDLCEnabled(2) or IsDLCEnabled(3) then
-        if GetSeasonManager() and GetSeasonManager():IsSpring() then
-            return amt * 1.33
-        else
-            return amt
-        end
-    else
-        return amt
-    end
-end
 
 local function FindInvaderFn(guy, inst)
     local function test_disguise(test_guy)
@@ -370,7 +369,7 @@ local function MakeMerm(name, assets, prefabs, postinit)
         inst.components.combat.hiteffectsymbol = "pig_torso"
 
         inst:AddComponent("eater")
-        inst.components.eater:SetVegetarian()
+        inst.components.eater.foodprefs = { "VEGGIE", "SEEDS", "HONEY" }
                 
         inst:AddComponent("lootdropper")
         inst.components.lootdropper:SetLoot(loot)

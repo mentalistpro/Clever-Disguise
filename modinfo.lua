@@ -1,10 +1,10 @@
 name                        = "Clever Disguise"
 description                 = "Disguise yourself as a merm"
 author                      = "Mentalistpro"
-version                     = "2.0.3"
+version                     = "2.0.5"
 forumthread                 = ""
 api_version                 = 6
-priorty                     = -1	--load after Mermhouse Crafting
+priorty                     = -1    --load after Mermhouse Crafting
 
 dont_starve_compatible      = true
 reign_of_giants_compatible  = true

@@ -20,11 +20,17 @@ local function OnEquip(inst, owner)
         owner:RemoveTag("monster")
         owner:AddTag("unmonster")     
     end
-	
+    
     if owner:HasTag("merm") then
         owner:RemoveTag("merm")
         owner:AddTag("unmerm")     
     end
+
+    --Merms and spiders don't recognise you when you wear shamlet mask
+    if owner.components.leader then
+        owner.components.leader:RemoveFollowersByTag("merm")
+        owner.components.leader:RemoveFollowersByTag("spider")
+    end 
 end
 
 -----------------------------------------------------------------------------------------
@@ -51,6 +57,11 @@ local function OnUnequip(inst, owner)
         owner:RemoveTag("unmerm")
         owner:AddTag("merm")     
     end
+    
+    --Pigs feel cheated when you remove shamlet mask.
+    if owner.components.leader then
+        owner.components.leader:RemoveFollowersByTag("pig")
+    end 
 end
 
 -----------------------------------------------------------------------------------------

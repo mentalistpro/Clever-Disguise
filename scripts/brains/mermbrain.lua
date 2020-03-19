@@ -72,7 +72,7 @@ local function KeepChoppingAction(inst)
         or (inst.components.follower.leader ~= nil and 
             inst:IsNear(inst.components.follower.leader, KEEP_CHOPPING_DIST))
         or FindDeciduousTreeMonster(inst) ~= nil
-    
+       
     return keep_chopping
 end
 

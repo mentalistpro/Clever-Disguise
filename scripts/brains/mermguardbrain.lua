@@ -71,6 +71,8 @@ local function KeepChoppingAction(inst)
             inst:IsNear(inst.components.follower.leader, KEEP_CHOPPING_DIST))
         or FindDeciduousTreeMonster(inst) ~= nil
     
+    if inst.tree_target ~= nil then target = inst.tree_target end
+    
     return keep_chopping
 end
 
@@ -80,6 +82,8 @@ local function StartChoppingCondition(inst)
             inst.components.follower.leader.sg ~= nil and
             inst.components.follower.leader.sg:HasStateTag("chopping"))
         or FindDeciduousTreeMonster(inst) ~= nil
+
+    if inst.tree_target ~= nil then target = inst.tree_target end
 
     return chop_condition
 end
