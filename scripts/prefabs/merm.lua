@@ -380,7 +380,7 @@ local function MakeMerm(name, assets, prefabs, postinit)
         inst.components.combat.hiteffectsymbol = "pig_torso"
 
         inst:AddComponent("eater")
-        inst.components.eater.foodprefs = { "VEGGIE", "SEEDS", "HONEY" }
+        inst.components.eater.foodprefs = { "VEGGIE", "SEEDS", "HONEY", "ICE" }
                 
         inst:AddComponent("lootdropper")
         inst.components.lootdropper:SetLoot(loot)

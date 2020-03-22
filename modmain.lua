@@ -299,3 +299,10 @@ AddPrefabPostInit("honey",
         inst.components.edible.foodtype = "HONEY"
     end
 )
+
+--//Add new food category "ICE"
+AddPrefabPostInit("ice", 
+    function(inst)
+        inst.components.edible.foodtype = "ICE"
+    end
+)
