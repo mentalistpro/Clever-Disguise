@@ -1,7 +1,7 @@
 name                        = "Clever Disguise"
 description                 = "Disguise yourself as a merm"
 author                      = "Mentalistpro"
-version                     = "2.0.5"
+version                     = "2.1"
 forumthread                 = ""
 api_version                 = 6
 priorty                     = -1    --load after Mermhouse Crafting

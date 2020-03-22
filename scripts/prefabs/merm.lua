@@ -79,8 +79,10 @@ end
 --#3 Merm King
 --#4 Sleep
 --#5 Target
---#6 Trade
+--#6 Friends
 --#7 Fn
+--#8 merm_postinit
+--#9 mermguard_postinit
 
 -------------------------------------------------------------------------------------------------------------------------
 --#1 Chop
@@ -122,6 +124,10 @@ local function OnAttacked(inst, data)
         local share_target_dist = inst:HasTag("mermguard") and TUNING.MERM_GUARD_SHARE_TARGET_DIST or TUNING.MERM_SHARE_TARGET_DIST
         local max_target_shares = inst:HasTag("mermguard") and TUNING.MERM_GUARD_MAX_TARGET_SHARES or TUNING.MERM_MAX_TARGET_SHARES
         inst.components.combat:SetTarget(attacker)
+            
+        if not (attacker:HasTag("merm") and attacker:HasTag("mermguard") ) then
+            inst.components.combat:ShareTarget(attacker, share_target_dist, function(dude) return dude:HasTag("merm") end, max_target_shares)
+        end     
         
         if inst.components.homeseeker and inst.components.homeseeker.home then
             local home = inst.components.homeseeker.home           
@@ -279,7 +285,17 @@ local function OnTimerDone(inst, data)
 end
 
 -------------------------------------------------------------------------------------------------------------------------
---#6 Trade
+--#6 Friends
+
+local function CalcSanityAura(inst, observer)
+    if inst.components.follower and inst.components.follower.leader == observer and GetPlayer().prefab == "wurt" then
+        return TUNING.SANITYAURA_SMALL
+    elseif inst.components.follower and inst.components.follower.leader == observer then
+        return TUNING.SANITYAURA_TINY
+    end
+    
+    return 0
+end
 
 local function ShouldAcceptItem(inst, item, giver)
     local giver = GetPlayer()
@@ -307,19 +323,15 @@ local function ShouldAcceptItem(inst, item, giver)
 end
 
 local function OnGetItemFromPlayer(inst, giver, item)
-    local loyalty_max = inst:HasTag("mermguard") and TUNING.MERM_GUARD_LOYALTY_MAXTIME or TUNING.MERM_LOYALTY_MAXTIME
     local loyalty_per_hunger = inst:HasTag("mermguard") and TUNING.MERM_GUARD_LOYALTY_PER_HUNGER or TUNING.MERM_LOYALTY_PER_HUNGER
-
     if item.components.edible ~= nil then
         if inst.components.combat.target and inst.components.combat.target == giver then
             inst.components.combat:SetTarget(nil)
             
         elseif giver.components.leader ~= nil and not (GetWorld() and GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager:IsCandidate(inst) ) then
             giver.components.leader:AddFollower(inst)
-            
             inst.SoundEmitter:PlaySound("dontstarve/common/makeFriend")
             inst.components.follower:AddLoyaltyTime(item.components.edible:GetHunger() * loyalty_per_hunger)
-            inst.components.follower.maxfollowtime = loyalty_max
         end
     end
 
@@ -327,8 +339,7 @@ local function OnGetItemFromPlayer(inst, giver, item)
         local current = inst.components.inventory:GetEquippedItem(EQUIPSLOTS.HEAD)
         if current ~= nil then
             inst.components.inventory:DropItem(current)
-        end
-        
+        end    
         inst.components.inventory:Equip(item)
         inst.AnimState:Show("hat")
     end
@@ -373,6 +384,11 @@ local function MakeMerm(name, assets, prefabs, postinit)
                 
         inst:AddComponent("lootdropper")
         inst.components.lootdropper:SetLoot(loot)
+    
+        inst:AddComponent("sanityaura")
+        if TUNING.WURT_QOL_BUFF == 1 then
+            inst.components.sanityaura.aurafn = CalcSanityAura
+        end
         
         inst:AddComponent("talker")
         inst.components.talker.fontsize = 35
@@ -413,6 +429,9 @@ local function MakeMerm(name, assets, prefabs, postinit)
     return Prefab(name, fn, assets, prefabs)
 end
 
+-------------------------------------------------------------------------------------------------------------------------
+--#8 merm_postinit
+
 local function merm_postinit(inst)
     inst.AnimState:SetBuild("merm_build")
     inst.sounds = sounds
@@ -426,8 +445,7 @@ local function merm_postinit(inst)
     inst.components.combat:SetRetargetFunction(1, RetargetFn)
     inst.components.combat:SetKeepTargetFunction(KeepTargetFn)  
     
-    inst.components.follower.maxfollowtime = TUNING.MERM_LOYALTY_MAXTIME
-    
+    inst.components.follower.maxfollowtime = TUNING.MERM_LOYALTY_MAXTIME  
     inst.components.health:SetMaxHealth(TUNING.MERM_HEALTH)
     
     inst.components.locomotor.runspeed =  TUNING.MERM_RUN_SPEED
@@ -441,7 +459,8 @@ local function merm_postinit(inst)
 
     inst.components.sleeper:SetSleepTest(ShouldSleep)
     inst.components.sleeper:SetWakeTest(ShouldWakeUp)
-    
+
+    --//Mermking things   
     inst:ListenForEvent("onmermkingcreated", function() 
         inst:DoTaskInTime(math.random()*SLIGHTDELAY,function()
             RoyalUpgrade(inst) 
@@ -461,6 +480,9 @@ local function merm_postinit(inst)
     end
 end
 
+-------------------------------------------------------------------------------------------------------------------------
+--#9 mermguard_postinit
+
 local function mermguard_postinit(inst)
     inst.AnimState:SetBuild("merm_guard_build")
     inst.sounds = sounds_guard
@@ -477,8 +499,7 @@ local function mermguard_postinit(inst)
     inst.components.combat:SetRetargetFunction(1, RetargetFn)
     inst.components.combat:SetKeepTargetFunction(KeepTargetFn)  
     
-    inst.components.follower.maxfollowtime = TUNING.MERM_GUARD_LOYALTY_MAXTIME
-    
+    inst.components.follower.maxfollowtime = TUNING.MERM_GUARD_LOYALTY_MAXTIME   
     inst.components.health:SetMaxHealth(TUNING.MERM_GUARD_HEALTH)
     
     inst.components.locomotor.runspeed =  TUNING.MERM_GUARD_RUN_SPEED
@@ -493,6 +514,7 @@ local function mermguard_postinit(inst)
     inst.components.sleeper:SetSleepTest(ShouldGuardSleep)
     inst.components.sleeper:SetWakeTest(ShouldGuardWakeUp)
     
+    --//Mermking things
     inst:ListenForEvent("onmermkingcreated", function() 
         inst:DoTaskInTime(math.random()*SLIGHTDELAY,function()  
             RoyalGuardUpgrade(inst) 

@@ -58,6 +58,9 @@ Assets =
     
 --Mermhat
     TUNING.MERMHAT_PERISH = GetModConfigData("perish")
+    
+--Merm sanity aura (change it in Wurt mod)
+    TUNING.WURT_QOL_BUFF = 0
 
 -----------------------------------------------------------------
 --#2 Recipes
