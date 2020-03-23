@@ -4,7 +4,7 @@ version                     = "0.1"
 description                 = "Make Merms Great Again!?!?"
 forumthread                 = ""
 api_version                 = 6
-priority                    = -2    --load after Mermhouse Crafting and Clever Disguise
+priority                    = -3    	--load after Clever Disguise, Mermhouse Crafting and Wurt mods.
 
 dont_starve_compatible      = true
 reign_of_giants_compatible  = true
