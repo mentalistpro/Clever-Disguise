@@ -42,7 +42,7 @@ local events=
         end
 
         if not inst.sg:HasStateTag("transforming") then
-            if TheWorld.components.mermkingmanager and TheWorld.components.mermkingmanager:ShouldTransform(inst) then 
+            if GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager:ShouldTransform(inst) then 
                 if inst.sg:HasStateTag("sitting") then
                     inst.sg:GoToState("getup")
                 elseif not inst.sg:HasStateTag("gettingup") then
@@ -233,7 +233,7 @@ local states=
         events =
         {
             EventHandler("animover", function(inst)
-                if TheWorld.components.mermkingmanager and TheWorld.components.mermkingmanager:ShouldTransform(inst) then
+                if GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager:ShouldTransform(inst) then
                     inst.sg:GoToState("transform_to_king")
                 else
                     inst.sg:GoToState("idle")
@@ -264,7 +264,7 @@ local states=
         events =
         {
             EventHandler("animover", function(inst)
-                TheWorld:PushEvent("oncandidatekingarrived", {candidate = inst})
+                GetWorld():PushEvent("oncandidatekingarrived", {candidate = inst})
             end),
         },
         

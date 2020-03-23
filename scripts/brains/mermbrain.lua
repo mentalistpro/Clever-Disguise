@@ -56,15 +56,10 @@ end)
 -----------------------------------------------------------------------------------------------
 --#1 Chop
 
-local function IsDeciduousTreeMonster(guy)
-    return guy.monster and guy.prefab == "deciduoustree"
-end
-
 local function FindDeciduousTreeMonster(inst)
-    return FindEntity(inst, SEE_TREE_DIST / 3, IsDeciduousTreeMonster, 
-        function(item) 
-            return item.components.workable and item.components.workable.action == ACTIONS.CHOP 
-        end)
+    return FindEntity(inst, SEE_TREE_DIST / 3, function(item)
+        return item.prefab == "deciduoustree" and item.monster and item.components.workable and item.components.workable.action == ACTIONS.CHOP 
+    end)
 end
 
 local function KeepChoppingAction(inst)
@@ -87,10 +82,9 @@ local function StartChoppingCondition(inst)
 end
 
 local function FindTreeToChopAction(inst)
-    local target = FindEntity(inst, SEE_TREE_DIST, 
-        function(item) 
-            return item.components.workable and item.components.workable.action == ACTIONS.CHOP 
-        end)
+    local target = FindEntity(inst, SEE_TREE_DIST, function(item) 
+        return item.components.workable and item.components.workable.action == ACTIONS.CHOP 
+    end)
         
     if target ~= nil then
         if inst.tree_target ~= nil then
@@ -118,10 +112,14 @@ local function EatFoodAction(inst)
     end
     
     if target == nil then
-        target = FindEntity(inst, SEE_FOOD_DIST, 
-                    function(item) 
-                        return inst.components.eater:CanEat(item) 
-                    end, { "VEGGIE", "ROUGHAGE"}, { "INLIMBO" })
+        target = FindEntity(inst, SEE_FOOD_DIST, function(item) 
+                    local edible = item.components.edible
+                    if item.prefab == "mandrake" then return false end
+                    if edible and edible.foodtype == {"VEGGIE", "SEEDS", "HONEY", "ICE"} then return true end
+                    if edible and edible.foodtype == {"MEAT"} then return false end
+                    if not item:IsOnValidGround() then return false end
+                    return inst.components.eater:CanEat(item) 
+                end)
                     
         --check for scary things near the food
         if target ~= nil and (GetClosestInstWithTag("scarytoprey", target, SEE_PLAYER_DIST) ~= nil) then
@@ -188,10 +186,9 @@ local function StartHammeringCondition(inst)
 end
 
 local function FindHammerTargetAction(inst)
-    local target = FindEntity(inst, SEE_HAMMER_DIST, 
-                    function(item) 
-                        return item.components.workable and item.components.workable.action == ACTIONS.HAMMER 
-                    end)
+    local target = FindEntity(inst, SEE_HAMMER_DIST, function(item) 
+        return item.components.workable and item.components.workable.action == ACTIONS.HAMMER 
+    end)
                     
     if target ~= nil then
         return BufferedAction(inst, target, ACTIONS.HAMMER)
@@ -260,7 +257,11 @@ local function ShouldGoToThrone(inst)
     if GetWorld() and GetWorld().components.mermkingmanager then
         local throne = GetWorld().components.mermkingmanager:GetThrone(inst)
         if throne == nil then
-            throne = FindEntity(inst, SEE_THRONE_DISTANCE, nil, { "mermthrone" })
+            throne = FindEntity(inst, SEE_THRONE_DISTANCE, function(location)
+                if location:HasTag("mermthrone") then 
+					return throne and GetWorld().components.mermkingmanager:ShouldGoToThrone(inst, throne) 
+				end
+            end)
         end
 
         return throne and GetWorld().components.mermkingmanager:ShouldGoToThrone(inst, throne)
@@ -294,10 +295,9 @@ local function StartMiningCondition(inst)
 end
 
 local function FindRockToMineAction(inst)
-    local target = FindEntity(inst, SEE_ROCK_DIST, 
-        function(item) 
-            return item.components.workable and item.components.workable.action == ACTIONS.MINE 
-        end)
+    local target = FindEntity(inst, SEE_ROCK_DIST, function(item) 
+        return item.components.workable and item.components.workable.action == ACTIONS.MINE 
+    end)
         
     if target ~= nil then
         return BufferedAction(inst, target, ACTIONS.MINE)

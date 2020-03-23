@@ -227,7 +227,7 @@ _S.MERM_GUARD_BATTLECRY                     = {"To battle!", "For glory of Mermf
 ------------------------------------------------------------------------------------------------------------------------
 --#4 AddPrefabPostInit
 
---//Fish tags
+--//4.1 Add new fish tags
 local function ItemIsFish(inst)
     inst:AddTag("fish")
 end
@@ -236,7 +236,26 @@ AddPrefabPostInit("eel", ItemIsFish)
 AddPrefabPostInit("fish", ItemIsFish)
 AddPrefabPostInit("tropical_fish", ItemIsFish)
 
---//Pigs target merms
+--//4.2 Add new food categories
+AddPrefabPostInit("honey", function(inst)
+    inst.components.edible.foodtype = "HONEY"
+end)
+
+AddPrefabPostInit("ice", function(inst)
+    inst.components.edible.foodtype = "ICE"
+end)
+
+--//4.3 Add mermguard in mermwatchtower, see Mermhouse Crafting mod
+AddPrefabPostInit("mermwatchtower", function(inst)
+    inst.components.childspawner.childname = "mermguard"
+end) 
+
+--//4.4 Add mermkingmanager in GetWorld()
+AddPrefabPostInit("world", function(inst)
+    inst:AddComponent("mermkingmanager")
+end) 
+
+--//4.5 Pigs target merms
 local FindEntity = _G.FindEntity
 local GetPlayer = _G.GetPlayer
 
@@ -260,7 +279,7 @@ for k,v in pairs(prefabs) do
     end)
 end
 
---//Royal pigguards target merms
+--//4.6 Royal pigguards target merms
 local function NormalRetargetFn_royal_new(inst)
     return FindEntity(inst, TUNING.CITY_PIG_GUARD_TARGET_DIST,
         function(guy)
@@ -286,23 +305,3 @@ for k,v in pairs(prefabs) do
     end)
 end
 
---//Spawn mermguard in mermwatchtower -- previously, it spawns normal merms in Mermhouse Crafting
-local function MermguardReturns(inst)
-    inst.components.childspawner.childname = "mermguard"
-end
-
-AddPrefabPostInit("mermwatchtower", MermguardReturns) 
-
---//Add new food category "HONEY"
-AddPrefabPostInit("honey", 
-    function(inst)
-        inst.components.edible.foodtype = "HONEY"
-    end
-)
-
---//Add new food category "ICE"
-AddPrefabPostInit("ice", 
-    function(inst)
-        inst.components.edible.foodtype = "ICE"
-    end
-)
