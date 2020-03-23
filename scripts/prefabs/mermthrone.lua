@@ -1,7 +1,8 @@
 local assets =
 {
     Asset("ANIM", "anim/merm_king_carpet.zip"),
-    Asset("ANIM", "anim/merm_king_carpet_construction.zip")
+    Asset("ANIM", "anim/merm_king_carpet_construction.zip"),
+    Asset("ANIM", "anim/ui_construction_4x1.zip"),
 }
 
 local prefabs =
@@ -10,15 +11,16 @@ local prefabs =
     "mermking"
 }
 
------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------
 
 --//CONTENT//
 --#1 Physical properties
---#2 Mermthrone_constuction_fn()
---#3 Mermking
---#4 Mermthrone_fn()
+--#2 Container
+--#3 Mermthrone_constuction_fn()
+--#4 Mermking
+--#5 Mermthrone_fn()
 
------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------
 --#1 Physical properties
 
 local function OnConstructed(inst, doer)
@@ -77,8 +79,37 @@ local function onconstruction_built(inst)
     inst.SoundEmitter:PlaySound("dontstarve/characters/wurt/merm/throne/place")
 end
 
------------------------------------------------------------------------------------------------------------------------------------
---#2 Mermthrone_constuction fn()
+------------------------------------------------------------------------------------
+--#2 Container
+
+local slotpos = {}
+
+for x = -1.5, 1.5, 1 do
+    table.insert(slotpos, Vector3(x * 110, 8, 0))
+end
+
+local function itemtest(inst, item, slot)
+    local doer = inst.entity:GetParent()
+    return doer ~= nil
+        and doer.components.constructionbuilderuidata ~= nil
+        and doer.components.constructionbuilderuidata:GetIngredientForSlot(slot) == item.prefab
+end
+
+local widgetbuttoninfo = {
+    text = STRINGS.ACTIONS.APPLYCONSTRUCTION,
+    position =  Vector3(0, -94, 0),
+    fn = function(inst) 
+        if inst.components.container ~= nil then
+            BufferedAction(inst.components.container.opener, inst, ACTIONS.APPLYCONSTRUCTION):Do()
+        end
+    end,
+    validfn = function(inst)
+        return inst.components.container ~= nil and not inst.components.container:IsEmpty()
+    end
+}
+
+------------------------------------------------------------------------------------
+--#3 Mermthrone_constuction fn()
 
 local function onsave(inst, data)
     if inst:HasTag("burnt") or (inst.components.burnable ~= nil and inst.components.burnable:IsBurning()) then
@@ -114,12 +145,24 @@ local function construction_fn()
     inst.AnimState:SetBuild("merm_king_carpet_construction")
     inst.AnimState:PlayAnimation("idle", true)
 
+    inst:AddComponent("container")
+    inst.components.container:SetNumSlots(#slotpos)
+    inst.components.container.widgetslotpos = slotpos
+    inst.components.container.widgetanimbank = "ui_construction_4x1"
+    inst.components.container.widgetanimbuild = "ui_construction_4x1"
+    inst.components.container.widgetpos = Vector3(300, 0, 0)
+    inst.components.container.itemtestfn = itemtest
+    inst.components.container.side_align_tip = 50
+    inst.components.container.type = "cooker"
+    inst.components.container.widgetbuttoninfo = widgetbuttoninfo    
+
     inst:AddComponent("constructionsite")
     inst.components.constructionsite:SetConstructionPrefab("construction_container")
     inst.components.constructionsite:SetOnConstructedFn(OnConstructed)
 
     inst:AddComponent("inspectable")
     inst:AddComponent("lootdropper")
+    
     inst:AddComponent("workable")
     inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
     inst.components.workable:SetWorkLeft(4)
@@ -135,7 +178,7 @@ local function construction_fn()
 end
 
 -----------------------------------------------------------------------------------------------------------------------------------
---#3 Mermking
+--#4 Mermking
 
 local function OnMermKingCreated(inst, data)
     if data and data.throne == inst then
@@ -173,7 +216,7 @@ local function OnThroneRemoved(inst)
 end
 
 -----------------------------------------------------------------------------------------------------------------------------------
---#4 Mermthrone_fn()
+--#5 Mermthrone_fn()
 
 local function fn()
     local inst = CreateEntity()
@@ -198,8 +241,8 @@ local function fn()
     inst:AddTag("mermthrone")
 
     inst:AddComponent("inspectable")
-
     inst:AddComponent("lootdropper")
+    
     inst:AddComponent("workable")
     inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
     inst.components.workable:SetWorkLeft(4)

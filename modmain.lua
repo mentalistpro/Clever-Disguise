@@ -31,9 +31,11 @@ AddMinimapAtlas("minimap/merm_king_carpet_occupied.xml")
 --#2 Recipes
 --#3 Strings
 --#4 Modified drying_rack
+
+--//PostInit
 --#5 Actions
 --#6 Stategraphs
---#7 PostInit
+--#7 Prefab
 
 -------------------------------------------------------------------------------
 --#1 Config
@@ -90,6 +92,11 @@ local mermthrone_construction = Recipe(
     if IsDLCEnabled(2) or IsDLCEnabled(3) then
         mermthrone_construction.gameTUNINGype = "common"
     end
+    
+CONSTRUCTION_PLANS =
+{
+    ["mermthrone_construction"] = { Ingredient("kelp", 20), Ingredient("pigskin", 10), Ingredient("beefalowool", 15) },
+}
 
 -------------------------------------------------------------------------------
 --#3 Strings
@@ -464,7 +471,7 @@ AddStategraphState("wilson", constructing_state)
 AddStategraphState("wilson", construct_pst_state)
 
 -------------------------------------------------------------------------------
---#7 PostInit
+--#7 Prefab
 
 local function construction_components(inst)
     inst:AddComponent("constructionbuilderuidata")
@@ -473,3 +480,4 @@ local function construction_components(inst)
 end
 
 AddPrefabPostInit("player_common", construction_components)
+
