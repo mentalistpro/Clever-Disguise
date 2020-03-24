@@ -1,6 +1,3 @@
---V2C: constructionbuilderuidata client-side component must exist
---     so that we don't have to add a constructionbuilder_replica
-
 local function onconstructioninst(self, constructioninst)
     self.inst.components.constructionbuilderuidata:SetContainer(constructioninst)
 end
@@ -24,6 +21,8 @@ nil,
     constructioninst = onconstructioninst,
     constructionsite = onconstructionsite,
 })
+
+local EMPTY_TABLE = {}
 
 function ConstructionBuilder:CanStartConstruction()
     return self.inst.sg.currentstate.name == "construct"
@@ -172,5 +171,52 @@ end
 
 ConstructionBuilder.OnRemoveFromEntity = ConstructionBuilder.StopConstruction
 ConstructionBuilder.OnRemoveEntity = ConstructionBuilder.StopConstruction
+
+----------------------------------------------------------------------------------------
+--From constructionbuilderuidata
+
+local EMPTY_TABLE = {}
+
+local ConstructionBuilder = Class(function(self, inst)
+    self.inst = inst
+    self.containerinst = nil
+    self.targetinst = nil
+end)
+
+function ConstructionBuilder:SetContainer(containerinst)
+    self._containerinst:set(containerinst)
+end
+
+function ConstructionBuilder:GetContainer()
+    return self._containerinst:value()
+end
+
+function ConstructionBuilder:SetTarget(targetinst)
+    self._targetinst:set(targetinst)
+end
+
+function ConstructionBuilder:GetTarget()
+    return self._targetinst:value()
+end
+
+function ConstructionBuilder:GetConstructionSite()
+    return self._targetinst:value() ~= nil and self._targetinst:value().replica.constructionsite or nil
+end
+
+function ConstructionBuilder:GetIngredientForSlot(slot)
+    return (self._targetinst:value() ~= nil and (CONSTRUCTION_PLANS[self._targetinst:value().prefab] or EMPTY_TABLE)[slot] or EMPTY_TABLE).type
+end
+
+function ConstructionBuilder:GetSlotForIngredient(prefab)
+    if self._targetinst:value() ~= nil then
+        for i, v in ipairs(CONSTRUCTION_PLANS[self._targetinst:value().prefab] or EMPTY_TABLE) do
+            if v.type == prefab then
+                return i
+            end
+        end
+    end
+end
+
+----------------------------------------------------------------------------------------
 
 return ConstructionBuilder

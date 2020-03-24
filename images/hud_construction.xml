@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Atlas>
+	<Texture filename="hud_construction.tex" />
+	<Elements>
+		<Element name="inv_slot_construction_1.tex" u1="0.26271875" u2="0.5224375" v2="0.999" v1="0.4775625" variant="" />
+		<Element name="inv_slot_construction_2.tex" u1="0.001" u2="0.26071875" v2="0.999" v1="0.4775625" variant="" />
+	</Elements>
+</Atlas>

@@ -91,8 +91,8 @@ end
 local function itemtest(inst, item, slot)
     local doer = inst.entity:GetParent()
     return doer ~= nil
-        and doer.components.constructionbuilderuidata ~= nil
-        and doer.components.constructionbuilderuidata:GetIngredientForSlot(slot) == item.prefab
+        and doer.components.constructionbuilder ~= nil
+        and doer.components.constructionbuilder:GetIngredientForSlot(slot) == item.prefab
 end
 
 local widgetbuttoninfo = {
@@ -155,6 +155,7 @@ local function construction_fn()
     inst.components.container.side_align_tip = 50
     inst.components.container.type = "cooker"
     inst.components.container.widgetbuttoninfo = widgetbuttoninfo    
+    inst.components.container.top_align_tip = 50    
 
     inst:AddComponent("constructionsite")
     inst.components.constructionsite:SetConstructionPrefab("construction_container")

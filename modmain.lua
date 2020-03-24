@@ -9,6 +9,7 @@ PrefabFiles =
 
 Assets = 
 {
+    Asset("ATLAS", "images/hud_construction.xml"),
     Asset("ATLAS", "images/inventoryimages/kelp.xml"),
     Asset("ATLAS", "images/inventoryimages/kelp_cooked.xml"),
     Asset("ATLAS", "images/inventoryimages/kelp_dried.xml"),
@@ -35,7 +36,8 @@ AddMinimapAtlas("minimap/merm_king_carpet_occupied.xml")
 --//PostInit
 --#5 Actions
 --#6 Stategraphs
---#7 Prefab
+--#7 Prefabs
+--#8 Widgets
 
 -------------------------------------------------------------------------------
 --#1 Config
@@ -70,6 +72,7 @@ end
 --#2 Recipes
 
 local _G = GLOBAL
+local require = _G.require
 local Ingredient = _G.Ingredient
 local IsDLCEnabled = _G.IsDLCEnabled
 local Recipe = _G.Recipe
@@ -92,7 +95,7 @@ local mermthrone_construction = Recipe(
     if IsDLCEnabled(2) or IsDLCEnabled(3) then
         mermthrone_construction.gameTUNINGype = "common"
     end
-    
+
 CONSTRUCTION_PLANS =
 {
     ["mermthrone_construction"] = { Ingredient("kelp", 20), Ingredient("pigskin", 10), Ingredient("beefalowool", 15) },
@@ -471,13 +474,50 @@ AddStategraphState("wilson", constructing_state)
 AddStategraphState("wilson", construct_pst_state)
 
 -------------------------------------------------------------------------------
---#7 Prefab
+--#7 Prefabs
 
 local function construction_components(inst)
-    inst:AddComponent("constructionbuilderuidata")
     inst:AddComponent("constructionbuilder")
     inst.components.constructionbuilder:StopConstruction()
 end
 
 AddPrefabPostInit("player_common", construction_components)
 
+-------------------------------------------------------------------------------
+--#8 Widgets
+
+AddClassPostConstruct("widgets/containerwidget", function(self) 
+    local oldfn = self.Open
+    function self:Open(container, doer)
+        oldfn(self, container, doer)
+
+        local constructionsite = doer.components.constructionbuilder ~= nil and doer.components.constructionbuilder:GetContainer() == container and doer.components.constructionbuilder:GetConstructionSite() or nil
+        local constructionmats = constructionsite ~= nil and constructionsite:GetIngredients() or nil
+        local InvSlot = require "widgets/invslot"
+
+        for i, v in ipairs(container.components.container.widgetslotpos or {}) do
+            local slot = InvSlot(i,
+                "images/hud_construction.xml",
+                (constructionmats ~= nil and "inv_slot_construction_1.tex" or "inv_slot_construction_2.tex"),
+                self.owner,
+                container.components.container
+            )
+            self.inv[i] = self:AddChild(slot)
+
+            slot:SetPosition(v)
+            
+            local widget = container.components.container
+            if not container.components.container.side_widget then
+                if widget.top_align_tip ~= nil then
+                    slot.top_align_tip = widget.top_align_tip
+                else
+                    slot.side_align_tip = (widget.side_align_tip or 0) - v.x
+                end
+            end
+
+            if constructionmats ~= nil then
+                slot:ConvertToConstructionSlot(constructionmats[i], constructionsite:GetSlotCount(i))
+            end
+        end
+    end
+end)
