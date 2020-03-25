@@ -82,6 +82,16 @@ local function OnCandidateRemoved(inst, data)
     end
 end
 
+local function ReplacePrefab(original_inst, name)
+    local x,y,z = original_inst.Transform:GetWorldPosition()
+    
+    local replacement_inst = SpawnPrefab(name)
+    replacement_inst.Transform:SetPosition(x,y,z)
+    original_inst:Remove()
+
+    return replacement_inst
+end
+
 function MermKingManager:OnThroneDestroyed(throne)
     local removal_index = nil
     for index, throne_instance in ipairs(self.thrones) do

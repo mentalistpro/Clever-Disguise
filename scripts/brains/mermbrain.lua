@@ -242,13 +242,12 @@ end
 
 local function IsThroneValid(inst)
     if GetWorld() and GetWorld().components.mermkingmanager then
-        local throne = GetWorld.components.mermkingmanager:GetThrone(inst)
-        return  throne ~= nil and 
-                throne:IsValid() and not
-                throne:HasTag("burnt") and not
-                (throne.components.burnable ~= nil and throne.components.burnable:IsBurning() ) 
-                
-                and GetWorld().components.mermkingmanager:ShouldGoToThrone(inst, throne)
+        local throne = GetWorld().components.mermkingmanager:GetThrone(inst)
+        return  throne ~= nil 
+            and throne:IsValid() 
+            and not throne:HasTag("burnt") 
+            and not ( throne.components.burnable and throne.components.burnable:IsBurning() ) 
+            and GetWorld().components.mermkingmanager:ShouldGoToThrone(inst, throne)
     end
     return false
 end
@@ -257,11 +256,7 @@ local function ShouldGoToThrone(inst)
     if GetWorld() and GetWorld().components.mermkingmanager then
         local throne = GetWorld().components.mermkingmanager:GetThrone(inst)
         if throne == nil then
-            throne = FindEntity(inst, SEE_THRONE_DISTANCE, function(location)
-                if location:HasTag("mermthrone") then 
-					return throne and GetWorld().components.mermkingmanager:ShouldGoToThrone(inst, throne) 
-				end
-            end)
+            throne = FindEntity(inst, SEE_THRONE_DISTANCE, nil, { "mermthrone" })
         end
 
         return throne and GetWorld().components.mermkingmanager:ShouldGoToThrone(inst, throne)
@@ -346,16 +341,20 @@ function MermBrain:OnStart()
     local root = PriorityNode(
     {
         IfNode(function() return GetWorld() and GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager.king end, "panic with king",
-            BrainCommon.PanicWhenScared(self.inst, .25, STRINGS.MERM_TALK_PANICBOSS_KING)),
-            
+            BrainCommon.PanicWhenScared(self.inst, .25, STRINGS.MERM_TALK_PANICBOSS_KING)),         
         IfNode(function() return not GetWorld().components.mermkingmanager or not GetWorld().components.mermkingmanager.king  end,"panic with no king",
             BrainCommon.PanicWhenScared(self.inst, .25, STRINGS.MERM_TALK_PANICBOSS)),
             
-        WhileNode(function() return self.inst.components.health.takingfiredamage end, "OnFire", Panic(self.inst)),
-        
+        WhileNode(function() return self.inst.components.health.takingfiredamage end, "OnFire", Panic(self.inst)),        
         WhileNode(function() return self.inst.components.combat.target ~= nil and self.inst.components.combat:InCooldown() end, "Dodge",
             RunAway(self.inst, function() return self.inst.components.combat.target end, RUN_AWAY_DIST, STOP_RUN_AWAY_DIST)),
             
+        ChattyNode(self.inst, STRINGS.MERM_BATTLECRY,   
+            WhileNode(function() return self.inst.components.combat.target == nil or not self.inst.components.combat:InCooldown() end, "AttackMomentarily",
+                ChaseAndAttack(self.inst, SpringCombatMod(MAX_CHASE_TIME), SpringCombatMod(MAX_CHASE_DIST)))),              
+        ChattyNode(self.inst, STRINGS.MERM_TALK_FIND_FOOD,
+            DoAction(self.inst, EatFoodAction, "Eat Food")),
+
         WhileNode(function() return ShouldGoToThrone(self.inst) and self.inst.components.combat.target == nil end, "ShouldGoToThrone",
             PriorityNode({
                 Leash(self.inst, GetThronePosition, 0.2, 0.2, true),
@@ -364,25 +363,16 @@ function MermBrain:OnStart()
                 ),
             }, .25)),
 
-        ChattyNode(self.inst, STRINGS.MERM_BATTLECRY,   
-            WhileNode(function() return self.inst.components.combat.target == nil or not self.inst.components.combat:InCooldown() end, "AttackMomentarily",
-                ChaseAndAttack(self.inst, SpringCombatMod(MAX_CHASE_TIME), SpringCombatMod(MAX_CHASE_DIST)))),
-                
-        ChattyNode(self.inst, STRINGS.MERM_TALK_FIND_FOOD,
-            DoAction(self.inst, EatFoodAction, "Eat Food")),
-
         IfNode(function() return StartChoppingCondition(self.inst) end, "chop", 
                 WhileNode(function() return KeepChoppingAction(self.inst) end, "keep chopping",
                     LoopNode{
                         ChattyNode(self.inst, STRINGS.MERM_TALK_HELP_CHOP_WOOD,
                             DoAction(self.inst, FindTreeToChopAction ))})),
-
         IfNode(function() return StartMiningCondition(self.inst) end, "mine", 
                 WhileNode(function() return KeepMiningAction(self.inst) end, "keep mining", 
                     LoopNode{
                         ChattyNode(self.inst, STRINGS.MERM_TALK_HELP_MINE_ROCK,
-                            DoAction(self.inst, FindRockToMineAction ))})),
-                            
+                            DoAction(self.inst, FindRockToMineAction ))})),                            
         IfNode(function() return StartHammeringCondition(self.inst) end, "hammer", 
                 WhileNode(function() return KeepHammeringAction(self.inst) end, "keep hammering", 
                     LoopNode{
