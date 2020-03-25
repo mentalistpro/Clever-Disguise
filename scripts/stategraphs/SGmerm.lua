@@ -35,7 +35,7 @@ local events=
             return
         end
 
-        local player_close = FindClosestPlayerToInst(inst, 5, true)
+        local player_close = GetClosestInstWithTag("player", inst, 5)
         if player_close then
             local pos = Vector3(player_close.Transform:GetWorldPosition())
             inst:ForceFacePoint(pos.x, pos.y, pos.z)
