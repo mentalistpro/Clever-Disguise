@@ -305,3 +305,38 @@ for k,v in pairs(prefabs) do
     end)
 end
 
+--//4.7 Pig Traders flee away from merms and wurt
+
+--[[local TheSim:FindEntities = _G.TheSim:FindEntities
+local Transform = _G.Transform
+local Vector3 = _G.Vector3
+
+local function shouldPanic(inst)
+    local x,y,z = inst.Transform:GetWorldPosition()
+    local ents = TheSim:FindEntities(x,y,z, 20, nil,{"city_pig"},{"hostile", "merm", "LIMBO"}) 
+    if #ents > 0 then
+        print("CAUSE PANIC")
+        dumptable(ents,1,1,1)
+        return true
+    end
+        
+    if inst.components.combat.target then
+        local threat = inst.components.combat.target
+        if threat then
+            local myPos = Vector3(inst.Transform:GetWorldPosition() )
+            local threatPos = Vector3(threat.Transform:GetWorldPosition() )
+            local dist = distsq(threatPos, myPos)
+            if dist < FAR_ENOUGH*FAR_ENOUGH then
+                if dist > STOP_RUN_AWAY_DIST*STOP_RUN_AWAY_DIST then
+                    return true
+                end
+            else
+                inst.components.combat:GiveUp()
+            end
+        end
+    end
+    return false
+end
+
+AddBrainPostInit("citypigbrain", shouldPanic)
+]]
