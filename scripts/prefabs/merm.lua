@@ -8,7 +8,7 @@ local assets =
     Asset("ANIM", "anim/merm_guard_build.zip"),
     Asset("ANIM", "anim/merm_guard_small_build.zip"),
     Asset("ANIM", "anim/merm_actions.zip"),
-    Asset("ANIM", "anim/merm_guard_transformation.zip"),    
+    Asset("ANIM", "anim/merm_guard_transformation.zip"),
     Asset("ANIM", "anim/ds_pig_basic.zip"),
     Asset("ANIM", "anim/ds_pig_actions.zip"),
     Asset("ANIM", "anim/ds_pig_attacks.zip"),
@@ -38,7 +38,7 @@ local sw_loot =
     "froglegs",
 }
 
-local sounds = 
+local sounds =
 {
     attack = "dontstarve/creatures/merm/attack",
     hit = "dontstarve/creatures/merm/hurt",
@@ -54,13 +54,13 @@ local sounds_guard =
     death = "dontstarve/characters/wurt/merm/warrior/death",
     talk = "dontstarve/characters/wurt/merm/warrior/talk",
     buff = "dontstarve/characters/wurt/merm/warrior/yell",
-} 
+}
 
 local MAX_TARGET_SHARES = 5
 local SHARE_TARGET_DIST = 40
 
 local function SpringCombatMod(amt)
-    if IsDLCEnabled(1) or IsDLCEnabled(2) or IsDLCEnabled(3) then
+    if IsDLCEnabled and ( IsDLCEnabled(1) or IsDLCEnabled(2) or IsDLCEnabled(3) ) then
         if GetSeasonManager() and GetSeasonManager():IsSpring() then
             return amt * 1.33
         else
@@ -74,7 +74,7 @@ end
 -------------------------------------------------------------------------------------------------------------------------
 
 --//CONTENT//
---#1 Chop 
+--#1 Chop
 --#2 Combat
 --#3 Merm King
 --#4 Sleep
@@ -99,10 +99,11 @@ end
 local function OnAttackedByDecidRoot(inst, attacker)
     local share_target_dist = inst:HasTag("mermguard") and TUNING.MERM_GUARD_SHARE_TARGET_DIST or TUNING.MERM_SHARE_TARGET_DIST
     local max_target_shares = inst:HasTag("mermguard") and TUNING.MERM_GUARD_MAX_TARGET_SHARES or TUNING.MERM_MAX_TARGET_SHARES
+
     local x, y, z = inst.Transform:GetWorldPosition()
     local ents = TheSim:FindEntities(x, y, z, SpringCombatMod(share_target_dist) * .5, { "_combat", "_health", "merm" }, { "INLIMBO" })
     local num_helpers = 0
-    
+
     for i, v in ipairs(ents) do
         if v ~= inst and not v.components.health:IsDead() then
             v:PushEvent("suggest_tree_target", { tree = attacker })
@@ -118,35 +119,37 @@ local function OnAttacked(inst, data)
     local attacker = data and data.attacker
     inst:ClearBufferedAction()
 
-    if attacker.prefab == "deciduous_root" and attacker.owner then 
+    if attacker.prefab == "deciduous_root" and attacker.owner then
         OnAttackedByDecidRoot(inst, attacker.owner)
+
     elseif attacker.prefab ~= "deciduous_root" then
         local share_target_dist = inst:HasTag("mermguard") and TUNING.MERM_GUARD_SHARE_TARGET_DIST or TUNING.MERM_SHARE_TARGET_DIST
         local max_target_shares = inst:HasTag("mermguard") and TUNING.MERM_GUARD_MAX_TARGET_SHARES or TUNING.MERM_MAX_TARGET_SHARES
+
         inst.components.combat:SetTarget(attacker)
-            
-        if not (attacker:HasTag("merm") and attacker:HasTag("mermguard") ) then
-            inst.components.combat:ShareTarget(attacker, share_target_dist, function(dude) return dude:HasTag("merm") end, max_target_shares)
-        end     
-        
+
+        --I attack with my merm mates
+        if TUNING.MERM_SHARETARGETS == 0 then
+            if not attacker:HasTag("mermplayer") then
+                inst.components.combat:ShareTarget(attacker, share_target_dist, function(dude)
+                    return dude:HasTag("merm") and not dude:HasTag("player")
+                end, max_target_shares)
+            end
+        end
+
         if inst.components.homeseeker and inst.components.homeseeker.home then
-            local home = inst.components.homeseeker.home           
+            local home = inst.components.homeseeker.home
             if home and home.components.childspawner and inst:GetDistanceSqToInst(home) <= share_target_dist*share_target_dist then
                 max_target_shares = max_target_shares - home.components.childspawner.childreninside
                 home.components.childspawner:ReleaseAllChildren(attacker)
             end
-            
+
             inst.components.combat:ShareTarget(attacker, share_target_dist, function(dude)
-                return  (dude.components.homeseeker and
-                         dude.components.homeseeker.home and
-                         dude.components.homeseeker.home == home) or
-                        
-                        (dude:HasTag("merm") and not 
-                         dude:HasTag("player") and not
-                         
-                        (dude.components.follower and
-                         dude.components.follower.leader and
-                         dude.components.follower.leader:HasTag("player") ) )
+                return  --I attack with my homemates
+                        (dude.components.homeseeker and dude.components.homeseeker.home and dude.components.homeseeker.home == home) or
+                        --I attack with merms who are not following player
+                        (dude:HasTag("merm") and not dude:HasTag("player") and not
+                        (dude.components.follower and dude.components.follower.leader and dude.components.follower.leader:HasTag("player") ) )
             end, max_target_shares)
         end
     end
@@ -201,23 +204,22 @@ end
 --#4 Sleep
 
 local function ShouldSleep(inst)
-    return  GetClock():IsDay() and not 
-            (inst.components.combat and inst.components.combat.target) and not 
-            (inst.components.burnable and inst.components.burnable:IsBurning() ) and not 
-            (inst.components.freezable and inst.components.freezable:IsFrozen() ) and not
-            (inst.components.homeseeker and inst.components.homeseeker:HasHome() ) and not
-            (GetWorld() and GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager:IsCandidate(inst) ) and
-            
-            (inst.components.follower == nil or inst.components.follower.leader == nil)
+    return  GetClock():IsDay()
+        and not (inst.components.combat and inst.components.combat.target)
+        and not (inst.components.burnable and inst.components.burnable:IsBurning() )
+        and not (inst.components.freezable and inst.components.freezable:IsFrozen() )
+        and not (inst.components.homeseeker and inst.components.homeseeker:HasHome() )
+        and not (GetWorld() and GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager:IsCandidate(inst) )
+        and (inst.components.follower == nil or inst.components.follower.leader == nil)
 end
 
 local function ShouldWakeUp(inst)
-    return  not GetClock():IsDay() or
-            (inst.components.combat and inst.components.combat.target) or
-            (inst.components.burnable and inst.components.burnable:IsBurning() ) or
-            (inst.components.freezable and inst.components.freezable:IsFrozen() ) or
-            (inst.components.homeseeker and inst.components.homeseeker:HasHome() ) or
-            (GetWorld() and GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager:IsCandidate(inst) )
+    return  GetClock():IsDay()
+        and not (inst.components.combat and inst.components.combat.target)
+        and not (inst.components.burnable and inst.components.burnable:IsBurning() )
+        and not (inst.components.freezable and inst.components.freezable:IsFrozen() )
+        and not (inst.components.homeseeker and inst.components.homeseeker:HasHome() )
+        and not (GetWorld() and GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager:IsCandidate(inst) )
 end
 
 local function ShouldGuardSleep(inst)
@@ -235,21 +237,21 @@ local function FindInvaderFn(guy, inst)
     local function test_disguise(test_guy)
         return test_guy.components.inventory and test_guy.components.inventory:EquipHasTag("merm")
     end
-    
+
     local leader = inst.components.follower and inst.components.follower.leader
     local leader_guy = guy.components.follower and guy.components.follower.leader
-    
+
     if leader_guy and leader_guy.components.inventoryitem then
         leader_guy = leader_guy.components.inventoryitem:GetGrandOwner()
     end
 
-    return  --No merm tag on character = invader
+    return  --I attack non-merm character
             (guy:HasTag("character") and not guy:HasTag("merm") ) and not
-            --No merm king presence = invader
+            --I attack when mermking is not here
             (GetWorld() and GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager:HasKing() ) and not
-            --No player tag on leader = invader
+            --I attack when I have no player leader
             (leader and leader:HasTag("player") ) and not
-            --No merm tag and has pig tag on leader = invader
+            --I attack leader who has pig tag
             (leader_guy and leader_guy:HasTag("merm") and not guy:HasTag("pig") )
 end
 
@@ -293,41 +295,49 @@ local function CalcSanityAura(inst, observer)
     elseif inst.components.follower and inst.components.follower.leader == observer then
         return TUNING.SANITYAURA_TINY
     end
-    
+
     return 0
 end
 
 local function ShouldAcceptItem(inst, item, giver)
     local giver = GetPlayer()
-    
+    --I don't accept when I'm sleeping or busy
     if inst.components.sleeper and inst.components.sleeper:IsAsleep() then
         inst.components.sleeper:WakeUp()
     end
-    
     if inst.sg ~= nil and inst.sg:HasStateTag("busy") then
         return false, "BUSY"
-    end 
+    end
 
+    --I don't accept items when I'm a mermguard and mermking is here
     if inst:HasTag("mermguard") and inst.king ~= nil then
         return false
     end
 
-    return  --Accept if giver is a merm. Merm guard only accepts if giver is not wearing Clever Disguise.
-            (giver:HasTag("merm") and not (giver:HasTag("mermdisguise") and inst:HasTag("mermguard") ) ) 
-            --Accept if item is a hat
-            and ( (item.components.equippable ~= nil and item.components.equippable.equipslot == EQUIPSLOTS.HEAD) 
-            --Accept if item is a food
-            or (item.components.edible and inst.components.eater:CanEat(item) ) 
-            --Accept if item is a fish and receiver is not mermking candidate
-            or (item:HasTag("fish") and not (GetWorld() and GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager:IsCandidate(inst) ) ) )
+    --I don't accept items when I'm a mermguard and the giver is wearing Clever Disguise
+    if TUNING.MERMGUARD_BEFRIENDABLE == 1 then
+        if giver:HasTag("mermdisguise") and inst:HasTag("mermguard") then
+            return false
+        end
+    end
+
+    return  --I accept hat
+            (item.components.equippable ~= nil and item.components.equippable.equipslot == EQUIPSLOTS.HEAD)
+            --I accept food
+            or (item.components.edible and inst.components.eater:CanEat(item) )
+            --I accept fish when I'm not a mermcandidate
+            or (item:HasTag("fish") and not (GetWorld() and GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager:IsCandidate(inst) ) )
 end
 
 local function OnGetItemFromPlayer(inst, giver, item)
     local loyalty_per_hunger = inst:HasTag("mermguard") and TUNING.MERM_GUARD_LOYALTY_PER_HUNGER or TUNING.MERM_LOYALTY_PER_HUNGER
+
+    --I eat
     if item.components.edible ~= nil then
+        --I stop targetting
         if inst.components.combat.target and inst.components.combat.target == giver then
             inst.components.combat:SetTarget(nil)
-            
+        --I make friends
         elseif giver.components.leader ~= nil and not (GetWorld() and GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager:IsCandidate(inst) ) then
             giver.components.leader:AddFollower(inst)
             inst.SoundEmitter:PlaySound("dontstarve/common/makeFriend")
@@ -335,11 +345,12 @@ local function OnGetItemFromPlayer(inst, giver, item)
         end
     end
 
+    --I wear hat
     if item.components.equippable ~= nil and item.components.equippable.equipslot == EQUIPSLOTS.HEAD then
         local current = inst.components.inventory:GetEquippedItem(EQUIPSLOTS.HEAD)
         if current ~= nil then
             inst.components.inventory:DropItem(current)
-        end    
+        end
         inst.components.inventory:Equip(item)
         inst.AnimState:Show("hat")
     end
@@ -375,22 +386,22 @@ local function MakeMerm(name, assets, prefabs, postinit)
         inst:AddTag("character")
         inst:AddTag("merm")
         inst:AddTag("wet")
-        
+
         inst:AddComponent("combat")
         inst.components.combat.hiteffectsymbol = "pig_torso"
 
         inst:AddComponent("eater")
         inst.components.eater.ablefoods = { "VEGGIE", "SEEDS", "HONEY", "ICE" }
         inst.components.eater.foodprefs = { "VEGGIE", "SEEDS", "HONEY", "ICE" }
-                
+
         inst:AddComponent("lootdropper")
         inst.components.lootdropper:SetLoot(loot)
-    
+
         inst:AddComponent("sanityaura")
-        if TUNING.WURT_QOL_BUFF == 1 then
+        if TUNING.MERM_SANITYAURA == 0 then
             inst.components.sanityaura.aurafn = CalcSanityAura
         end
-        
+
         inst:AddComponent("talker")
         inst.components.talker.fontsize = 35
         inst.components.talker.font = TALKINGFONT
@@ -401,7 +412,7 @@ local function MakeMerm(name, assets, prefabs, postinit)
         inst.components.trader.onaccept = OnGetItemFromPlayer
         inst.components.trader.onrefuse = OnRefuseItem
         inst.components.trader.deleteitemonaccept = false
-        
+
         inst:AddComponent("follower")
         inst:AddComponent("health")
         inst:AddComponent("inspectable")
@@ -415,14 +426,14 @@ local function MakeMerm(name, assets, prefabs, postinit)
 
         MakeMediumBurnableCharacter(inst, "pig_torso")
         MakeMediumFreezableCharacter(inst, "pig_torso")
-        
+
         inst:ListenForEvent("attacked", OnAttacked)
         inst:ListenForEvent("suggest_tree_target", SuggestTreeTarget)
         inst:ListenForEvent("timerdone", OnTimerDone)
 
         if postinit ~= nil then
             postinit(inst)
-        end        
+        end
 
         return inst
     end
@@ -434,24 +445,24 @@ end
 --#8 merm_postinit
 
 local function merm_postinit(inst)
-    inst.AnimState:SetBuild("merm_build")
+    inst.AnimState:SetBuild("merm_build_2")
     inst.sounds = sounds
 
     local merm_brain = require "brains/mermbrain"
     inst:SetStateGraph("SGmerm")
     inst:SetBrain(merm_brain)
 
-    inst.components.combat:SetAttackPeriod(TUNING.MERM_ATTACK_PERIOD)   
+    inst.components.combat:SetAttackPeriod(TUNING.MERM_ATTACK_PERIOD)
     inst.components.combat:SetDefaultDamage(TUNING.MERM_DAMAGE)
     inst.components.combat:SetRetargetFunction(1, RetargetFn)
-    inst.components.combat:SetKeepTargetFunction(KeepTargetFn)  
-    
-    inst.components.follower.maxfollowtime = TUNING.MERM_LOYALTY_MAXTIME  
+    inst.components.combat:SetKeepTargetFunction(KeepTargetFn)
+
+    inst.components.follower.maxfollowtime = TUNING.MERM_LOYALTY_MAXTIME
     inst.components.health:SetMaxHealth(TUNING.MERM_HEALTH)
-    
+
     inst.components.locomotor.runspeed =  TUNING.MERM_RUN_SPEED
     inst.components.locomotor.walkspeed = TUNING.MERM_WALK_SPEED
-    
+
     if SaveGameIndex and SaveGameIndex:IsModeShipwrecked() then
         inst.components.lootdropper:SetLoot(sw_loot)
     else
@@ -461,18 +472,18 @@ local function merm_postinit(inst)
     inst.components.sleeper:SetSleepTest(ShouldSleep)
     inst.components.sleeper:SetWakeTest(ShouldWakeUp)
 
-    --//Mermking things   
-    inst:ListenForEvent("onmermkingcreated", function() 
+    --//Mermking things
+    inst:ListenForEvent("onmermkingcreated", function()
         inst:DoTaskInTime(math.random()*SLIGHTDELAY,function()
-            RoyalUpgrade(inst) 
-            inst:PushEvent("onmermkingcreated") 
+            RoyalUpgrade(inst)
+            inst:PushEvent("onmermkingcreated")
         end)
     end, GetWorld() )
-    
-    inst:ListenForEvent("onmermkingdestroyed", function() 
+
+    inst:ListenForEvent("onmermkingdestroyed", function()
         inst:DoTaskInTime(math.random()*SLIGHTDELAY,function()
             RoyalDowngrade(inst)
-            inst:PushEvent("onmermkingdestroyed")  
+            inst:PushEvent("onmermkingdestroyed")
         end)
     end, GetWorld() )
 
@@ -491,18 +502,18 @@ local function mermguard_postinit(inst)
     local merm_guard_brain = require "brains/mermguardbrain"
     inst:SetStateGraph("SGmerm")
     inst:SetBrain(merm_guard_brain)
-    
+
     inst:AddTag("mermguard")
     inst:AddTag("guard")
 
-    inst.components.combat:SetAttackPeriod(TUNING.MERM_GUARD_ATTACK_PERIOD) 
+    inst.components.combat:SetAttackPeriod(TUNING.MERM_GUARD_ATTACK_PERIOD)
     inst.components.combat:SetDefaultDamage(TUNING.MERM_GUARD_DAMAGE)
     inst.components.combat:SetRetargetFunction(1, RetargetFn)
-    inst.components.combat:SetKeepTargetFunction(KeepTargetFn)  
-    
-    inst.components.follower.maxfollowtime = TUNING.MERM_GUARD_LOYALTY_MAXTIME   
+    inst.components.combat:SetKeepTargetFunction(KeepTargetFn)
+
+    inst.components.follower.maxfollowtime = TUNING.MERM_GUARD_LOYALTY_MAXTIME
     inst.components.health:SetMaxHealth(TUNING.MERM_GUARD_HEALTH)
-    
+
     inst.components.locomotor.runspeed =  TUNING.MERM_GUARD_RUN_SPEED
     inst.components.locomotor.walkspeed = TUNING.MERM_GUARD_WALK_SPEED
 
@@ -511,22 +522,22 @@ local function mermguard_postinit(inst)
     else
         inst.components.lootdropper:SetLoot(loot)
     end
-    
+
     inst.components.sleeper:SetSleepTest(ShouldGuardSleep)
     inst.components.sleeper:SetWakeTest(ShouldGuardWakeUp)
-    
+
     --//Mermking things
-    inst:ListenForEvent("onmermkingcreated", function() 
-        inst:DoTaskInTime(math.random()*SLIGHTDELAY,function()  
-            RoyalGuardUpgrade(inst) 
-            inst:PushEvent("onmermkingcreated") 
+    inst:ListenForEvent("onmermkingcreated", function()
+        inst:DoTaskInTime(math.random()*SLIGHTDELAY,function()
+            RoyalGuardUpgrade(inst)
+            inst:PushEvent("onmermkingcreated")
         end)
     end, GetWorld() )
-    
+
     inst:ListenForEvent("onmermkingdestroyed", function()
-        inst:DoTaskInTime(math.random()*SLIGHTDELAY,function() 
-            RoyalGuardDowngrade(inst) 
-            inst:PushEvent("onmermkingdestroyed") 
+        inst:DoTaskInTime(math.random()*SLIGHTDELAY,function()
+            RoyalGuardDowngrade(inst)
+            inst:PushEvent("onmermkingdestroyed")
         end)
     end, GetWorld() )
 
@@ -539,4 +550,4 @@ end
 
 return MakeMerm("merm", assets, prefabs, merm_postinit),
        MakeMerm("mermguard", assets, prefabs, mermguard_postinit)
-       
+
