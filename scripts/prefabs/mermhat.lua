@@ -1,5 +1,5 @@
-local assets = 
-{ 
+local assets =
+{
     Asset("ANIM", "anim/hat_merm.zip"),
 }
 
@@ -19,29 +19,29 @@ local function OnEquip(inst, owner)
     owner.AnimState:Hide("HAIR_HAT")
     owner.AnimState:Show("HAIR_NOHAT")
     owner.AnimState:Show("HAIR")
-    
+
     if owner:HasTag("player") then
         owner.AnimState:Show("HEAD")
         owner.AnimState:Hide("HEAD_HAIR")
     end
-    
+
     --If worn, you are a merm
     if (owner:HasTag("player") or owner:HasTag("pig") ) and not owner:HasTag("merm")  then
         owner:AddTag("merm")
         owner:AddTag("mermdisguise")
-    end 
-    
+    end
+
     --Monsters are not monsters
     if owner:HasTag("monster") then
         owner:RemoveTag("monster")
-        owner:AddTag("unmonster")     
+        owner:AddTag("unmonster")
     end
-    
+
     --Pigs and spiders don't recognise you when you wear shamlet mask
     if owner.components.leader then
         owner.components.leader:RemoveFollowersByTag("pig")
         owner.components.leader:RemoveFollowersByTag("spider")
-    end 
+    end
 end
 
 -----------------------------------------------------------------------------------------
@@ -52,7 +52,7 @@ local function OnUnequip(inst, owner)
     owner.AnimState:Hide("HAIR_HAT")
     owner.AnimState:Show("HAIR_NOHAT")
     owner.AnimState:Show("HAIR")
-    
+
     if owner:HasTag("player") then
         owner.AnimState:Show("HEAD")
         owner.AnimState:Hide("HEAD_HAIR")
@@ -65,9 +65,9 @@ local function OnUnequip(inst, owner)
 
     if owner:HasTag("unmonster") then
         owner:RemoveTag("unmonster")
-        owner:AddTag("monster")       
+        owner:AddTag("monster")
     end
-    
+
     --Merms feel cheated when you remove shamlet mask.
     if owner.components.leader then
         owner.components.leader:RemoveFollowersByTag("merm")
@@ -76,12 +76,12 @@ end
 
 -----------------------------------------------------------------------------------------
 --#3 fn()
-    
+
 local function fn()
     local inst = CreateEntity()
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
-    
+
     MakeInventoryPhysics(inst)
 
     inst.AnimState:SetBank("mermhat") --syname (tex file)
@@ -92,24 +92,24 @@ local function fn()
     inst:AddTag("hat")
     inst:AddTag("merm")
     inst:AddTag("show_spoilage")
-    
+
     inst:AddComponent("equippable")
     inst.components.equippable.equipslot = EQUIPSLOTS.HEAD
     inst.components.equippable:SetOnEquip(OnEquip)
     inst.components.equippable:SetOnUnequip(OnUnequip)
     inst.components.equippable.dapperness = 0
-    
+
     inst:AddComponent("inventoryitem")
     inst.components.inventoryitem.atlasname = "images/inventoryimages/mermhat.xml"
-    
+
     inst:AddComponent("perishable")
     inst.components.perishable:SetPerishTime(TUNING.MERMHAT_PERISH)
     inst.components.perishable:StartPerishing()
     inst.components.perishable:SetOnPerishFn(inst.Remove)
-    
+
     inst:AddComponent("inspectable")
     inst:AddComponent("tradable")
-    
+
     return inst
 end
 

@@ -1,6 +1,6 @@
 require("stategraphs/commonstates")
 
-local actionhandlers = 
+local actionhandlers =
 {
     ActionHandler(ACTIONS.GOHOME, "gohome"),
     ActionHandler(ACTIONS.EAT, "eat"),
@@ -20,8 +20,8 @@ local events=
     CommonHandlers.OnAttacked(),
     CommonHandlers.OnDeath(),
 
-    EventHandler("doaction", 
-        function(inst, data) 
+    EventHandler("doaction",
+        function(inst, data)
             if not inst.components.health:IsDead() and not inst.sg:HasStateTag("busy") then
                 if data.action == ACTIONS.CHOP then
                     inst.sg:GoToState("chop", data.target)
@@ -42,7 +42,7 @@ local events=
         end
 
         if not inst.sg:HasStateTag("transforming") then
-            if GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager:ShouldTransform(inst) then 
+            if GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager:ShouldTransform(inst) then
                 if inst.sg:HasStateTag("sitting") then
                     inst.sg:GoToState("getup")
                 elseif not inst.sg:HasStateTag("gettingup") then
@@ -56,14 +56,14 @@ local events=
         end
     end),
 
-    EventHandler("onmermkingcreated", function(inst) 
+    EventHandler("onmermkingcreated", function(inst)
         inst.sg:GoToState("buff")
     end),
-    EventHandler("onmermkingdestroyed", function(inst) 
+    EventHandler("onmermkingdestroyed", function(inst)
         inst.sg:GoToState("debuff")
     end),
-    
-    EventHandler("getup", function(inst) 
+
+    EventHandler("getup", function(inst)
         inst.sg:GoToState("getup")
     end),
 }
@@ -124,7 +124,7 @@ local states=
             inst.components.fishingrod:Hook()
         end,
 
-        events = 
+        events =
         {
             EventHandler("fishingstrain", function(inst) inst.sg:GoToState("fishing_strain") end),
         },
@@ -137,7 +137,7 @@ local states=
             inst.components.fishingrod:Reel()
         end,
 
-        events = 
+        events =
         {
             EventHandler("fishingcatch", function(inst, data)
                 inst.sg:GoToState("catchfish", data.build)
@@ -156,23 +156,23 @@ local states=
             inst.AnimState:PlayAnimation("fishcatch")
             inst.AnimState:OverrideSymbol("fish01", build, "fish01")
         end,
-        
-        timeline = 
+
+        timeline =
         {
             TimeEvent(10*FRAMES, function(inst)
                 inst.SoundEmitter:PlaySound("dontstarve_DLC002/creatures/Merm/whoosh_throw")
-            end), 
+            end),
             TimeEvent(14*FRAMES, function(inst)
                 inst.SoundEmitter:PlaySound("dontstarve_DLC002/creatures/Merm/spear_water")
-            end), 
-            TimeEvent(34*FRAMES, function(inst) 
+            end),
+            TimeEvent(34*FRAMES, function(inst)
                 inst.components.fishingrod:Collect()
             end),
         },
 
         events =
         {
-            EventHandler("animover", function(inst) 
+            EventHandler("animover", function(inst)
                 inst.sg:RemoveStateTag("fishing")
                 inst.sg:GoToState("idle")
             end),
@@ -181,8 +181,8 @@ local states=
         onexit = function(inst)
             inst.AnimState:ClearOverrideSymbol("fish01")
         end,
-    }, 
-    
+    },
+
     State{
         name = "idle_sit",
         tags = { "idle", "sitting" },
@@ -259,7 +259,7 @@ local states=
             TimeEvent(30 * FRAMES, function(inst)
                 inst.SoundEmitter:PlaySound("dontstarve/characters/wurt/merm/transform_pre")
             end),
-        },        
+        },
 
         events =
         {
@@ -267,7 +267,7 @@ local states=
                 GetWorld():PushEvent("oncandidatekingarrived", {candidate = inst})
             end),
         },
-        
+
     },
 
     State{
@@ -309,7 +309,7 @@ local states=
 
                 if inst.bufferedaction ~= nil then
                     local target = inst.bufferedaction.target
-                    
+
                     if target ~= nil and target:IsValid() then
                         local frozen = target:HasTag("frozen")
                         local moonglass = target:HasTag("moonglass")
@@ -365,10 +365,10 @@ local states=
 
         onenter = function(inst)
             inst.Physics:Stop()
-            
+
             if inst:HasTag("guard") then
                 inst.AnimState:PlayAnimation("transform_pre")
-            else                
+            else
                 inst.AnimState:PlayAnimation("buff")
             end
             local fx = SpawnPrefab("merm_splash")
@@ -381,7 +381,7 @@ local states=
             TimeEvent(9 * FRAMES, function(inst)
                 inst.SoundEmitter:PlaySound(inst.sounds.buff)
             end),
-        },        
+        },
 
         events =
         {
@@ -454,7 +454,7 @@ CommonStates.AddRunStates(states,
 
 CommonStates.AddSleepStates(states,
 {
-    sleeptimeline = 
+    sleeptimeline =
     {
         TimeEvent(35*FRAMES, function(inst) inst.SoundEmitter:PlaySound("dontstarve/creatures/merm/sleep") end ),
     },
@@ -462,17 +462,17 @@ CommonStates.AddSleepStates(states,
 
 CommonStates.AddCombatStates(states,
 {
-    attacktimeline = 
+    attacktimeline =
     {
         TimeEvent(0*FRAMES, function(inst) inst.SoundEmitter:PlaySound(inst.sounds.attack) end),
         TimeEvent(0*FRAMES, function(inst) inst.SoundEmitter:PlaySound("dontstarve/wilson/attack_whoosh") end),
         TimeEvent(13*FRAMES, function(inst) inst.components.combat:DoAttack() end),
     },
-    hittimeline = 
+    hittimeline =
     {
         TimeEvent(0*FRAMES, function(inst) inst.SoundEmitter:PlaySound("dontstarve/creatures/merm/hurt") end),
     },
-    deathtimeline = 
+    deathtimeline =
     {
         TimeEvent(0*FRAMES, function(inst) inst.SoundEmitter:PlaySound("dontstarve/creatures/merm/death") end),
     },
@@ -482,5 +482,5 @@ CommonStates.AddIdle(states)
 CommonStates.AddSimpleActionState(states, "gohome", "pig_pickup", 4*FRAMES, {"busy"})
 CommonStates.AddSimpleState(states, "refuse", "pig_reject", { "busy" })
 CommonStates.AddFrozenStates(states)
-    
+
 return StateGraph("merm", states, events, "idle", actionhandlers)

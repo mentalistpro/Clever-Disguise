@@ -9,7 +9,7 @@ local MermKingManager = Class(function(self, inst)
     self.candidates = {}
     self.candidate_transforming = nil
 
-    self.inst:ListenForEvent("oncandidatekingarrived", function(inst, data) 
+    self.inst:ListenForEvent("oncandidatekingarrived", function(inst, data)
         if data then
             if not self:IsCandidate(data.candidate) then
                 print ("ERROR: WRONG CANDIDATE")
@@ -33,7 +33,7 @@ local MermKingManager = Class(function(self, inst)
         end
     end)
 
-    self.inst:ListenForEvent("onthronedestroyed", function(inst, data) 
+    self.inst:ListenForEvent("onthronedestroyed", function(inst, data)
         if data and data.throne then
             self:OnThroneDestroyed(data.throne)
         end
@@ -50,10 +50,10 @@ local function OnKingRemoval(inst, data)
     local manager = GetWorld().components.mermkingmanager
     manager.inst:RemoveEventCallback("onremove", OnKingRemoval, manager.king)
     manager.inst:RemoveEventCallback("death", OnKingDeath, manager.king)
-    
+
     GetWorld():PushEvent("onmermkingdestroyed", {throne = manager.main_throne})
     table.insert(manager.thrones, manager.main_throne)
-    
+
     manager.main_throne = nil
     manager.king = nil
     manager.king_dying = false
@@ -84,7 +84,7 @@ end
 
 local function ReplacePrefab(original_inst, name)
     local x,y,z = original_inst.Transform:GetWorldPosition()
-    
+
     local replacement_inst = SpawnPrefab(name)
     replacement_inst.Transform:SetPosition(x,y,z)
     original_inst:Remove()
@@ -110,7 +110,7 @@ function MermKingManager:OnThroneDestroyed(throne)
         if self:IsCandidateAtThrone(candidate, throne) then
             candidate:PushEvent("getup")
         end
-        
+
         candidate.nameoverride = nil
         self.inst:RemoveEventCallback("death", OnCandidateRemoved, candidate)
         self.inst:RemoveEventCallback("onremove", OnCandidateRemoved, candidate)
@@ -134,7 +134,7 @@ function MermKingManager:CreateMermKing(candidate, throne)
 
     self.king = ReplacePrefab(candidate, "mermking")
     self.king:PushEvent("oncreated")
-    
+
     self.inst:ListenForEvent("onremove", OnKingRemoval, self.king)
     self.inst:ListenForEvent("death", OnKingDeath, self.king)
 
@@ -153,7 +153,7 @@ function MermKingManager:CreateMermKing(candidate, throne)
             self.inst:RemoveEventCallback("death", OnCandidateRemoved, v)
         end
     end
-    
+
     self.candidates = {}
     self.candidate_transforming = nil
     GetWorld():PushEvent("onmermkingcreated", {king = self.king, throne = self:GetMainThrone()})
@@ -169,8 +169,8 @@ function MermKingManager:FindMermCandidate(throne)
     if throne then
         local merm_candidate = FindEntity(throne, 50, function(ent)
             return  ent:IsValid()
-                    and ent:HasTag("merm") and not ent:HasTag("player") and not ent:HasTag("mermking") and not ent:HasTag("mermguard") 
-                    and ent.components.health and not ent.components.health:IsDead() 
+                    and ent:HasTag("merm") and not ent:HasTag("player") and not ent:HasTag("mermking") and not ent:HasTag("mermguard")
+                    and ent.components.health and not ent.components.health:IsDead()
                     and not self:IsCandidate(ent)
         end)
 

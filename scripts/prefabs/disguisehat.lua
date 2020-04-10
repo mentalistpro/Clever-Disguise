@@ -1,5 +1,5 @@
-local assets = 
-{ 
+local assets =
+{
     Asset("ANIM", "anim/hat_disguise.zip"),
 }
 
@@ -15,22 +15,22 @@ local function OnEquip(inst, owner)
     owner.AnimState:Show("HAIRFRONT")
     owner.AnimState:Show("HEAD")
     owner.AnimState:Hide("HEAD_HAIR")
-    
+
     if owner:HasTag("monster") then
         owner:RemoveTag("monster")
-        owner:AddTag("unmonster")     
+        owner:AddTag("unmonster")
     end
-    
+
     if owner:HasTag("merm") then
         owner:RemoveTag("merm")
-        owner:AddTag("unmerm")     
+        owner:AddTag("unmerm")
     end
 
     --Merms and spiders don't recognise you when you wear shamlet mask
     if owner.components.leader then
         owner.components.leader:RemoveFollowersByTag("merm")
         owner.components.leader:RemoveFollowersByTag("spider")
-    end 
+    end
 end
 
 -----------------------------------------------------------------------------------------
@@ -47,21 +47,21 @@ local function OnUnequip(inst, owner)
         owner.AnimState:Hide("HEAD_HAIR")
         owner.AnimState:Show("HAIRFRONT")
     end
-    
+
     if owner:HasTag("unmonster") then
         owner:RemoveTag("unmonster")
-        owner:AddTag("monster")     
+        owner:AddTag("monster")
     end
 
     if owner:HasTag("unmerm") then
         owner:RemoveTag("unmerm")
-        owner:AddTag("merm")     
+        owner:AddTag("merm")
     end
-    
+
     --Pigs feel cheated when you remove shamlet mask.
     if owner.components.leader then
         owner.components.leader:RemoveFollowersByTag("pig")
-    end 
+    end
 end
 
 -----------------------------------------------------------------------------------------
@@ -71,11 +71,11 @@ local function fn()
     local inst = CreateEntity()
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
-    
+
     MakeInventoryPhysics(inst)
 
     inst.AnimState:SetBank("disguisehat") --syname (tex file)
-    inst.AnimState:SetBuild("hat_disguise") --fname (zip file under /anim)
+    inst.AnimState:SetBuild("hat_disguise_2") --fname (zip file under /anim)
     inst.AnimState:PlayAnimation("anim")
 
     inst:AddTag("disguise")
@@ -87,13 +87,13 @@ local function fn()
     inst.components.equippable:SetOnEquip(OnEquip)
     inst.components.equippable:SetOnUnequip(OnUnequip)
     inst.opentop = true
-    
+
     inst:AddComponent("inventoryitem")
     inst.components.inventoryitem.atlasname = "images/inventoryimages/disguisehat.xml"
-    
+
     inst:AddComponent("inspectable")
     inst:AddComponent("tradable")
-    
+
     return inst
 end
 
