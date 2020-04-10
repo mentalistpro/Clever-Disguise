@@ -29,7 +29,7 @@ configuration_options =
 
     {
     name = "mermking_rate",
-    label = "Exchange rate",
+    label = "Generous King",
     options = {
               {description = "Normal", data = 0},
               {description = "Generous", data = 1},
@@ -40,7 +40,7 @@ configuration_options =
 
     {
     name = "mermguard_friends",
-    label = "Friendly Mermguards",
+    label = "Friendly Guards",
     options =   {
                     {description = "YES", data = 0},
                     {description = "NO", data = 1},
@@ -50,7 +50,7 @@ configuration_options =
 
     {
     name = "merm_sanity",
-    label = "Trusted Merms",
+    label = "Trustworthy Merms",
     options =   {
                     {description = "YES", data = 0},
                     {description = "NO", data = 1},
