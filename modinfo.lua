@@ -18,12 +18,53 @@ configuration_options =
 {
     {
     name = "mermhat_perish",
-    label = "Mermhat perishes?",
+    label = "Clever Disguise perishes",
     options =   {
-                    {description = "Default (Fast)", data = 6*480},
-                    {description = "Medium", data = 10*480},
-                    {description = "Slow", data = 15*480},
+                    {description = "Normally", data = 6*480},
+                    {description = "Slowly", data = 10*480},
+                    {description = "Very Slowly", data = 15*480},
                 },
     default = 6*480,
-    }
+    },
+
+    {
+    name = "mermking_rate",
+    label = "Exchange rate",
+    options = {
+              {description = "Normal", data = 0},
+              {description = "Generous", data = 1},
+              {description = "CHARITY!", data = 2}
+              },
+    default = 0
+    },
+
+    {
+    name = "mermguard_friends",
+    label = "Friendly Mermguards",
+    options =   {
+                    {description = "YES", data = 0},
+                    {description = "NO", data = 1},
+                },
+    default = 1,
+    },
+
+    {
+    name = "merm_sanity",
+    label = "Trusted Merms",
+    options =   {
+                    {description = "YES", data = 0},
+                    {description = "NO", data = 1},
+                },
+    default = 1,
+    },
+
+    {
+    name = "merm_united",
+    label = "United Merms",
+    options =   {
+                    {description = "YES", data = 0},
+                    {description = "NO", data = 1},
+                },
+    default = 1,
+    },
 }

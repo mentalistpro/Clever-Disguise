@@ -7,8 +7,8 @@ PrefabFiles =
 
 Assets =
 {
-    Asset("ATLAS", "images/inventoryimages/mermhat.xml"),
-    Asset("ATLAS", "images/inventoryimages/disguisehat.xml"),
+    Asset("ATLAS", "images/inventoryimages/mermhat.xml"),      --Clever Disguise
+    Asset("ATLAS", "images/inventoryimages/disguisehat.xml"),  --Shamlet Mask
 }
 
 -----------------------------------------------------------------
@@ -31,13 +31,13 @@ Assets =
     TUNING.MERM_ATTACK_PERIOD = 3
     TUNING.MERM_DEFEND_DIST = 30
     TUNING.MERM_TARGET_DIST = 10
-    TUNING.MERM_RUNSTRINGSPEED = 8
-    TUNING.MERM_WALKSTRINGSPEED = 3
+    TUNING.MERM_RUN_SPEED = 8
+    TUNING.MERM_WALK_SPEED = 3
 
     TUNING.MERM_LOYALTY_MAXTIME = 3 * 480
     TUNING.MERM_LOYALTY_PER_HUNGER = 480/25
-    TUNING.MERM_MAX_TARGETSTRINGSHARES = 5
-    TUNING.MERMSTRINGSHARE_TARGET_DIST = 40
+    TUNING.MERM_MAX_TARGET_SHARES = 5
+    TUNING.MERM_SHARE_TARGET_DIST = 40
 
 --Mermguard
     TUNING.PUNY_MERM_DAMAGE = 20
@@ -48,19 +48,20 @@ Assets =
     TUNING.MERM_GUARD_ATTACK_PERIOD = 3
     TUNING.MERM_GUARD_DEFEND_DIST = 40
     TUNING.MERM_GUARD_TARGET_DIST = 15
-    TUNING.MERM_GUARD_RUNSTRINGSPEED = 8
-    TUNING.MERM_GUARD_WALKSTRINGSPEED = 3
+    TUNING.MERM_GUARD_RUN_SPEED = 8
+    TUNING.MERM_GUARD_WALK_SPEED = 3
 
     TUNING.MERM_GUARD_LOYALTY_MAXTIME = 3 * 480
     TUNING.MERM_GUARD_LOYALTY_PER_HUNGER = 480/25
-    TUNING.MERM_GUARD_MAX_TARGETSTRINGSHARES = 8
-    TUNING.MERM_GUARDSTRINGSHARE_TARGET_DIST = 60
+    TUNING.MERM_GUARD_MAX_TARGET_SHARES = 8
+    TUNING.MERM_GUARD_SHARE_TARGET_DIST = 60
 
---Mermhat
+--Modconfig
     TUNING.MERMHAT_PERISH = GetModConfigData("mermhat_perish")
-
---Merm sanity aura? (change the aura setting in Wurt mod)
-    TUNING.WURT_QOL_BUFF = 0
+    TUNING.MERMKING_EXCHANGERATE = GetModConfigData("mermking_rate")
+    TUNING.MERMGUARD_BEFRIENDABLE = GetModConfigData("mermguard_friends")
+    TUNING.MERM_SANITYAURA = GetModConfigData("merm_sanity")
+    TUNING.MERM_SHARETARGETS = GetModConfigData("merm_united")
 
 -----------------------------------------------------------------
 --#2 Recipes
@@ -293,14 +294,12 @@ end
 
 --4.7 Pigcity citizens flee away from merms, see original citybigbrain.lua
 local require = _G.require
-local TheSim:FindEntities = _G.TheSim:FindEntities
-local Transform = _G.Transform
 local Vector3 = _G.Vector3
 
-if IsDLCEnabled and IsDLCEnabled(3) then
+--[[if IsDLCEnabled and IsDLCEnabled(3) then
     local function shouldPanic(inst)
         local x,y,z = inst.Transform:GetWorldPosition()
-        local ents = TheSim:FindEntities(x,y,z, 20, nil,{"city_pig"},{"hostile", "merm", "LIMBO"})
+        local ents = _G.TheSim:FindEntities(x,y,z, 20, nil,{"city_pig"},{"hostile", "merm", "LIMBO"})
         if #ents > 0 then
             print("CAUSE PANIC")
             dumptable(ents,1,1,1)
@@ -327,4 +326,6 @@ if IsDLCEnabled and IsDLCEnabled(3) then
 
     AddBrainPostInit("citypigbrain", shouldPanic)
 end
+]]
 
+--combat range issue
