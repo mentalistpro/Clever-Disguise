@@ -17,8 +17,8 @@ icon                        = "modicon.tex"
 configuration_options =
 {
     {
-    name = "perish",
-    label = "Perishability",
+    name = "mermhat_perish",
+    label = "Mermhat perishes?",
     options =   {
                     {description = "Default (Fast)", data = 6*480},
                     {description = "Medium", data = 10*480},
