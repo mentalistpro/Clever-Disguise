@@ -46,3 +46,22 @@ local mermhat = Recipe(
     mermhat.atlas = "images/inventoryimages/mermhat.xml"
     mermhat.sortkey = 1
 
+--Mermthrone_construction
+local mermthrone_construction = Recipe(
+    "mermthrone_construction",
+    {
+    Ingredient("boards", 5),
+    Ingredient("rope", 5),
+    },
+    RECIPETABS.TOWN, TECH.SCIENCE_ONE)
+    mermthrone_construction.placer = "mermthrone_construction_placer"
+    mermthrone_construction.atlas = "images/inventoryimages/mermthrone_construction.xml"
+
+
+---------------------------------------------------------------------
+
+CONSTRUCTION_PLANS =
+{
+    ["mermthrone_construction"] = { Ingredient("kelp", 20), Ingredient("pigskin", 10), Ingredient("beefalowool", 15) },
+}
+

@@ -1,15 +1,34 @@
 PrefabFiles =
 {
-    "merm",
+    "disguisehat",
+    "kelp",
+    "kelphat",
     "mermhat",
-    "disguisehat"
+    "mermking",
+    "mermsplashes",
+    "mermthrone",
+    "merm",
 }
 
 Assets =
 {
-    Asset("ATLAS", "images/inventoryimages/mermhat.xml"),      --Clever Disguise
-    Asset("ATLAS", "images/inventoryimages/disguisehat.xml"),  --Shamlet Mask
+    Asset("ATLAS", "images/inventoryimages/kelp.xml"),
+    Asset("ATLAS", "images/inventoryimages/kelp_cooked.xml"),
+    Asset("ATLAS", "images/inventoryimages/kelp_dried.xml"),
+    Asset("ATLAS", "images/inventoryimages/kelphat.xml"),
+    Asset("ATLAS", "images/inventoryimages/mermhat.xml"),
+    Asset("ATLAS", "images/inventoryimages/disguisehat.xml"),
+    Asset("ATLAS", "images/inventoryimages/mermthrone_construction.xml"),
+    Asset("ATLAS", "minimap/merm_king_carpet.xml"),
+    Asset("ATLAS", "minimap/merm_king_carpet_construction.xml"),
+    Asset("ATLAS", "minimap/merm_king_carpet_occupied.xml"),
+    --Asset("ANIM", "anim/player_construct.zip"),   --for prefabs/player_common.lua
+    Asset("ATLAS", "images/hud_construction.xml"),
 }
+
+AddMinimapAtlas("minimap/merm_king_carpet.xml")
+AddMinimapAtlas("minimap/merm_king_carpet_construction.xml")
+AddMinimapAtlas("minimap/merm_king_carpet_occupied.xml")
 
 modimport("modrecipes.lua") --mod recipes
 modimport("modstrings.lua") --mod strings
@@ -17,28 +36,53 @@ modimport("modtunings.lua") --mod TUNING
 
 -----------------------------------------------------------------
 
+--[[CONTENT]]
+--#1 Global functions
+--#2 AddPrefabPostInit
+    --2.1-2.2   Fish tags & foodtype
+    --2.3       Mermkingmanager
+    --2.4       Mermgurad
+    --2.5-2.6   Pigmens' NormalRetargetfn
+    --2.7       Drying rack
+
+-----------------------------------------------------------------
+--#1 Global functions
+
+function ReplacePrefab(original_inst, name)
+    local x,y,z = original_inst.Transform:GetWorldPosition()
+
+    local replacement_inst = SpawnPrefab(name)
+    replacement_inst.Transform:SetPosition(x,y,z)
+    original_inst:Remove()
+
+    return replacement_inst
+end
+
+-----------------------------------------------------------------
+--#2 AddPrefabPostInit
+
 local _G = GLOBAL
 local FindEntity = _G.FindEntity
 local GetPlayer = _G.GetPlayer
 local IsDLCEnabled = _G.IsDLCEnabled
 
---#1 Add new fish tag
+--2.1 Add new fish tag
 local function ItemIsFish(inst) inst:AddTag("fish") end
 AddPrefabPostInit("eel", ItemIsFish)
 AddPrefabPostInit("fish", ItemIsFish)
 AddPrefabPostInit("tropical_fish", ItemIsFish)
 
---#2 Add new food categories
+--2.2 Add new food categories
 AddPrefabPostInit("honey", function(inst) inst.components.edible.foodtype = "HONEY" end)
 AddPrefabPostInit("ice", function(inst) inst.components.edible.foodtype = "ICE" end)
 
---#3 Add mermkingmanager in the world
+--2.3 Add mermkingmanager in the world
 AddPrefabPostInit("world", function(inst) inst:AddComponent("mermkingmanager") end)
 
---#4 Spawn mermguard in mermwatchtower
+--2.4 Spawn mermguard in mermwatchtower
 AddPrefabPostInit("mermwatchtower", function(inst) inst.components.childspawner.childname = "mermguard" end)
 
---#5 Pigs target merms
+--2.5 Pigs target merms
 local function NormalRetargetfn(inst)
     return FindEntity(inst, TUNING.PIG_TARGET_DIST, function(guy)
         if not guy.LightWatcher or guy.LightWatcher:IsInLight() then
@@ -59,7 +103,7 @@ for k,v in pairs(prefabs) do
     end)
 end
 
---#6 Royal pigguards target merms
+--2.6 Royal pigguards target merms
 if IsDLCEnabled and IsDLCEnabled(3) then
     local function NormalRetargetFn_royal(inst)
         return FindEntity(inst, TUNING.CITY_PIG_GUARD_TARGET_DIST, function(guy)
@@ -87,4 +131,39 @@ if IsDLCEnabled and IsDLCEnabled(3) then
         end)
     end
 end
+
+--2.7 Modified drying rack
+local function ModDryingRack(inst)
+    --//Add drying kelp anim
+    local oldonstartdrying = inst.components.dryer.onstartcooking
+    local onstartdrying = function(inst, dryable, ...)
+        if dryable == "kelp" then
+            inst.AnimState:PlayAnimation("drying_pre")
+            inst.AnimState:PushAnimation("drying_loop", true)
+            inst.AnimState:OverrideSymbol("swap_dried", "meat_rack_kelp", "kelp")
+            return
+        end
+
+        return oldonstartdrying(inst, dryable, ...)
+    end
+
+    --//Add dried kelp anim
+    local oldsetdone = inst.components.dryer.oncontinuedone
+    local setdone = function(inst, product, ...)
+        if product == "kelp_dried" then
+            inst.AnimState:PlayAnimation("idle_full")
+            inst.AnimState:OverrideSymbol("swap_dried", "meat_rack_kelp", "kelp_dried")
+            return
+        end
+
+        return oldsetdone(inst, product, ...)
+    end
+
+    inst.components.dryer:SetStartDryingFn(onstartdrying)
+    inst.components.dryer:SetContinueDryingFn(onstartdrying)
+    inst.components.dryer:SetDoneDryingFn(setdone)
+    inst.components.dryer:SetContinueDoneFn(setdone)
+end
+
+AddPrefabPostInit("meatrack", ModDryingRack)
 

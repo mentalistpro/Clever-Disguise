@@ -14,6 +14,21 @@ if STRINGS.CHARACTERS.WORMWOOD   == nil then STRINGS.CHARACTERS.WORMWOOD      = 
 if STRINGS.CHARACTERS.WORTOX     == nil then STRINGS.CHARACTERS.WORTOX        = { DESCRIBE = {},} end -- DST
 if STRINGS.CHARACTERS.WURT       == nil then STRINGS.CHARACTERS.WURT          = { DESCRIBE = {},} end -- DST
 
+-------------------------------------------------------
+
+--#Pighat
+--#Mermhat
+
+--#Mermguard
+
+--#Mermtalk
+--#Mermking_talk
+
+--#Mermthrone_construction
+--#Mermthrone
+
+-------------------------------------------------------
+
 --Pighat
 STRINGS.NAMES.DISGUISEHAT = "Shamlet Mask"
 STRINGS.RECIPE_DESC.DISGUISEHAT = "A fresh face."
@@ -40,6 +55,7 @@ STRINGS.CHARACTERS.WHEELER.DESCRIBE.DISGUISEHAT      = {"A disguise sneaky enoug
 STRINGS.CHARACTERS.WILBA.DESCRIBE.DISGUISEHAT        = {"A MERRY VISAGE"}
 STRINGS.CHARACTERS.WOODLEGS.DESCRIBE.DISGUISEHAT     = {"'Tis fer foolin' tha'pigs."}
 
+
 --Mermhat
 STRINGS.NAMES.MERMHAT = "Clever Disguise"
 STRINGS.RECIPE_DESC.MERMHAT = "Merm-ify your friends."
@@ -60,6 +76,7 @@ STRINGS.CHARACTERS.WORTOX.DESCRIBE.MERMHAT       = {"Some would call me two-face
 STRINGS.CHARACTERS.WURT.DESCRIBE.MERMHAT         = {"Make scale-less look like friendly Mermfolk!"}
 STRINGS.CHARACTERS.WX78.DESCRIBE.MERMHAT         = {"WARTY CONCEALMENT"}
 
+
 --Mermguard
 STRINGS.NAMES.MERMGUARD = "Loyal Merm Guard"
 
@@ -78,6 +95,7 @@ STRINGS.CHARACTERS.WORMWOOD.DESCRIBE.MERMGUARD       = {"Friends?"}
 STRINGS.CHARACTERS.WORTOX.DESCRIBE.MERMGUARD         = {"The horns are an improvement."}
 STRINGS.CHARACTERS.WURT.DESCRIBE.MERMGUARD           = {"Will grow up big and strong like that one day!"}
 STRINGS.CHARACTERS.WX78.DESCRIBE.MERMGUARD           = {"YOU WOULD MAKE AN EXCELLENT MINION"}
+
 
 --Merm Talk
 STRINGS.MERM_TALK_FOLLOWWILSON_UNTRANSLATED      = {"Flort glut.", "Blut gloppy Glurtsu!", "Glut Glurtsu flopt!", "Florpy flort."}
@@ -101,4 +119,52 @@ STRINGS.MERM_BATTLECRY_UNTRANSLATED              = {"Glorp! Glorpy glup!", "Wult
 STRINGS.MERM_BATTLECRY                           = {"Glorp! Go away!", "Destroy you!"}
 STRINGS.MERM_GUARD_BATTLECRY_UNTRANSLATED        = {"Wult flrot!", "Flort Glurtsu flut!", "GLOT FLOOOORPH!!", "Glurph Glurtsen!"}
 STRINGS.MERM_GUARD_BATTLECRY                     = {"To battle!", "For glory of Mermfolk!", "ATTAAAACK!!", "Defend King!"}
+
+
+--Mermking Talk
+STRINGS.MERM_KINGTUNINGALK_HUNGERSTRINGSTARVING = "Hungry... HUNGRY! HUNGRYYYY!!!"
+STRINGS.MERM_KINGTUNINGALK_HUNGER_CLOSESTRINGSTARVING = "Treachery... villainy! To let King waste away like this..."
+STRINGS.MERM_KINGTUNINGALK_HUNGER_VERY_HUNGRY = "What take so long? Make offerings to your King!"
+STRINGS.MERM_KINGTUNINGALK_HUNGER_HUNGRY = "King desires food!"
+STRINGS.MERM_KINGTUNINGALK_HUNGER_HUNGRISH = "King feeling a bit peckish..."
+STRINGS.MERM_KINGTUNINGALK_HUNGER_FULL =  "Have done well. Now go."
+
+
+--Mermthrone_construction
+STRINGS.NAMES.MERMTHRONE_CONSTRUCTION = "DIY Royalty Kit"
+STRINGS.RECIPE_DESC.MERMTHRONE_CONSTRUCTION = "Usher in a new Merm Monarchy."
+
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"Just what is she planning?"}
+STRINGS.CHARACTERS.WARLY.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"You have all the ingredients you need?"}
+STRINGS.CHARACTERS.WATHGRITHR.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"The little beast toils away."}
+STRINGS.CHARACTERS.WAXWELL.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"What is that little creature up to?"}
+STRINGS.CHARACTERS.WEBBER.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"Can we help?"}
+STRINGS.CHARACTERS.WENDY.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"I don't know why you bother."}
+STRINGS.CHARACTERS.WICKERBOTTOM.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"Careful not to get a splinter, dear."}
+STRINGS.CHARACTERS.WILLOW.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"What's all this stuff for?"}
+STRINGS.CHARACTERS.WINONA.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"Whatcha makin' there, kid?"}
+STRINGS.CHARACTERS.WOLFGANG.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"Tiny fish girl seems very busy."}
+STRINGS.CHARACTERS.WOODIE.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"You look like you've got this under control."}
+STRINGS.CHARACTERS.WORMWOOD.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"Making something"}
+STRINGS.CHARACTERS.WORTOX.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"My my, what mischief are you making?"}
+STRINGS.CHARACTERS.WX78.DESCRIBE.MERMTHRONE_CONSTRUCTION = {"THE GREEN ONE IS DOING SOMETHING USELESS"}
+
+
+--Mermthrone
+STRINGS.NAMES.MERMTHRONE = "Royal Tapestry"
+
+STRINGS.CHARACTERS.GENERIC.DESCRIBE.MERMTHRONE = {"Looks fit for a swamp king!"}
+STRINGS.CHARACTERS.WARLY.DESCRIBE.MERMTHRONE = {"Très royal!"}
+STRINGS.CHARACTERS.WATHGRITHR.DESCRIBE.MERMTHRONE = {"Have you chosen a chieftain?"}
+STRINGS.CHARACTERS.WAXWELL.DESCRIBE.MERMTHRONE = {"Not especially impressive for a 'throne'."}
+STRINGS.CHARACTERS.WEBBER.DESCRIBE.MERMTHRONE = {"Hey, can we be the king? We can take turns!"}
+STRINGS.CHARACTERS.WENDY.DESCRIBE.MERMTHRONE = {"The Frogs Who Desired a King..."}
+STRINGS.CHARACTERS.WICKERBOTTOM.DESCRIBE.MERMTHRONE = {"The 'if it fits, it sits' method of choosing a monarch. I'm familiar."}
+STRINGS.CHARACTERS.WILLOW.DESCRIBE.MERMTHRONE = {"I shouldn't burn it... but I want to..."}
+STRINGS.CHARACTERS.WINONA.DESCRIBE.MERMTHRONE = {"Not bad handiwork."}
+STRINGS.CHARACTERS.WOLFGANG.DESCRIBE.MERMTHRONE = {"Big chair looks very inviting."}
+STRINGS.CHARACTERS.WOODIE.DESCRIBE.MERMTHRONE = {"I'm from a Commonwealth, myself."}
+STRINGS.CHARACTERS.WORMWOOD.DESCRIBE.MERMTHRONE = {"Place for big Glub Glub"}
+STRINGS.CHARACTERS.WORTOX.DESCRIBE.MERMTHRONE = {"A mat made for a monarch."}
+STRINGS.CHARACTERS.WX78.DESCRIBE.MERMTHRONE = {"THIS IS WHERE THEY DEPOSIT THEIR ROYALTY"}
 

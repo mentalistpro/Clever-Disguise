@@ -31,9 +31,10 @@ configuration_options =
     name = "mermking_rate",
     label = "Generous King",
     options = {
-              {description = "Normal", data = 0},
-              {description = "Generous", data = 1},
-              {description = "CHARITY!", data = 2}
+              {description = "Normal", data = 1},
+              {description = "Generous", data = 2},
+              {description = "Very Generous", data = 4},
+              {description = "CHARITY!", data = 8}
               },
     default = 0
     },
