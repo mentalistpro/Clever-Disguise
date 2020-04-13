@@ -22,7 +22,7 @@ Assets =
     Asset("ATLAS", "minimap/merm_king_carpet.xml"),
     Asset("ATLAS", "minimap/merm_king_carpet_construction.xml"),
     Asset("ATLAS", "minimap/merm_king_carpet_occupied.xml"),
-    --Asset("ANIM", "anim/player_construct.zip"),   --for prefabs/player_common.lua
+    Asset("ANIM", "anim/player_construct.zip"),   --for prefabs/player_common.lua
     Asset("ATLAS", "images/hud_construction.xml"),
 }
 
@@ -39,11 +39,11 @@ modimport("modtunings.lua") --mod TUNING
 --[[CONTENT]]
 --#1 Global functions
 --#2 AddPrefabPostInit
-    --#2.1-2.2   Fish tags & foodtype
-    --#2.3       Mermkingmanager
-    --#2.4       Mermgurad
-    --#2.5-2.6   Pigmens' NormalRetargetfn
-    --#2.7       Drying rack
+--  #2.1-2   Fish tags & foodtype
+--  #2.3     Mermkingmanager
+--  #2.4     Mermgurad
+--  #2.5-6   Pigmens' NormalRetargetfn
+--  #2.7     Drying rack
 
 -----------------------------------------------------------------
 --#1 Global functions
@@ -56,6 +56,52 @@ function ReplacePrefab(original_inst, name)
     original_inst:Remove()
 
     return replacement_inst
+end
+
+local function OnUpdatePlacedObjectPhysicsRadius(inst, data)
+    local x, y, z = inst.Transform:GetWorldPosition()
+    local mindist = math.huge
+    for i, v in ipairs(TheSim:FindEntities(x, y, z, 2, { "character", "locomotor" }, { "INLIMBO" })) do
+        if v.entity:IsVisible() then
+            local d = v:GetDistanceSqToPoint(x, y, z)
+            d = d > 0 and (v.Physics ~= nil and math.sqrt(d) - v.Physics:GetRadius() or math.sqrt(d)) or 0
+            if d < mindist then
+                if d <= 0 then
+                    mindist = 0
+                    break
+                end
+                mindist = d
+            end
+        end
+    end
+    local radius = math.clamp(mindist, 0, inst.physicsradiusoverride)
+    if radius > 0 then
+        if radius ~= data.radius then
+            data.radius = radius
+            inst.Physics:SetCapsule(radius, 2)
+            inst.Physics:Teleport(x, y, z)
+        end
+        if data.ischaracterpassthrough then
+            data.ischaracterpassthrough = false
+            inst.Physics:CollidesWith(COLLISION.CHARACTERS)
+        end
+        if radius >= inst.physicsradiusoverride then
+            inst._physicstask:Cancel()
+            inst._physicstask = nil
+        end
+    end
+end
+
+function PreventCharacterCollisionsWithPlacedObjects(inst)
+    inst.Physics:ClearCollisionMask()
+    inst.Physics:CollidesWith(COLLISION.ITEMS)
+    --inst.Physics:CollidesWith(COLLISION.GIANTS)
+    if inst._physicstask ~= nil then
+        inst._physicstask:Cancel()
+    end
+    local data = { radius = inst.physicsradiusoverride, ischaracterpassthrough = true }
+    inst._physicstask = inst:DoPeriodicTask(.5, OnUpdatePlacedObjectPhysicsRadius, nil, data)
+    OnUpdatePlacedObjectPhysicsRadius(inst, data)
 end
 
 -----------------------------------------------------------------
