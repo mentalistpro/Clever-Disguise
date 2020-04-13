@@ -30,6 +30,7 @@ AddMinimapAtlas("minimap/merm_king_carpet.xml")
 AddMinimapAtlas("minimap/merm_king_carpet_construction.xml")
 AddMinimapAtlas("minimap/merm_king_carpet_occupied.xml")
 
+modimport("modactions.lua") --mod actions
 modimport("modrecipes.lua") --mod recipes
 modimport("modstrings.lua") --mod strings
 modimport("modtunings.lua") --mod TUNING

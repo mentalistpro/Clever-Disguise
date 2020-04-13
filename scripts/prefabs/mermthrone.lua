@@ -33,12 +33,7 @@ local function ReplacePrefab(original_inst, name)
     return replacement_inst
 end
 
-local function PreventCharacterCollisionsWithPlacedObjects(inst)
-    inst.Physics:ClearCollisionMask()
-    inst.Physics:CollidesWith(COLLISION.ITEMS)
-end
-
-local function OnConstructed(inst, doer)
+--[[local function OnConstructed(inst, doer)
     local concluded = true
     for i, v in ipairs(CONSTRUCTION_PLANS[inst.prefab] or {}) do
         if inst.components.constructionsite:GetMaterialCount(v.type) < v.amount then
@@ -52,7 +47,7 @@ local function OnConstructed(inst, doer)
         GetWorld():PushEvent("onthronebuilt", {throne = new_throne})
         new_throne.SoundEmitter:PlaySound("dontstarve/characters/wurt/merm/throne/build")
     end
-end
+end]]
 
 local function ondeconstruct_throne(inst)
     GetWorld():PushEvent("onthronedestroyed", {throne = inst})
@@ -89,7 +84,8 @@ local function onhit_construction(inst, worker)
 end
 
 local function onbuilt_construction(inst)
-    PreventCharacterCollisionsWithPlacedObjects(inst)
+    inst.Physics:ClearCollisionMask()
+    inst.Physics:CollidesWith(COLLISION.ITEMS)
     inst.SoundEmitter:PlaySound("dontstarve/characters/wurt/merm/throne/place")
 end
 
@@ -103,22 +99,21 @@ for x = -1.5, 1.5, 1 do
 end
 
 local function itemtest(inst, item, slot)
-    local doer = inst.entity:GetParent()
-    return doer
-        and doer.components.constructionbuilder
-        and doer.components.constructionbuilder:GetIngredientForSlot(slot) == item.prefab
+    if not inst:HasTag("burnt") then
+        if item.prefab == "boards" or item.prefab == "rope" then
+            return true
+        end
+    end
 end
 
 local widgetbuttoninfo = {
-    text = "Construct",
+    text = "Build",
     position =  Vector3(0, -94, 0),
     fn = function(inst)
-        if inst.components.container then
-            BufferedAction(inst.components.container.opener, inst, ACTIONS.APPLYCONSTRUCTION):Do()
-        end
+        inst.components.constructer:StartCooking()
     end,
     validfn = function(inst)
-        return inst.components.container and not inst.components.container:IsEmpty()
+        return inst.components.constructer:CanCook()
     end
 }
 
@@ -145,7 +140,7 @@ local function construction_fn()
     inst.entity:AddMiniMapEntity()
     inst.MiniMapEntity:SetIcon("merm_king_carpet_construction.tex")
 
-    MakeObstaclePhysics(inst, 1.5)
+    MakeObstaclePhysics(inst, 0)
 
     inst.AnimState:SetBank("merm_king_carpet_construction")
     inst.AnimState:SetBuild("merm_king_carpet_construction")
@@ -159,16 +154,17 @@ local function construction_fn()
     inst.components.container.widgetslotpos = slotpos
     inst.components.container.widgetanimbank = "ui_construction_4x1"
     inst.components.container.widgetanimbuild = "ui_construction_4x1"
+    inst.components.container.widgetbuttoninfo = widgetbuttoninfo
     inst.components.container.widgetpos = Vector3(300, 0, 0)
     inst.components.container.itemtestfn = itemtest
     inst.components.container.side_align_tip = 50
-    inst.components.container.type = "cooker"
-    inst.components.container.widgetbuttoninfo = widgetbuttoninfo
     inst.components.container.top_align_tip = 50
+    inst.components.container.type = "cooker"
 
-    inst:AddComponent("constructionsite")
+    inst:AddComponent("constructer")
+    --[[inst:AddComponent("constructionsite")
     inst.components.constructionsite:SetConstructionPrefab("construction_container")
-    inst.components.constructionsite:SetOnConstructedFn(OnConstructed)
+    inst.components.constructionsite:SetOnConstructedFn(OnConstructed)]]
     inst:ListenForEvent("onbuilt", onbuilt_construction)
 
     inst:AddComponent("inspectable")
