@@ -5,11 +5,11 @@ local assets =
 
 local prefabs =
 {
+    "tropical_fish",
     "fish",
     "froglegs",
     "kelp",
     "merm_king_splash",
-    "tropical_fish",
 }
 
 local loot =
@@ -32,37 +32,199 @@ local sw_loot =
     "kelp"
 }
 
------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------
 
---//CONTENT//
---#1 Combat
---#2 Hunger
---#3 Trade
---#4 fn()
+--[[CONTENT]]
+--#1 Trade
+--#2 Stats
+--#3 Combat
+--#4 Save/Load
+--#5 fn
 
------------------------------------------------------------------------------------------------------------------------------------
---#1 Combat
+------------------------------------------------------------------------------
+--#1 Trade
+
+local trading_items =
+{
+    { prefabs = { "kelp"  },         min_count = 2, max_count = 4, reset = false, add_filler = false, },
+    { prefabs = { "kelp"  },         min_count = 2, max_count = 3, reset = false, add_filler = false, },
+    { prefabs = { "seeds" },         min_count = 4, max_count = 6, reset = false, add_filler = false, },
+    { prefabs = { "spoiled_food"  }, min_count = 2, max_count = 4, reset = false, add_filler = false, },
+    { prefabs = { "tentaclespots" }, min_count = 1, max_count = 1, reset = false, add_filler = true,  },
+
+    {
+      prefabs = { "trinket_12", "trinket_3", "trinket_25", "trinket_17", "trinket_4" },
+      min_count = 1, max_count = 1, reset = false, add_filler = true,
+    },
+
+    {
+        prefabs = { "durian_seeds", "pepper_seeds", "eggplant_seeds", "pumpkin_seeds", "onion_seeds", "garlic_seeds"  },
+        min_count = 1, max_count = 2, reset = false, add_filler = true,
+    },
+}
+
+local trading_filler = { "seeds", "kelp", "seeds", "spoiled_food", "seeds", "seeds"}
+
+local function ShouldAcceptItem(inst, item, giver)
+    if giver:HasTag("merm") then
+        local can_eat = (item.components.edible and inst.components.eater:CanEat(item))
+                    and (inst.components.hunger and inst.components.hunger:GetPercent() < 1)
+        return can_eat or item:HasTag("fish")
+    end
+    return false
+end
+
+local function launchitem(item, angle)
+    local speed = math.random() * 4 + 2
+    angle = (angle + math.random() * 60 - 30) * DEGREES
+    item.Physics:SetVel(speed * math.cos(angle), math.random() * 2 + 8, speed * math.sin(angle))
+end
+
+local function TradeItem(inst)
+    local item = inst.itemtotrade
+    local giver = inst.tradegiver
+    local x, y, z = inst.Transform:GetWorldPosition()
+    y = 5.5
+
+    local angle
+    if giver and giver:IsValid() then
+        angle = 180 - giver:GetAngleToPoint(x, 0, z)
+    else
+        local down = TheCamera:GetDownVec()
+        angle = math.atan2(down.z, down.x) / DEGREES
+        giver = nil
+    end
+
+    local selected_index = math.random(1, #inst.trading_items)
+    local selected_item = inst.trading_items[selected_index]
+    local reward_count = math.random(selected_item.min_count, selected_item.max_count)
+    local filler_min = 2
+    local filler_max = 4
+
+    for k = 1, reward_count do
+        local reward_item = SpawnPrefab(selected_item.prefabs[math.random(1, #selected_item.prefabs)])
+        reward_item.Transform:SetPosition(x, y, z)
+        launchitem(reward_item, angle)
+    end
+
+    if selected_item.add_filler then
+        for i=filler_min, filler_max do
+            local filler_item = SpawnPrefab(trading_filler[math.random(1, #trading_filler)])
+            filler_item.Transform:SetPosition(x, y, z)
+            launchitem(filler_item, angle)
+        end
+    end
+
+    table.remove(inst.trading_items, selected_index)
+    if #inst.trading_items == 0 or selected_item.reset then
+        inst.trading_items = deepcopy(trading_items)
+    end
+
+    inst.itemtotrade = nil
+    inst.tradegiver  = nil
+
+    item:Remove()
+end
+
+local function OnGetItemFromPlayer(inst, giver, item)
+    if item.components.edible then
+        if inst.components.combat.target and inst.components.combat.target == giver then
+            inst.components.combat:SetTarget(nil)
+        end
+
+        if inst.components.eater:CanEat(item) then
+            inst.sg:GoToState("eat")
+            inst.components.eater:Eat(item)
+        else
+            inst.sg:GoToState("trade")
+            inst.itemtotrade = item
+            inst.tradegiver = giver
+        end
+    end
+end
+
+local function OnRefuseItem(inst, item)
+    inst.sg:GoToState("refuse")
+end
+
+------------------------------------------------------------------------------
+--#2 Stats
+
+local function HungerDelta(inst, data)
+    if data.newpercent then
+        local increase = false
+        if inst.lastpercent_hunger and data.newpercent - inst.lastpercent_hunger > 0 then
+            increase = true
+        end
+        inst.lastpercent_hunger = data.newpercent
+
+        if not inst.components.timer:TimerExists("hungrytalk_cooldown") or data.newpercent == 1 or (increase and not inst.components.timer:TimerExists("hungrytalk_increase_cooldown") ) then
+
+            if data.newpercent <= 0 then
+                inst.components.talker:Say(STRINGS.MERM_KING_TALK_HUNGER_STARVING)
+            elseif data.newpercent < 0.1 then
+                inst.components.talker:Say(STRINGS.MERM_KING_TALK_HUNGER_CLOSE_STARVING)
+            elseif data.newpercent < 0.25 then
+                inst.components.talker:Say(STRINGS.MERM_KING_TALK_HUNGER_VERY_HUNGRY)
+            elseif data.newpercent < 0.5 then
+                inst.components.talker:Say(STRINGS.MERM_KING_TALK_HUNGER_HUNGRY)
+            elseif data.newpercent < 0.95 then
+                inst.components.talker:Say(STRINGS.MERM_KING_TALK_HUNGER_HUNGRISH)
+            else
+                inst.components.talker:Say(STRINGS.MERM_KING_TALK_HUNGER_FULL)
+            end
+
+            local time = Remap(data.newpercent, 1,0, 30,8)
+            if increase then
+                inst.components.timer:StopTimer("hungrytalk_increase_cooldown")
+                inst.components.timer:StartTimer("hungrytalk_increase_cooldown", 10)
+            end
+            inst.components.timer:StopTimer("hungrytalk_cooldown")
+            inst.components.timer:StartTimer("hungrytalk_cooldown", time)
+        end
+
+        if data.newpercent <= 0 then
+            inst.components.health:StopRegen()
+        end
+
+        if data.oldpercent and data.oldpercent == 0 and data.newpercent > data.oldpercent then
+            inst.components.health:StartRegen(TUNING.MERM_KING_HEALTH_REGEN, TUNING.MERM_KING_HEALTH_REGEN_PERIOD)
+        end
+    end
+
+end
 
 local function HealthDelta(inst, data)
-    if data.newpercent and inst.components.combat.target ~= nil then
+    if data.newpercent and inst.components.combat.target then
         if data.newpercent < 0.75 and data.oldpercent > data.newpercent then
+
             if inst.guards_available == nil then
                 inst.guards_available = 4
             end
 
             if inst.guards_available > 0 and (inst.guards == nil or #inst.guards == 0) and not inst.sg:HasStateTag("calling_guards") and not inst.components.health:IsDead() then
                 inst.sg:PushEvent("call_guards")
+
                 if not inst.call_guard_task then
-                    inst.call_guard_task = inst:DoTaskInTime(TUNING.TOTAL_DAY_TIME,
-                        function()
-                            inst.guards_available = 4
-                            inst.call_guard_task = nil
-                        end)
+                    inst.call_guard_task = inst:DoTaskInTime(TUNING.TOTAL_DAY_TIME, function()
+                        inst.guards_available = 4
+                        inst.call_guard_task = nil
+                    end)
                 end
             end
         end
     end
 end
+
+local function OnCreated(inst)
+    inst.components.hunger:SetPercent(0.25)
+    inst.lastpercent_hunger = 0.25
+    inst.guards_available = 4
+    inst.guards = {}
+end
+
+------------------------------------------------------------------------------
+--#3 Combat
 
 local MAX_TARGET_SHARES = 30
 local SHARE_TARGET_DIST = 40
@@ -72,18 +234,28 @@ local function OnAttacked(inst, data)
     if attacker and inst.components.combat:CanTarget(attacker) then
         inst.components.combat:SetTarget(attacker)
         local targetshares = MAX_TARGET_SHARES
-        inst.components.combat:ShareTarget(attacker, SHARE_TARGET_DIST,
-            function(sharer)
-                return sharer:HasTag("merm") and not sharer:HasTag("player")
-            end, targetshares)
+        inst.components.combat:ShareTarget(attacker, SHARE_TARGET_DIST, function(sharer)
+            return sharer:HasTag("merm") and not sharer:HasTag("player")
+        end, targetshares)
     end
 end
 
-local function OnCreated(inst)
-    inst.components.hunger:SetPercent(0.25)
-    inst.lastpercent_hunger = 0.25
-    inst.guards_available = 4
-    inst.guards = {}
+local function KeepTarget(inst, target)
+    if target and not inst:IsNear(target, 75) then
+        return false
+    end
+
+    if inst.guards and #inst.guards > 0 then
+        for i,v in ipairs(inst.guards) do
+            if v.components.combat.target == target then
+                return true
+            end
+        end
+
+        return false
+    end
+
+    return true
 end
 
 local function OnGuardDeath(inst)
@@ -132,7 +304,7 @@ local function CallGuards(inst)
     end
 
     for i = 1, inst.guards_available do
-        local new_merm = SpawnPrefab("merm")
+        local new_merm = SpawnPrefab("mermguard")
         new_merm.Transform:SetPosition(x + merm_positions[i].x, y, z + merm_positions[i].z)
         new_merm.components.combat:SetTarget(inst.components.combat.target)
         new_merm.king = inst
@@ -150,23 +322,6 @@ local function CallGuards(inst)
     inst.guards_available = 0
 end
 
-local function KeepTarget(inst, target)
-    if target and not inst:IsNear(target, 75) then
-        return false
-    end
-
-    if inst.guards and #inst.guards > 0 then
-        for i,v in ipairs(inst.guards) do
-            if v.components.combat.target == target then
-                return true
-            end
-        end
-        return false
-    end
-
-    return true
-end
-
 local function ReturnMerms(inst)
     if inst.guards == nil then
         inst.guards = {}
@@ -176,6 +331,7 @@ local function ReturnMerms(inst)
         if v.components.combat.target ~= nil then
             v.components.combat:GiveUp()
         end
+
         v.return_to_king = true
     end
 end
@@ -184,159 +340,8 @@ local function OnGiveUpTarget(inst, data)
     ReturnMerms(inst)
 end
 
------------------------------------------------------------------------------------------------------------------------------------
---#2 Hunger
-
-local function HungerDelta(inst, data)
-    if data.newpercent then
-        local increase = false
-        if inst.lastpercent_hunger and data.newpercent - inst.lastpercent_hunger > 0 then
-            increase = true
-        end
-        inst.lastpercent_hunger = data.newpercent
-
-        if not inst.components.timer:TimerExists("hungrytalk_cooldown") or data.newpercent == 1 or (increase and not inst.components.timer:TimerExists("hungrytalk_increase_cooldown") ) then
-            if data.newpercent <= 0 then
-                inst.components.talker:Say(STRINGS.MERM_KING_TALK_HUNGER_STARVING)
-            elseif data.newpercent < 0.1 then
-                inst.components.talker:Say(STRINGS.MERM_KING_TALK_HUNGER_CLOSE_STARVING)
-            elseif data.newpercent < 0.25 then
-                inst.components.talker:Say(STRINGS.MERM_KING_TALK_HUNGER_VERY_HUNGRY)
-            elseif data.newpercent < 0.5 then
-                inst.components.talker:Say(STRINGS.MERM_KING_TALK_HUNGER_HUNGRY)
-            elseif data.newpercent < 0.95 then
-                inst.components.talker:Say(STRINGS.MERM_KING_TALK_HUNGER_HUNGRISH)
-            else
-                inst.components.talker:Say(STRINGS.MERM_KING_TALK_HUNGER_FULL)
-            end
-
-            local time = Remap(data.newpercent, 1,0, 30,8)
-            if increase then
-                inst.components.timer:StopTimer("hungrytalk_increase_cooldown")
-                inst.components.timer:StartTimer("hungrytalk_increase_cooldown", 10)
-            end
-            inst.components.timer:StopTimer("hungrytalk_cooldown")
-            inst.components.timer:StartTimer("hungrytalk_cooldown", time)
-        end
-
-        if data.newpercent <= 0 then
-            inst.components.health:StopRegen()
-        end
-
-        if data.oldpercent and data.oldpercent == 0 and data.newpercent > data.oldpercent then
-            inst.components.health:StartRegen(TUNING.MERM_KING_HEALTH_REGEN, TUNING.MERM_KING_HEALTH_REGEN_PERIOD)
-        end
-    end
-
-end
-
------------------------------------------------------------------------------------------------------------------------------------
---#3 Trade
-
-local trading_items =
-{
-    { prefabs = { "kelp"  },         min_count = 2, max_count = 4, reset = false, add_filler = false, },
-    { prefabs = { "kelp"  },         min_count = 2, max_count = 3, reset = false, add_filler = false, },
-    { prefabs = { "seeds" },         min_count = 4, max_count = 6, reset = false, add_filler = false, },
-    { prefabs = { "spoiled_food"  }, min_count = 2, max_count = 4, reset = false, add_filler = false, },
-    { prefabs = { "tentaclespots" }, min_count = 1, max_count = 1, reset = false, add_filler = true,  },
-
-    {
-      prefabs = { "trinket_12", "trinket_3", "trinket_25", "trinket_17", "trinket_4" },
-      min_count = 1, max_count = 1, reset = false, add_filler = true,
-    },
-
-    {
-        prefabs = { "durian_seeds", "pepper_seeds", "eggplant_seeds", "pumpkin_seeds", "onion_seeds", "garlic_seeds"  },
-        min_count = 1, max_count = 2, reset = false, add_filler = true,
-    },
-}
-
-local trading_filler = { "seeds", "kelp", "seeds", "spoiled_food", "seeds", "seeds"}
-
-local function ShouldAcceptItem(inst, item, giver)
-    local giver = GetPlayer()
-    if giver:HasTag("merm") then
-        local can_eat = (item.components.edible and inst.components.eater:CanEat(item)) and (inst.components.hunger and inst.components.hunger:GetPercent() < 1)
-        return can_eat or item.prefab == "fish" or item.prefab == "tropical_fish" or item.prefab == "eel"
-    end
-    return false
-end
-
-local function OnGetItemFromPlayer(inst, giver, item)
-    if item.components.edible ~= nil then
-        if inst.components.combat.target and inst.components.combat.target == giver then
-            inst.components.combat:SetTarget(nil)
-        end
-
-        if inst.components.eater:CanEat(item) then
-            inst.sg:GoToState("eat")
-            inst.components.eater:Eat(item)
-        else
-            inst.sg:GoToState("trade")
-            inst.itemtotrade = item
-            inst.tradegiver = giver
-        end
-    end
-end
-
-local function launchitem(item, angle)
-    local speed = math.random() * 4 + 2
-    angle = (angle + math.random() * 60 - 30) * DEGREES
-    item.Physics:SetVel(speed * math.cos(angle), math.random() * 2 + 8, speed * math.sin(angle))
-end
-
-local function TradeItem(inst)
-    local item = inst.itemtotrade
-    local giver = inst.tradegiver
-    local x, y, z = inst.Transform:GetWorldPosition()
-    y = 5.5
-
-    local angle
-    if giver ~= nil and giver:IsValid() then
-        angle = 180 - giver:GetAngleToPoint(x, 0, z)
-    else
-        local down = TheCamera:GetDownVec()
-        angle = math.atan2(down.z, down.x) / DEGREES
-        giver = nil
-    end
-
-    local selected_index = math.random(1, #inst.trading_items)
-    local selected_item = inst.trading_items[selected_index]
-    local reward_count = math.random(selected_item.min_count, selected_item.max_count)
-    local filler_min = 2
-    local filler_max = 4
-
-    for k = 1, reward_count do
-        local reward_item = SpawnPrefab(selected_item.prefabs[math.random(1, #selected_item.prefabs)])
-        reward_item.Transform:SetPosition(x, y, z)
-        launchitem(reward_item, angle)
-    end
-
-    if selected_item.add_filler then
-        for i=filler_min, filler_max do
-            local filler_item = SpawnPrefab(trading_filler[math.random(1, #trading_filler)])
-            filler_item.Transform:SetPosition(x, y, z)
-            launchitem(filler_item, angle)
-        end
-    end
-
-    table.remove(inst.trading_items, selected_index)
-    if #inst.trading_items == 0 or selected_item.reset then
-        inst.trading_items = deepcopy(trading_items)
-    end
-
-    inst.itemtotrade = nil
-    inst.tradegiver  = nil
-    item:Remove()
-end
-
-local function OnRefuseItem(inst, item)
-    inst.sg:GoToState("refuse")
-end
-
------------------------------------------------------------------------------------------------------------------------------------
---#4 fn()
+------------------------------------------------------------------------------
+--#4 Save/Load
 
 local function OnSave(inst, data)
     local ents = {}
@@ -373,6 +378,7 @@ local function OnLoadPostPass(inst, newents, savedata)
                 table.insert(inst.guards, guard)
                 guard.king = inst
                 guard.return_to_king = true
+
                 inst:ListenForEvent("death",  OnGuardDeath, guard)
                 inst:ListenForEvent("onremove", OnGuardRemoved, guard)
                 inst:ListenForEvent("enterlimbo", OnGuardEnterLimbo, guard)
@@ -390,6 +396,9 @@ local function OnLoadPostPass(inst, newents, savedata)
             end)
     end
 end
+
+------------------------------------------------------------------------------
+--#5 fn
 
 local function fn()
     local inst = CreateEntity()
@@ -421,7 +430,6 @@ local function fn()
     inst:ListenForEvent("hungerdelta", function(_, data) HungerDelta(inst, data) end)
     inst:ListenForEvent("healthdelta", function(_, data) HealthDelta(inst, data) end)
     inst:ListenForEvent("oncreated", function() OnCreated(inst) end)
-    inst:ListenForEvent("droppedtarget", OnGiveUpTarget)
     inst:ListenForEvent("giveuptarget", OnGiveUpTarget)
 
     inst.OnGuardDeath = OnGuardDeath
@@ -479,3 +487,4 @@ local function fn()
 end
 
 return Prefab("common/characters/mermking", fn, assets, prefabs)
+
