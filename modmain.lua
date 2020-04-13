@@ -39,11 +39,11 @@ modimport("modtunings.lua") --mod TUNING
 --[[CONTENT]]
 --#1 Global functions
 --#2 AddPrefabPostInit
-    --2.1-2.2   Fish tags & foodtype
-    --2.3       Mermkingmanager
-    --2.4       Mermgurad
-    --2.5-2.6   Pigmens' NormalRetargetfn
-    --2.7       Drying rack
+    --#2.1-2.2   Fish tags & foodtype
+    --#2.3       Mermkingmanager
+    --#2.4       Mermgurad
+    --#2.5-2.6   Pigmens' NormalRetargetfn
+    --#2.7       Drying rack
 
 -----------------------------------------------------------------
 --#1 Global functions
@@ -77,7 +77,8 @@ AddPrefabPostInit("honey", function(inst) inst.components.edible.foodtype = "HON
 AddPrefabPostInit("ice", function(inst) inst.components.edible.foodtype = "ICE" end)
 
 --2.3 Add mermkingmanager in the world
-AddPrefabPostInit("world", function(inst) inst:AddComponent("mermkingmanager") end)
+AddPrefabPostInit("cave", function(inst) inst:AddComponent("mermkingmanager") end)
+AddPrefabPostInit("forest", function(inst) inst:AddComponent("mermkingmanager") end)
 
 --2.4 Spawn mermguard in mermwatchtower
 AddPrefabPostInit("mermwatchtower", function(inst) inst.components.childspawner.childname = "mermguard" end)
@@ -167,3 +168,5 @@ end
 
 AddPrefabPostInit("meatrack", ModDryingRack)
 
+GLOBAL.CHEATS_ENABLED = true
+GLOBAL.require( 'debugkeys' )
