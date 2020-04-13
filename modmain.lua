@@ -37,99 +37,39 @@ modimport("modtunings.lua") --mod TUNING
 -----------------------------------------------------------------
 
 --[[CONTENT]]
---#1 Global functions
---#2 AddPrefabPostInit
---  #2.1-2   Fish tags & foodtype
---  #2.3     Mermkingmanager
---  #2.4     Mermgurad
---  #2.5-6   Pigmens' NormalRetargetfn
---  #2.7     Drying rack
+--#1 AddPrefabPostInit
+--  #1.1-2   Fish tags & foodtype
+--  #1.3     Mermkingmanager
+--  #1.4     Mermgurad
+--  #1.5-6   Pigmens' NormalRetargetfn
+--  #1.7     Drying rack
 
 -----------------------------------------------------------------
---#1 Global functions
-
-function ReplacePrefab(original_inst, name)
-    local x,y,z = original_inst.Transform:GetWorldPosition()
-
-    local replacement_inst = SpawnPrefab(name)
-    replacement_inst.Transform:SetPosition(x,y,z)
-    original_inst:Remove()
-
-    return replacement_inst
-end
-
-local function OnUpdatePlacedObjectPhysicsRadius(inst, data)
-    local x, y, z = inst.Transform:GetWorldPosition()
-    local mindist = math.huge
-    for i, v in ipairs(TheSim:FindEntities(x, y, z, 2, { "character", "locomotor" }, { "INLIMBO" })) do
-        if v.entity:IsVisible() then
-            local d = v:GetDistanceSqToPoint(x, y, z)
-            d = d > 0 and (v.Physics ~= nil and math.sqrt(d) - v.Physics:GetRadius() or math.sqrt(d)) or 0
-            if d < mindist then
-                if d <= 0 then
-                    mindist = 0
-                    break
-                end
-                mindist = d
-            end
-        end
-    end
-    local radius = math.clamp(mindist, 0, inst.physicsradiusoverride)
-    if radius > 0 then
-        if radius ~= data.radius then
-            data.radius = radius
-            inst.Physics:SetCapsule(radius, 2)
-            inst.Physics:Teleport(x, y, z)
-        end
-        if data.ischaracterpassthrough then
-            data.ischaracterpassthrough = false
-            inst.Physics:CollidesWith(COLLISION.CHARACTERS)
-        end
-        if radius >= inst.physicsradiusoverride then
-            inst._physicstask:Cancel()
-            inst._physicstask = nil
-        end
-    end
-end
-
-function PreventCharacterCollisionsWithPlacedObjects(inst)
-    inst.Physics:ClearCollisionMask()
-    inst.Physics:CollidesWith(COLLISION.ITEMS)
-    --inst.Physics:CollidesWith(COLLISION.GIANTS)
-    if inst._physicstask ~= nil then
-        inst._physicstask:Cancel()
-    end
-    local data = { radius = inst.physicsradiusoverride, ischaracterpassthrough = true }
-    inst._physicstask = inst:DoPeriodicTask(.5, OnUpdatePlacedObjectPhysicsRadius, nil, data)
-    OnUpdatePlacedObjectPhysicsRadius(inst, data)
-end
-
------------------------------------------------------------------
---#2 AddPrefabPostInit
+--#1 AddPrefabPostInit
 
 local _G = GLOBAL
 local FindEntity = _G.FindEntity
 local GetPlayer = _G.GetPlayer
 local IsDLCEnabled = _G.IsDLCEnabled
 
---2.1 Add new fish tag
+--1.1 Add new fish tag
 local function ItemIsFish(inst) inst:AddTag("fish") end
 AddPrefabPostInit("eel", ItemIsFish)
 AddPrefabPostInit("fish", ItemIsFish)
 AddPrefabPostInit("tropical_fish", ItemIsFish)
 
---2.2 Add new food categories
+--1.2 Add new food categories
 AddPrefabPostInit("honey", function(inst) inst.components.edible.foodtype = "HONEY" end)
 AddPrefabPostInit("ice", function(inst) inst.components.edible.foodtype = "ICE" end)
 
---2.3 Add mermkingmanager in the world
+--1.3 Add mermkingmanager in the world
 AddPrefabPostInit("cave", function(inst) inst:AddComponent("mermkingmanager") end)
 AddPrefabPostInit("forest", function(inst) inst:AddComponent("mermkingmanager") end)
 
---2.4 Spawn mermguard in mermwatchtower
+--1.4 Spawn mermguard in mermwatchtower
 AddPrefabPostInit("mermwatchtower", function(inst) inst.components.childspawner.childname = "mermguard" end)
 
---2.5 Pigs target merms
+--1.5 Pigs target merms
 local function NormalRetargetfn(inst)
     return FindEntity(inst, TUNING.PIG_TARGET_DIST, function(guy)
         if not guy.LightWatcher or guy.LightWatcher:IsInLight() then
@@ -150,7 +90,7 @@ for k,v in pairs(prefabs) do
     end)
 end
 
---2.6 Royal pigguards target merms
+--1.6 Royal pigguards target merms
 if IsDLCEnabled and IsDLCEnabled(3) then
     local function NormalRetargetFn_royal(inst)
         return FindEntity(inst, TUNING.CITY_PIG_GUARD_TARGET_DIST, function(guy)
@@ -179,7 +119,7 @@ if IsDLCEnabled and IsDLCEnabled(3) then
     end
 end
 
---2.7 Modified drying rack
+--1.7 Modified drying rack
 local function ModDryingRack(inst)
     --//Add drying kelp anim
     local oldonstartdrying = inst.components.dryer.onstartcooking

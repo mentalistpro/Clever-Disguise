@@ -23,6 +23,21 @@ local prefabs =
 ---------------------------------------------------------------------
 --#1 Physics
 
+local function ReplacePrefab(original_inst, name)
+    local x,y,z = original_inst.Transform:GetWorldPosition()
+
+    local replacement_inst = SpawnPrefab(name)
+    replacement_inst.Transform:SetPosition(x,y,z)
+    original_inst:Remove()
+
+    return replacement_inst
+end
+
+local function PreventCharacterCollisionsWithPlacedObjects(inst)
+    inst.Physics:ClearCollisionMask()
+    inst.Physics:CollidesWith(COLLISION.ITEMS)
+end
+
 local function OnConstructed(inst, doer)
     local concluded = true
     for i, v in ipairs(CONSTRUCTION_PLANS[inst.prefab] or {}) do
