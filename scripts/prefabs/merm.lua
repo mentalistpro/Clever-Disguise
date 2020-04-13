@@ -303,7 +303,7 @@ local function RoyalUpgrade(inst)
 
     inst.components.health:SetMaxHealth(TUNING.MERM_HEALTH_KINGBONUS)
     inst.components.combat:SetDefaultDamage(TUNING.MERM_DAMAGE_KINGBONUS)
-    inst.Transform:SetScale(1.05, 1.05, 1.05)
+    --inst.Transform:SetScale(1.05, 1.05, 1.05)
 end
 
 local function RoyalDowngrade(inst)
