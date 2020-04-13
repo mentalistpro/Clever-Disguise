@@ -282,10 +282,11 @@ local function ShouldGoHome(inst)
     end
 
     --one merm should stay outside
-    local home = inst.components.homeseeker and inst.components.homeseeker.home or nil
-    return home == nil
-        or home.components.childspawner == nil
-        or home.components.childspawner:CountChildrenOutside() > 1
+    local home = inst.components.homeseeker and inst.components.homeseeker.home
+    local shouldStay = home
+                    and home.components.childspawner
+                    and home.components.childspawner:CountChildrenOutside() <= 1
+    return not shouldStay
 end
 
 local function IsHomeOnFire(inst)
