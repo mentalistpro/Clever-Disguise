@@ -306,13 +306,11 @@ end
 -----------------------------------------------------------------------------------------------
 --#8 Nodes
 
+local IsDLCEnabled = IsDLCEnabled and (IsDLCEnabled(1) or IsDLCEnabled(2) or IsDLCEnabled(3))
+
 local function SpringCombatMod(amt)
-    if IsDLCEnabled(1) or IsDLCEnabled(2) or IsDLCEnabled(3) then
-        if GetSeasonManager() and GetSeasonManager():IsSpring() then
-            return amt * 1.33
-        else
-            return amt
-        end
+    if IsDLCEnabled and GetSeasonManager() and GetSeasonManager():IsSpring() then
+        return amt * 1.33
     else
         return amt
     end

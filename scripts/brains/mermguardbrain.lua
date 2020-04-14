@@ -33,14 +33,6 @@ local MermBrain = Class(Brain, function(self, inst)
     Brain._ctor(self, inst)
 end)
 
-local function SpringCombatMod(amt)
-    if GetSeasonManager() and GetSeasonManager():IsSpring() then
-        return amt * 1.33
-    else
-        return amt
-    end
-end
-
 ------------------------------------------------------------------------------
 
 --[[CONTENT]]
@@ -236,6 +228,16 @@ end
 
 ------------------------------------------------------------------------------
 --#7 Nodes
+
+local IsDLCEnabled = IsDLCEnabled and (IsDLCEnabled(1) or IsDLCEnabled(2) or IsDLCEnabled(3))
+
+local function SpringCombatMod(amt)
+    if IsDLCEnabled and GetSeasonManager() and GetSeasonManager():IsSpring() then
+        return amt * 1.33
+    else
+        return amt
+    end
+end
 
 function MermBrain:OnStart()
 

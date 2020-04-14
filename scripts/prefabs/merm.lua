@@ -73,8 +73,10 @@ local merm_guard_brain = require "brains/mermguardbrain"
 local MAX_TARGET_SHARES = 5
 local SHARE_TARGET_DIST = 40
 
+local IsDLCEnabled = IsDLCEnabled and (IsDLCEnabled(1) or IsDLCEnabled(2) or IsDLCEnabled(3))
+
 local function SpringCombatMod(amt)
-    if GetSeasonManager() and GetSeasonManager():IsSpring() then
+    if IsDLCEnabled and GetSeasonManager() and GetSeasonManager():IsSpring() then
         return amt * 1.33
     else
         return amt
