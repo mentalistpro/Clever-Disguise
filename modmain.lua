@@ -8,7 +8,7 @@ PrefabFiles =
     "mermsplashes",
     "mermthrone",
     "merm",
-    "onemandband",
+    "onemanband",
 }
 
 Assets =
