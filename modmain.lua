@@ -8,6 +8,7 @@ PrefabFiles =
     "mermsplashes",
     "mermthrone",
     "merm",
+    "onemandband",
 }
 
 Assets =
@@ -157,53 +158,7 @@ local IsDLCEnabled = _G.IsDLCEnabled
         end
     end
 
---1.8 One-man band attracts merms
-    local function band_update(inst)
-        local owner = inst.components.inventoryitem and inst.components.inventoryitem.owner
-        if owner and owner.components.leader then
-            local x,y,z = _G.owner.Transform:GetWorldPosition()
-            local ents = _G.TheSim:FindEntities(x,y,z, 12, nil, {"werepig"}, {"pig", "merm"})
+--1.8 One man band attracts merms
+    --Directly replace prefabs/onemandband.lua
 
-            for k,v in pairs(ents) do
-                if v.components.follower and not v.components.follower.leader
-                    and not owner.components.leader:IsFollower(v) and owner.components.leader.numfollowers < 10 then
-
-                    if v:HasTag("merm") then
-                        if v:HasTag("mermguard") then
-                            if owner:HasTag("merm") and not owner:HasTag("mermdisguise") and TUNING.MERMGUARD_BEFRIENDABLE == 0 then
-                                owner.components.leader:AddFollower(v)
-                            end
-                        else
-                            if owner:HasTag("merm") or (GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager:HasKing()) then
-                                owner.components.leader:AddFollower(v)
-                            end
-                        end
-                    else
-                        owner.components.leader:AddFollower(v)
-                    end
-                end
-            end
-
-            for k,v in pairs(owner.components.leader.followers) do
-                if k.components.follower then
-                    if k:HasTag("pig") then
-                        k.components.follower:AddLoyaltyTime(3)
-
-                    elseif k:HasTag("merm") then
-                        if k:HasTag("mermguard") then
-                            if owner:HasTag("merm") and not owner:HasTag("mermdisguise") and TUNING.MERMGUARD_BEFRIENDABLE == 0 then
-                                k.components.follower:AddLoyaltyTime(3)
-                            end
-                        else
-                            if owner:HasTag("merm") or (GetWorld().components.mermkingmanager and GetWorld().components.mermkingmanager:HasKing()) then
-                                k.components.follower:AddLoyaltyTime(3)
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-
-    AddPrefabPostInit("onemanband", band_update)
 
