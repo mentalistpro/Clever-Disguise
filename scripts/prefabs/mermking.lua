@@ -9,6 +9,7 @@ local prefabs =
     "fish",
     "froglegs",
     "kelp",
+    "seaweed",
     "merm_king_splash",
 }
 
@@ -28,8 +29,8 @@ local sw_loot =
     "tropical_fish",
     "tropical_fish",
     "froglegs",
-    "kelp",
-    "kelp"
+    "seaweed",
+    "seaweed"
 }
 
 ------------------------------------------------------------------------------
@@ -44,10 +45,17 @@ local sw_loot =
 ------------------------------------------------------------------------------
 --#1 Trade
 
+local x
+if SaveGameIndex and SaveGameIndex:IsModeShipwrecked() then
+    x = "seaweed"
+else
+    x = "kelp"
+end
+
 local trading_items =
 {
-    { prefabs = { "kelp"  },         min_count = 2, max_count = 4, reset = false, add_filler = false, },
-    { prefabs = { "kelp"  },         min_count = 2, max_count = 3, reset = false, add_filler = false, },
+    { prefabs = { x },  min_count = 2, max_count = 4, reset = false, add_filler = false, },
+    { prefabs = { x },  min_count = 2, max_count = 3, reset = false, add_filler = false, },
     { prefabs = { "seeds" },         min_count = 4, max_count = 6, reset = false, add_filler = false, },
     { prefabs = { "spoiled_food"  }, min_count = 2, max_count = 4, reset = false, add_filler = false, },
     { prefabs = { "tentaclespots" }, min_count = 1, max_count = 1, reset = false, add_filler = true,  },
@@ -63,7 +71,7 @@ local trading_items =
     },
 }
 
-local trading_filler = { "seeds", "kelp", "seeds", "spoiled_food", "seeds", "seeds"}
+local trading_filler = { "seeds", x, "seeds", "spoiled_food", "seeds", "seeds"}
 
 local function ShouldAcceptItem(inst, item, giver)
     if giver:HasTag("merm") then
@@ -97,21 +105,27 @@ local function TradeItem(inst)
 
     local selected_index = math.random(1, #inst.trading_items)
     local selected_item = inst.trading_items[selected_index]
-    local reward_count = math.random(selected_item.min_count, selected_item.max_count)
+    local reward_count = math.random(selected_item.min_count, selected_item.max_count) * TUNING.MERMKING_EXCHANGERATE
     local filler_min = 2
     local filler_max = 4
 
     for k = 1, reward_count do
         local reward_item = SpawnPrefab(selected_item.prefabs[math.random(1, #selected_item.prefabs)])
-        reward_item.Transform:SetPosition(x, y, z)
-        launchitem(reward_item, angle)
+        if reward_item then
+            print("reward item is given")
+            reward_item.Transform:SetPosition(x, y, z)
+            launchitem(reward_item, angle)
+        end
     end
 
     if selected_item.add_filler then
         for i=filler_min, filler_max do
             local filler_item = SpawnPrefab(trading_filler[math.random(1, #trading_filler)])
-            filler_item.Transform:SetPosition(x, y, z)
-            launchitem(filler_item, angle)
+            if filler_item then
+                print("filler item is given")
+                filler_item.Transform:SetPosition(x, y, z)
+                launchitem(filler_item, angle)
+            end
         end
     end
 
