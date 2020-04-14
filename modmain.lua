@@ -101,8 +101,11 @@ local IsDLCEnabled = _G.IsDLCEnabled
     AddPrefabPostInit("meatrack", ModifiedDryingRack)
 
 --1.4 Add mermkingmanager in the world
-    AddPrefabPostInit("cave", function(inst) inst:AddComponent("mermkingmanager") end)
-    AddPrefabPostInit("forest", function(inst) inst:AddComponent("mermkingmanager") end)
+    AddPrefabPostInit("cave", function(inst) inst:AddComponent("mermkingmanager") end)          --DLC001
+    AddPrefabPostInit("forest", function(inst) inst:AddComponent("mermkingmanager") end)        --DLC001
+    AddPrefabPostInit("shipwrecked", function(inst) inst:AddComponent("mermkingmanager") end)   --DLC002
+    AddPrefabPostInit("volcanolevel", function(inst) inst:AddComponent("mermkingmanager") end)  --DLC002
+    AddPrefabPostInit("porkland", function(inst) inst:AddComponent("mermkingmanager") end)      --DLC003
     --//TODO: Missing SW, HAM prefabs volcano, pig city, sea
 
 --1.5 Spawn mermguard in mermwatchtower
