@@ -140,7 +140,7 @@ local IsDLCEnabled = _G.IsDLCEnabled
                     if guy == GetPlayer() and inst:HasTag("angry_at_player") and guy.components.health
                      and not guy.components.health:IsDead() and inst.components.combat:CanTarget(guy)
                      and inst.components.combat.target ~= GetPlayer() then
-                        inst.sayline(inst, getSpeechType(inst,STRINGS.CITY_PIG_GUARD_TALK_ANGRY_PLAYER))
+                        inst.sayline(inst, _G.getSpeechType(inst,STRINGS.CITY_PIG_GUARD_TALK_ANGRY_PLAYER))
                     end
 
                     return  (guy:HasTag("monster") or guy:HasTag("merm") or (guy == GetPlayer() and inst:HasTag("angry_at_player")) )
